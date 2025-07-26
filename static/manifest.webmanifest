@@ -1,0 +1,23 @@
+{
+  "name": "Flowbite Test",
+  "short_name": "Flowbite Test",
+  "description": "...",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#64748b",
+  "theme_color": "#64748b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }, 
+    {
+      "src": "/maskable_icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
