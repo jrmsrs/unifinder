@@ -7,7 +7,7 @@ const fetchUserProfile = async () => {
 	return {
 		name: 'John Doe',
 		bio: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-		avatarUrl: 'icon.svg',
+		avatarUrl: 'favicon.svg',
 		tags: ['developer', 'frontend', 'svelte']
 	};
 };

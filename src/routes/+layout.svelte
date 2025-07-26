@@ -29,9 +29,9 @@
 	});
 </script>
 
-<!-- 	<h1 class="text-3xl font-bold md:text-4xl">Flowbite Test</h1> -->
+<!-- 	<h1 class="text-3xl font-bold md:text-4xl">UniFinder</h1> -->
 <svelte:head>
-	<title>Flowbite Test</title>
+	<title>UniFinder</title>
 </svelte:head>
 
 <div
@@ -39,9 +39,9 @@
 >
 	<Navbar>
 		<NavBrand href="/">
-			<img src="icon.svg" class="me-3 h-6 sm:h-9" alt="Flowbite Logo" />
+			<img src="favicon.svg" class="me-3 h-6 sm:h-9" alt="UniFinder Logo" />
 			<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
-				>Flowbite</span
+				>UniFinder</span
 			>
 		</NavBrand>
 		<NavHamburger />

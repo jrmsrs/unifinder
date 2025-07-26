@@ -1,6 +1,6 @@
 {
-  "name": "Flowbite Test",
-  "short_name": "Flowbite Test",
+  "name": "UniFinder",
+  "short_name": "UniFinder",
   "description": "...",
   "start_url": "/",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "theme_color": "#64748b",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
