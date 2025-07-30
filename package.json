@@ -48,6 +48,8 @@
 	},
 	"packageManager": "yarn@1.22.22",
 	"dependencies": {
+		"@supabase/ssr": "^0.6.1",
+		"@supabase/supabase-js": "^2.53.0",
 		"lucide-svelte": "^0.525.0"
 	}
 }
