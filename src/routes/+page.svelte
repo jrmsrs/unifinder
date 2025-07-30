@@ -10,7 +10,8 @@
 		Modal,
 		Card,
 		Alert,
-		Badge
+		Badge,
+		Textarea
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
 	let { data } = $props();
@@ -22,6 +23,9 @@
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
+			<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+				Atraso simulado para demonstrar o estado de carregamento.
+			</p>
 			{#await data.streamed.userProfile}
 				<SkeletonExample />
 			{:then profile}
@@ -51,15 +55,32 @@
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Card com Imagem</h5>
 			<div class="mx-auto w-full max-w-md">
-				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-					Esta imagem é carregada com um atraso para demonstrar o estado de carregamento.
-				</p>
+				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">Fica salva em cache.</p>
 
 				<ImageLoader
 					src="https://placehold.co/800x450"
 					alt="Exemplo de imagem com carregamento lento"
 					divClass="aspect-video w-full rounded-lg"
 				></ImageLoader>
+			</div>
+		</Card>
+
+		{#if data.user}
+			<Card class="col-span-1 p-6">
+				(Um card visível só pra usuários autenticados. Usuário: {data.user.email})
+			</Card>
+		{/if}
+
+		<Card class="col-span-1 p-6">
+			<h5 class="mb-4 text-xl font-bold tracking-tight">Teste query tabela objeto</h5>
+			<div class="h-64 [&>]:w-full">
+				{#await data.streamed.objetos}
+					<Textarea class="h-64 w-full" value="Carregando objetos..." readonly />
+				{:then objetos}
+					<Textarea class="h-64 w-full" value={JSON.stringify(objetos, null, 4)} readonly />
+				{:catch error}
+					<Alert color="red" dismissable>Erro: {error.message}</Alert>
+				{/await}
 			</div>
 		</Card>
 	</div>

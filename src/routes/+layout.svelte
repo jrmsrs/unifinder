@@ -2,9 +2,14 @@
 	import '../app.css';
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, DarkMode } from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
+	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import FloatingSpin from '$lib/components/FloatingSpin.svelte';
 
-	let { children } = $props();
+	let { data, children } = $props();
+	let { session, supabase } = $derived(data);
+	// apenas teste
+	let loading = true;
 
 	async function detectSWUpdate() {
 		const registration = await navigator.serviceWorker.ready;
@@ -23,16 +28,23 @@
 	}
 
 	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
 		if ('serviceWorker' in navigator) {
 			detectSWUpdate();
 		}
+		return () => data.subscription.unsubscribe();
 	});
 </script>
 
-<!-- 	<h1 class="text-3xl font-bold md:text-4xl">UniFinder</h1> -->
 <svelte:head>
 	<title>UniFinder</title>
 </svelte:head>
+
+<FloatingSpin {loading} />
 
 <div
 	class="min-h-[100svh] bg-white text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-white"
@@ -52,6 +64,12 @@
 		>
 			<NavLi href="/">Home</NavLi>
 			<NavLi href="/about">About</NavLi>
+			{#if !data.session}
+				<NavLi href="/auth">Login</NavLi>
+			{:else}
+				<NavLi href="/private">Perfil</NavLi>
+				<NavLi href="/auth/logout">Logout</NavLi>
+			{/if}
 			<div class="not-md:w-full">
 				<DarkMode
 					class="flex w-full content-center rounded-sm md:rounded-full [&>*]:mx-auto [&>*]:w-min"

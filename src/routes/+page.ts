@@ -12,9 +12,11 @@ const fetchUserProfile = async () => {
 	};
 };
 
-export const load: PageLoad = () => {
+export const load: PageLoad = ({ data }) => {
 	return {
+		...data,
 		streamed: {
+			...data.streamed,
 			userProfile: fetchUserProfile()
 		}
 	};
