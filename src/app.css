@@ -3,7 +3,6 @@
 @plugin 'flowbite/plugin';
 
 @custom-variant dark (&:where(.dark, .dark *));
-/* @custom-variant dark (&:is(.dark *)); */
 
 @theme {
 	--color-primary-50: #f8fafc;
