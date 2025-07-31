@@ -8,8 +8,6 @@
 
 	let { data, children } = $props();
 	let { session, supabase } = $derived(data);
-	// apenas teste
-	let loading = true;
 
 	async function detectSWUpdate() {
 		const registration = await navigator.serviceWorker.ready;
@@ -44,7 +42,7 @@
 	<title>UniFinder</title>
 </svelte:head>
 
-<FloatingSpin {loading} />
+<FloatingSpin />
 
 <div
 	class="min-h-[100svh] bg-white text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-white"

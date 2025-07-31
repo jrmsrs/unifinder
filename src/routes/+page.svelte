@@ -72,7 +72,7 @@
 		{/if}
 
 		<Card class="col-span-1 p-6">
-			<h5 class="mb-4 text-xl font-bold tracking-tight">Teste query tabela objeto</h5>
+			<h5 class="mb-4 text-xl font-bold tracking-tight">Tabela Objeto query test</h5>
 			<div class="h-64 [&>]:w-full">
 				{#await data.streamed.objetos}
 					<Textarea class="h-64 w-full" value="Carregando objetos..." readonly />
