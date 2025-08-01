@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SkeletonExample from '$lib/components/SkeletonExample.svelte';
+	import Skeleton from '$lib/components/Skeleton.svelte';
 	import ImageLoader from '$lib/components/ImageLoader.svelte';
 	import {
 		Label,
@@ -32,7 +32,7 @@
 				Atraso simulado para demonstrar o estado de carregamento.
 			</p>
 			{#await data.streamed.userProfile}
-				<SkeletonExample />
+				<Skeleton />
 			{:then profile}
 				<div class="flex items-center space-x-4">
 					<ImageLoader

@@ -2,10 +2,10 @@
 	import '../app.css';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import FloatingSpin from '$lib/components/FloatingSpin.svelte';
-	import Header from '$lib/components/Header.svelte';
-	import AppContent from '$lib/components/AppContent.svelte';
-	import MainContainer from '$lib/components/MainContainer.svelte';
+	import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
+	import Header from '$lib/components/template/header/Header.svelte';
+	import AppContent from '$lib/components/template/AppContent.svelte';
+	import MainContainer from '$lib/components/template/MainContainer.svelte';
 
 	let { data, children } = $props();
 	let { session, supabase } = $derived(data);
