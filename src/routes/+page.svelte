@@ -1,6 +1,6 @@
 <script lang="ts">
-	import SkeletonExample from './SkeletonExample.svelte';
-	import ImageLoader from './ImageLoader.svelte';
+	import SkeletonExample from '$lib/components/SkeletonExample.svelte';
+	import ImageLoader from '$lib/components/ImageLoader.svelte';
 	import {
 		Label,
 		Input,
@@ -87,7 +87,7 @@
 	<Button onclick={() => (defaultModal = true)}>Abrir modal</Button>
 
 	<Modal
-		class="w-11/12"
+		class="w-11/12 backdrop:bg-gray-500/50 backdrop:backdrop-blur-md"
 		title="Random Form"
 		form
 		transition={scale}
