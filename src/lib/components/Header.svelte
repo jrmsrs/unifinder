@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NavSeparator from './NavSeparator.svelte';
+	import NavSeparator from './TheNavSep.svelte';
 	import {
 		ArrowRightToBracketOutline,
 		ArrowLeftToBracketOutline,
