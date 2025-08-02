@@ -5,7 +5,7 @@
 
 	let {
 		href,
-		text,
+		children,
 		icon,
 		blue = false,
 		red = false,
@@ -13,8 +13,8 @@
 		class: extraClass = ''
 	}: {
 		href?: string;
-		text?: string;
-		icon?: Component;
+		children?: any;
+		icon?: Component | any[];
 		blue?: boolean;
 		red?: boolean;
 		themeToggle?: boolean;
@@ -61,9 +61,24 @@
     {extraClass}
   "
 	>
-		{@const Icon = icon}
-		<Icon class="me-1 inline h-5 w-5" />
-		{text}
+		<!-- {@const Icon = icon}
+		<Icon class="me-1 inline h-5 w-5" /> -->
+		{#if icon}
+			{#if Array.isArray(icon)}
+				<span class="relative me-1 inline-block h-5 w-5">
+					{#each icon as ic, i}
+						{@const IconComponent = ic}
+						<IconComponent
+							class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0"
+						/>
+					{/each}
+				</span>
+			{:else}
+				{@const Icon = icon}
+				<Icon class="me-1 inline h-5 w-5" />
+			{/if}
+		{/if}
+		<span>{@render children()}</span>
 		<hr class="h-5 w-5 opacity-0 md:hidden" />
 	</NavLi>
 {/if}
