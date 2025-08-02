@@ -2316,6 +2316,11 @@ svelte-eslint-parser@^1.3.0:
     postcss-scss "^4.0.9"
     postcss-selector-parser "^7.0.0"
 
+svelte-lucide@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/svelte-lucide/-/svelte-lucide-2.0.1.tgz#cbdd0c27d3772805f46cc6c5cb038159b0798551"
+  integrity sha512-VjcVYrgTBC9ZyUCIYT0pzFCSzOOBj5zKxQ9UTzq9GmJSjxwq0PPRmdsIl0F38bQ2IhAtuCLs0gkl56Xw8621rQ==
+
 svelte@^5.0.0:
   version "5.36.13"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.36.13.tgz#23b1ad0562158db96715e44d958cbd3192c6f0b3"
