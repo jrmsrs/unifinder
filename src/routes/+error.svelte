@@ -6,7 +6,7 @@
 
 <div class="flex min-h-screen flex-col items-center justify-center p-4 text-center">
 	<h1 class="text-8xl font-black text-primary-600 dark:text-primary-500">{page.status}</h1>
-	<p class="mt-4 mb-8 text-xl text-gray-500 dark:text-gray-400">
+	<p class="mt-4 mb-8 text-xl text-primary-500 dark:text-primary-400">
 		{page.error?.message}
 	</p>
 	<a href="/">

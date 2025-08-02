@@ -19,11 +19,11 @@
 </script>
 
 <header class="sticky top-0 z-10">
-	<Navbar class="bg-white dark:bg-gray-900">
+	<Navbar class="bg-white dark:bg-primary-900">
 		<NavBrand href="/">
 			<img src="favicon.svg" class="me-3 h-6 sm:h-9" alt="UniFinder Logo" />
 			<span
-				class="self-center text-xl font-semibold whitespace-nowrap inline md:hidden lg:inline dark:text-white"
+				class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"
 			>
 				UniFinder
 			</span>
@@ -34,9 +34,7 @@
 			<NavItem href="/objects?tipo=perdidos" icon={[CubesStackedSolid, QuestionCircleOutline]}>
 				Perdidos
 			</NavItem>
-			<NavItem href="/objects?tipo=achados" icon={[HandHelpingIcon, CubeSolid]}>
-				Achados
-			</NavItem>
+			<NavItem href="/objects?tipo=achados" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
 			<NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
 			<NavSeparator />
 			{#if !session}

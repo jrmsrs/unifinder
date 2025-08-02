@@ -28,7 +28,7 @@
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
-			<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+			<p class="mb-2 text-sm text-primary-500 dark:text-primary-400">
 				Atraso simulado para demonstrar o estado de carregamento.
 			</p>
 			{#await data.streamed.userProfile}
@@ -42,7 +42,7 @@
 					/>
 					<div>
 						<p class="text-lg font-semibold">{profile.name}</p>
-						<p class="text-sm text-gray-500 dark:text-gray-400">
+						<p class="text-sm text-primary-500 dark:text-primary-400">
 							{profile.bio + ' ' + profile.bio}
 						</p>
 					</div>
@@ -60,7 +60,7 @@
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Card com Imagem</h5>
 			<div class="mx-auto w-full max-w-md">
-				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">Fica salva em cache.</p>
+				<p class="mb-2 text-sm text-primary-500 dark:text-primary-400">Fica salva em cache.</p>
 
 				<ImageLoader
 					src="https://placehold.co/800x450"
@@ -92,7 +92,7 @@
 	<Button onclick={() => (defaultModal = true)}>Abrir modal</Button>
 
 	<Modal
-		class="w-11/12 backdrop:bg-gray-500/50 backdrop:backdrop-blur-md"
+		class="w-11/12 backdrop:bg-primary-500/50 backdrop:backdrop-blur-md"
 		title="Random Form"
 		form
 		transition={scale}

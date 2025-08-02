@@ -4,13 +4,13 @@
 	let isLoading = $state(true);
 </script>
 
-<div class="relative overflow-hidden bg-gray-200 dark:bg-gray-700 {divClass}">
+<div class="relative overflow-hidden bg-primary-200 dark:bg-primary-700 {divClass}">
 	{#if isLoading}
 		<div
-			class="flex h-full w-full animate-pulse items-center justify-center bg-gray-300 dark:bg-gray-700"
+			class="flex h-full w-full animate-pulse items-center justify-center bg-primary-300 dark:bg-primary-700"
 		>
 			<ImageSolid
-				class="h-1/3 w-1/3 text-gray-400 dark:text-gray-600"
+				class="h-1/3 w-1/3 text-primary-400 dark:text-primary-600"
 				aria-label="Carregando imagem..."
 			/>
 		</div>
