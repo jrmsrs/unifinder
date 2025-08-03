@@ -1,6 +1,5 @@
 <script lang="ts">
-	import ObjectsCarousel from './ObjectsCarousel.svelte';
-
+	import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 	import ImageLoader from '$lib/components/ImageLoader.svelte';
 	import {
@@ -20,12 +19,7 @@
 		Search
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
-	import {
-		SearchOutline,
-		FilterOutline,
-		AngleLeftOutline,
-		AngleRightOutline
-	} from 'flowbite-svelte-icons';
+	import { SearchOutline, FilterOutline } from 'flowbite-svelte-icons';
 	let { data } = $props();
 	let defaultModal = $state(false);
 	let multiSelected = $state<string[]>([]);

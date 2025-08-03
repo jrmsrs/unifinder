@@ -1,8 +1,7 @@
 <script lang="ts">
-  import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
+	import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
 
-	import { Button, Card } from 'flowbite-svelte';
-	import { AngleLeftOutline, AngleRightOutline } from 'flowbite-svelte-icons';
+	import { Card } from 'flowbite-svelte';
 	let { objects } = $props();
 </script>
 
@@ -23,7 +22,13 @@
 		{#each objects as obj, i}
 			<Card class="col-span-1 p-6">Card {i + 1}</Card>
 		{/each}
-		<div class="flex flex-row items-center justify-center rounded-lg bg-primary-300 dark:bg-primary-700">Ver todos</div>
+		<div
+			class="
+				flex flex-row items-center justify-center rounded-lg bg-primary-300 dark:bg-primary-700
+			"
+		>
+			Ver todos
+		</div>
 	</div>
 	<div class="absolute top-1/2 left-0 -ml-7 -translate-y-1/2 bg-transparent">
 		<ObjectsCarouselScroll />
