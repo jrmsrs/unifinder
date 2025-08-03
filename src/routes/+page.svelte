@@ -11,15 +11,112 @@
 		Card,
 		Alert,
 		Badge,
-		Textarea
+		Textarea,
+		Heading,
+		P,
+		Hr,
+		Search
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
+	import {
+		SearchOutline,
+		FilterOutline,
+		AngleLeftOutline,
+		AngleRightOutline
+	} from 'flowbite-svelte-icons';
 	let { data } = $props();
 	let defaultModal = $state(false);
 	let multiSelected = $state<string[]>([]);
+	const cards = new Array(6);
 </script>
 
-<div class="m-auto flex flex-col items-center justify-center p-4">
+<div
+	class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64"
+>
+	<Heading tag="h4">Objetos em acompanhamento</Heading>
+	<P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
+	<div class="flex">
+		<div class="relative">
+			<Button
+				color="secondary"
+				class="rounded-e-none border border-e-0 border-primary-700 px-4 whitespace-nowrap"
+			>
+				<FilterOutline class="my-0.5 h-6 w-6" />
+			</Button>
+		</div>
+		<Search
+			placeholder="Buscar objetos..."
+			size="lg"
+			class="[&>div]:hidden [&>input]:rounded-none [&>input]:ps-4"
+		/>
+		<Button class="rounded-s-none px-4!"><SearchOutline class="h-6 w-6" /></Button>
+	</div>
+	<Hr class="my-0!">ou</Hr>
+	<Button>Cadastrar objeto perdido</Button>
+	<Hr />
+	<P>Encontrou algum objeto na UNIRIO?</P>
+	<Button>Cadastrar objeto achado</Button>
+	<Hr />
+	<Heading tag="h4">Últimos objetos achados</Heading>
+	<div class="relative w-full">
+		<!-- centralize first and last cards -->
+		<div
+			id="card-container"
+			class="
+				no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
+				first:px-[calc(50vw-10rem)]
+				sm:first:px-[calc(640px-50vw-10rem)]
+				md:first:px-[calc(768px-50vw-10rem)]
+				lg:first:px-[calc(1024px-50vw-10rem)]
+				xl:first:px-[calc(1280px-50vw-10rem)]
+				2xl:first:px-[calc(1536px-50vw-10rem)]
+				[&>*]:min-h-64 [&>*]:min-w-64
+			"
+		>
+			{#each cards as c, i}
+				<Card class="col-span-1 p-6">Card {i + 1}</Card>
+			{/each}
+			<div class="flex flex-row items-center justify-center rounded-lg bg-primary-500">
+				Ver todos
+			</div>
+		</div>
+		<div class="absolute top-1/2 left-0 -ml-7 -translate-y-1/2 bg-transparent">
+			<Button
+				id="scroll-left"
+				class="h-64 w-20 rounded-none bg-transparent! ps-0 pe-12"
+				onclick={() => {
+					const container = document.getElementById('card-container');
+					if (container) {
+						container.scrollBy({
+							left: -256 - 16,
+							behavior: 'smooth'
+						});
+					}
+				}}
+			>
+				<AngleLeftOutline class="my-0.5 h-6 w-6" />
+			</Button>
+		</div>
+		<div class="absolute top-1/2 right-0 -mr-7 -translate-y-1/2 bg-transparent">
+			<Button
+				id="scroll-right"
+				class="h-64 w-20 rounded-none bg-transparent! pe-0 ps-12"
+				onclick={() => {
+					const container = document.getElementById('card-container');
+					if (container) {
+						container.scrollBy({
+							left: 256 + 16,
+							behavior: 'smooth'
+						});
+					}
+				}}
+			>
+				<AngleRightOutline class="my-0.5 h-6 w-6" />
+			</Button>
+		</div>
+	</div>
+	<Hr />
+	<Heading tag="h4">Últimos objetos perdidos</Heading>
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
