@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DevInfo from '$lib/components/dev/DevInfo.svelte';
 	import { Label, Input, Button, Heading, Hr, P, A } from 'flowbite-svelte';
 	import { GoogleSolid } from 'flowbite-svelte-icons';
 
@@ -105,11 +106,17 @@
 			>
 		</div>
 	{/if}
-
-	tab={data.tab}<br />
-	* todo:<br />
-	&nbsp;&nbsp;- (x) implementar autenticação<br />
-	&nbsp;&nbsp;- (x) separar login e sign up em abas<br />
-	&nbsp;&nbsp;- ( ) campos de perfil em signup<br />
-	&nbsp;&nbsp;- ( ) adicionar validação de formulário<br /><br />
 </div>
+
+<DevInfo
+	content={`\
+# debug
+  - tab=${data.tab}
+# todo (tela autenticação)
+  - (x) layout autenticação
+  - (x) separar login e sign up em abas
+  - ( ) campos de perfil em signup
+  - ( ) validação de formulário
+  - (x) integração com autenticador
+  - ( ) integração com backend`}
+/>

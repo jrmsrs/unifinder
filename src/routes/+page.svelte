@@ -19,6 +19,7 @@
 		Hr
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
+	import DevInfo from '$lib/components/dev/DevInfo.svelte';
 	let { data } = $props();
 	let defaultModal = $state(false);
 	let multiSelected = $state<string[]>([]);
@@ -148,14 +149,14 @@
 		{/snippet}
 	</Modal>
 </div>
-<div
-	class="fixed right-0 bottom-0 left-0 z-50 flex w-96 items-center justify-center bg-primary-500 p-4 text-white"
->
-	* todo:<br />
-	&nbsp;&nbsp;- (x) layout objetos<br />
-	&nbsp;&nbsp;- (x) layout barra pesquisa filtrada<br />
-	&nbsp;&nbsp;- ( ) layout modal pesquisa filtrada<br />
-	&nbsp;&nbsp;- ( ) layout cards ultimos achados/perdidos<br />
-	&nbsp;&nbsp;- ( ) mocks<br />
-	&nbsp;&nbsp;- ( ) integração<br /><br />
-</div>
+
+<DevInfo
+	content={`\
+# todo (tela inicial):
+  - (x) layout objetos
+  - (x) layout barra pesquisa filtrada
+  - ( ) layout modal pesquisa filtrada
+  - ( ) layout cards ultimos achados/perdidos
+  - ( ) mocks
+  - ( ) integração`}
+/>
