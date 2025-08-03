@@ -20,11 +20,6 @@
 </script>
 
 <div class="m-auto flex flex-col items-center justify-center p-4">
-	* todo:<br />
-	- 1) objetos em acompanhamento<br />
-	- 2) barra pesquisa filtrada<br />
-	- 3) cards ultimos achados/perdidos<br /><br />
-
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
@@ -132,3 +127,7 @@
 		{/snippet}
 	</Modal>
 </div>
+* todo:<br />
+&nbsp;&nbsp;- ( ) objetos em acompanhamento<br />
+&nbsp;&nbsp;- ( ) barra pesquisa filtrada<br />
+&nbsp;&nbsp;- ( ) cards ultimos achados/perdidos<br /><br />
