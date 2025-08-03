@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FilteredSearch from '$lib/components/FilteredSearch.svelte';
 	import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
 	import Skeleton from '$lib/components/Skeleton.svelte';
 	import ImageLoader from '$lib/components/ImageLoader.svelte';
@@ -15,11 +16,9 @@
 		Textarea,
 		Heading,
 		P,
-		Hr,
-		Search
+		Hr
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
-	import { SearchOutline, FilterOutline } from 'flowbite-svelte-icons';
 	let { data } = $props();
 	let defaultModal = $state(false);
 	let multiSelected = $state<string[]>([]);
@@ -30,22 +29,7 @@
 >
 	<Heading tag="h4">Objetos em acompanhamento</Heading>
 	<P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
-	<div class="flex">
-		<div class="relative">
-			<Button
-				color="secondary"
-				class="rounded-e-none border border-e-0 border-primary-700 px-4 whitespace-nowrap"
-			>
-				<FilterOutline class="my-0.5 h-6 w-6" />
-			</Button>
-		</div>
-		<Search
-			placeholder="Buscar objetos..."
-			size="lg"
-			class="[&>div]:hidden [&>input]:rounded-none [&>input]:ps-4"
-		/>
-		<Button class="rounded-s-none px-4!"><SearchOutline class="h-6 w-6" /></Button>
-	</div>
+	<FilteredSearch></FilteredSearch>
 	<Hr class="my-0!">ou</Hr>
 	<Button>Cadastrar objeto perdido</Button>
 	<Hr />
