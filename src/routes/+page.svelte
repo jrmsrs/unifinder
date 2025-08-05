@@ -38,10 +38,10 @@
 	<Button>Cadastrar objeto achado</Button>
 	<Hr />
 	<Heading tag="h4">Últimos objetos achados</Heading>
-	<ObjectsCarousel objects={new Array(5) || data.streamed.objetos}></ObjectsCarousel>
+	<ObjectsCarousel id="found-objects-carousel" objects={new Array(5) || data.streamed.objetos} />
 	<Hr />
 	<Heading tag="h4">Últimos objetos perdidos</Heading>
-	<ObjectsCarousel objects={new Array(5) || data.streamed.objetos}></ObjectsCarousel>
+	<ObjectsCarousel id="lost-objects-carousel" objects={new Array(5) || data.streamed.objetos} />
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>

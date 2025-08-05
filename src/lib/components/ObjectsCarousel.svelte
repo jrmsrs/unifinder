@@ -2,12 +2,12 @@
 	import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
 
 	import { Card } from 'flowbite-svelte';
-	let { objects } = $props();
+	let { objects, id } = $props();
 </script>
 
 <div class="relative w-full">
 	<div
-		id="card-container"
+		{id}
 		class="
 				no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
 				first:px-[calc(50vw-10rem)]
@@ -31,9 +31,9 @@
 		</div>
 	</div>
 	<div class="absolute top-1/2 left-0 -ml-7 -translate-y-1/2 bg-transparent">
-		<ObjectsCarouselScroll />
+		<ObjectsCarouselScroll carouselId={id} />
 	</div>
 	<div class="absolute top-1/2 right-0 -mr-7 -translate-y-1/2 bg-transparent">
-		<ObjectsCarouselScroll right />
+		<ObjectsCarouselScroll carouselId={id} right />
 	</div>
 </div>
