@@ -1,8 +1,9 @@
 <script lang="ts">
+	import ImageLoader from './ImageLoader.svelte';
 	import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
 
-	import { Card } from 'flowbite-svelte';
-	let { objects, id } = $props();
+	import { Badge, Card, Heading, P } from 'flowbite-svelte';
+	let { objects, id }: { objects: Objeto[]; id: string } = $props();
 </script>
 
 <div class="relative w-full">
@@ -20,7 +21,21 @@
 			"
 	>
 		{#each objects as obj, i}
-			<Card class="col-span-1 p-6">Card {i + 1}</Card>
+			<Card class="relative col-span-1 p-6">
+				<ImageLoader src={obj.imagem} alt={obj.titulo} divClass="min-w-48 max-w-full h-48" />
+				<Heading tag="h5" class="mb-2 text-xl font-bold tracking-tight">{obj.titulo}</Heading>
+				<div class="flex">
+					<Badge
+						color={obj.tipo === 'achado' ? 'green' : 'yellow'}
+						class="absolute top-8 left-1/2 -translate-x-1/2"
+					>
+						{obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
+					</Badge>
+					<P class="mb-2 text-sm text-primary-500 dark:text-primary-400">
+						{obj.local}
+					</P>
+				</div>
+			</Card>
 		{/each}
 		<div
 			class="

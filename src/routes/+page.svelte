@@ -13,10 +13,9 @@
 		Card,
 		Alert,
 		Badge,
-		Textarea,
 		Heading,
 		P,
-		Hr
+		Hr,
 	} from 'flowbite-svelte';
 	import { scale } from 'svelte/transition';
 	import DevInfo from '$lib/components/dev/DevInfo.svelte';
@@ -29,6 +28,19 @@
 	class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64"
 >
 	<Heading tag="h4">Objetos em acompanhamento</Heading>
+	{#await data.streamed.tutelados}
+		<Skeleton />
+	{:then tutelados}
+		{#if tutelados.length > 0}
+			<ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
+		{:else}
+			<p class="text-center text-primary-500 dark:text-primary-400">
+				Nenhum objeto em acompanhamento.
+			</p>
+		{/if}
+	{:catch error}
+		<Alert color="red" dismissable>Erro: {error.message}</Alert>
+	{/await}
 	<P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
 	<FilteredSearch></FilteredSearch>
 	<Hr class="my-0!">ou</Hr>
@@ -38,10 +50,34 @@
 	<Button>Cadastrar objeto achado</Button>
 	<Hr />
 	<Heading tag="h4">Últimos objetos achados</Heading>
-	<ObjectsCarousel id="found-objects-carousel" objects={new Array(5) || data.streamed.objetos} />
+	{#await data.streamed.latestObjetos}
+		<Skeleton />
+	{:then latestObjetos}
+		{#if latestObjetos.achados.length > 0}
+			<ObjectsCarousel id="found-objects-carousel" objects={latestObjetos.achados} />
+		{:else}
+			<p class="text-center text-primary-500 dark:text-primary-400">
+				Nenhum objeto achado está disponível.
+			</p>
+		{/if}
+	{:catch error}
+		<Alert color="red" dismissable>Erro: {error.message}</Alert>
+	{/await}
 	<Hr />
 	<Heading tag="h4">Últimos objetos perdidos</Heading>
-	<ObjectsCarousel id="lost-objects-carousel" objects={new Array(5) || data.streamed.objetos} />
+	{#await data.streamed.latestObjetos}
+		<Skeleton />
+	{:then latestObjetos}
+		{#if latestObjetos.perdidos.length > 0}
+			<ObjectsCarousel id="lost-objects-carousel" objects={latestObjetos.perdidos} />
+		{:else}
+			<p class="text-center text-primary-500 dark:text-primary-400">
+				Nenhum objeto perdido está disponível.
+			</p>
+		{/if}
+	{:catch error}
+		<Alert color="red" dismissable>Erro: {error.message}</Alert>
+	{/await}
 	<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<Card class="col-span-1 p-6">
 			<h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
@@ -92,19 +128,6 @@
 				(Um card visível só pra usuários autenticados. Usuário: {data.user.email})
 			</Card>
 		{/if}
-
-		<Card class="col-span-1 p-6">
-			<h5 class="mb-4 text-xl font-bold tracking-tight">Tabela Objeto query test</h5>
-			<div class="h-64 [&>]:w-full">
-				{#await data.streamed.objetos}
-					<Textarea class="h-64 w-full" value="Carregando objetos..." readonly />
-				{:then objetos}
-					<Textarea class="h-64 w-full" value={JSON.stringify(objetos, null, 4)} readonly />
-				{:catch error}
-					<Alert color="red" dismissable>Erro: {error.message}</Alert>
-				{/await}
-			</div>
-		</Card>
 	</div>
 	<Button onclick={() => (defaultModal = true)}>Abrir modal</Button>
 
@@ -156,7 +179,7 @@
   - (x) layout objetos
   - (x) layout barra pesquisa filtrada
   - ( ) layout modal pesquisa filtrada
-  - ( ) layout cards ultimos achados/perdidos
-  - ( ) mocks
+  - (x) layout cards ultimos achados/perdidos
+  - (-) mocks
   - ( ) integração`}
 />
