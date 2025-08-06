@@ -4,10 +4,11 @@
 	import { NavUl } from 'flowbite-svelte';
 
 	let activeUrl = $derived(page.url.pathname);
-	let { children } = $props();
+	let { children, id = undefined } = $props();
 </script>
 
 <NavUl
+	{id}
 	{activeUrl}
 	transition={scale}
 	transitionParams={{ start: 0.8, duration: 200 }}

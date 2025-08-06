@@ -10,10 +10,20 @@
 		CubesStackedSolid
 	} from 'flowbite-svelte-icons';
 	import { Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
+	import HandHelpingIcon from 'lucide-svelte/icons/hand-helping';
+	import { navigating } from '$app/state';
+
 	import NavSeparator from './TheNavSep.svelte';
 	import NavItem from './TheNavItem.svelte';
 	import NavList from './TheNavList.svelte';
-	import HandHelpingIcon from 'lucide-svelte/icons/hand-helping';
+
+	$effect(() => {
+		if (!navigating.complete) {
+			const hamburger = document.getElementById('the-nav-hamburger');
+			const navlist = document.getElementById('the-nav-list');
+			if (hamburger && navlist && !navlist.classList.contains('hidden')) hamburger.click();
+		}
+	});
 
 	let { session } = $props();
 </script>
@@ -28,8 +38,8 @@
 				UniFinder
 			</span>
 		</NavBrand>
-		<NavHamburger />
-		<NavList>
+		<NavHamburger id="the-nav-hamburger" />
+		<NavList id="the-nav-list">
 			<NavItem href="/" icon={HomeSolid}>Início</NavItem>
 			<NavItem href="/objects?tipo=perdidos" icon={[CubesStackedSolid, QuestionCircleOutline]}>
 				Perdidos
