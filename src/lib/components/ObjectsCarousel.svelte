@@ -26,13 +26,16 @@
 				<Heading tag="h5" class="mb-2 text-xl font-bold tracking-tight">{obj.titulo}</Heading>
 				<div class="flex">
 					<Badge
-						color={obj.tipo === 'achado' ? 'green' : 'yellow'}
+						color={obj.tipo === 'achado' ? 'green' : 'red'}
 						class="absolute top-8 left-1/2 -translate-x-1/2"
 					>
 						{obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
 					</Badge>
 					<P class="mb-2 text-sm text-primary-500 dark:text-primary-400">
+						<span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
 						{obj.local}
+						<span class="italic">por</span>
+						{obj.usuario.username}
 					</P>
 				</div>
 			</Card>
