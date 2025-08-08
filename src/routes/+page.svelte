@@ -1,14 +1,10 @@
 <script lang="ts">
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
-  import ImageLoader from '$lib/components/ImageLoader.svelte';
   import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
-  import Skeleton from '$lib/components/Skeleton.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import {
     Alert,
-    Badge,
     Button,
-    Card,
     Heading,
     Helper,
     Hr,
@@ -30,7 +26,7 @@
 >
   <Heading tag="h4">Objetos em acompanhamento</Heading>
   {#await data.streamed.tutelados}
-    <Skeleton />
+    <ObjectsCarousel id="found-objects-carousel" objects={null} />
   {:then tutelados}
     {#if tutelados.length > 0}
       <ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
@@ -52,7 +48,7 @@
   <Hr />
   <Heading tag="h4">Últimos objetos achados</Heading>
   {#await data.streamed.latestObjetos}
-    <Skeleton />
+    <ObjectsCarousel id="found-objects-carousel" objects={null} />
   {:then latestObjetos}
     {#if latestObjetos.achados.length > 0}
       <ObjectsCarousel id="found-objects-carousel" objects={latestObjetos.achados} />
@@ -67,7 +63,7 @@
   <Hr />
   <Heading tag="h4">Últimos objetos perdidos</Heading>
   {#await data.streamed.latestObjetos}
-    <Skeleton />
+    <ObjectsCarousel id="found-objects-carousel" objects={null} />
   {:then latestObjetos}
     {#if latestObjetos.perdidos.length > 0}
       <ObjectsCarousel id="lost-objects-carousel" objects={latestObjetos.perdidos} />
@@ -79,58 +75,8 @@
   {:catch error}
     <Alert color="red" dismissable>Erro: {error.message}</Alert>
   {/await}
-  <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <Card class="col-span-1 p-6">
-      <h5 class="mb-4 text-xl font-bold tracking-tight">Exemplo de Card</h5>
-      <p class="mb-2 text-sm text-primary-500 dark:text-primary-400">
-        Atraso simulado para demonstrar o estado de carregamento.
-      </p>
-      {#await data.streamed.userProfile}
-        <Skeleton />
-      {:then profile}
-        <div class="flex items-center space-x-4">
-          <ImageLoader
-            src={profile.avatarUrl}
-            alt="Avatar de {profile.name}"
-            divClass="min-w-12 max-w-full h-12 rounded-full"
-          />
-          <div>
-            <p class="text-lg font-semibold">{profile.name}</p>
-            <p class="text-sm text-primary-500 dark:text-primary-400">
-              {profile.bio + ' ' + profile.bio}
-            </p>
-          </div>
-        </div>
-        <div class="mt-4">
-          {#each profile.tags as tag}
-            <Badge class="me-2 mb-2" color="secondary">{tag}</Badge>
-          {/each}
-        </div>
-      {:catch error}
-        <Alert color="red" dismissable>Erro: {error.message}</Alert>
-      {/await}
-    </Card>
 
-    <Card class="col-span-1 p-6">
-      <h5 class="mb-4 text-xl font-bold tracking-tight">Card com Imagem</h5>
-      <div class="mx-auto w-full max-w-md">
-        <p class="mb-2 text-sm text-primary-500 dark:text-primary-400">Fica salva em cache.</p>
-
-        <ImageLoader
-          src="https://placehold.co/800x450"
-          alt="Exemplo de imagem com carregamento lento"
-          divClass="aspect-video w-full rounded-lg"
-        ></ImageLoader>
-      </div>
-    </Card>
-
-    {#if data.user}
-      <Card class="col-span-1 p-6">
-        (Um card visível só pra usuários autenticados. Usuário: {data.user.email})
-      </Card>
-    {/if}
-  </div>
-  <Button onclick={() => (defaultModal = true)}>Abrir modal</Button>
+  <Button onclick={() => (defaultModal = true)}>Modal teste</Button>
 
   <Modal
     class="w-11/12 backdrop:bg-primary-500/50 backdrop:backdrop-blur-md"

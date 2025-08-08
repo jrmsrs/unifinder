@@ -52,10 +52,10 @@
     <NavHamburger id="the-nav-hamburger" />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
-      <NavItem href="/objects?tipo=perdidos" icon={[CubesStackedSolid, QuestionCircleOutline]}>
+      <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>
         Perdidos
       </NavItem>
-      <NavItem href="/objects?tipo=achados" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
+      <NavItem href="/objetos?tipo=achado" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
       <NavSeparator />
       {#if !session}

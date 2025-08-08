@@ -2,8 +2,9 @@
   import { Badge, Card, Heading, P } from 'flowbite-svelte';
   import ImageLoader from './ImageLoader.svelte';
   import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
+  import Skeleton from './Skeleton.svelte';
 
-  let { objects, id }: { objects: Objeto[]; id: string } = $props();
+  let { objects, id }: { objects: Objeto[] | null; id: string } = $props();
 </script>
 
 <div class="relative w-full">
@@ -20,26 +21,32 @@
 				[&>*]:min-h-64 [&>*]:min-w-64
 			"
   >
-    {#each objects as obj, i}
-      <Card class="relative col-span-1 p-6">
-        <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="min-w-48 max-w-full h-48" />
-        <Heading tag="h5" class="mb-2 text-xl font-bold tracking-tight">{obj.titulo}</Heading>
-        <div class="flex">
-          <Badge
-            color={obj.tipo === 'achado' ? 'green' : 'red'}
-            class="absolute top-8 left-1/2 -translate-x-1/2"
-          >
-            {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
-          </Badge>
-          <P class="mb-2 text-sm text-primary-500 dark:text-primary-400">
-            <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
-            {obj.local}
-            <span class="italic">por</span>
-            {obj.usuario.username}
-          </P>
-        </div>
-      </Card>
-    {/each}
+    {#if objects === null}
+      {#each Array.from({ length: 3 }) as _, i}
+        <Skeleton card={48} />
+      {/each}
+    {:else}
+      {#each objects as obj}
+        <Card class="relative col-span-1 flex gap-2 p-6">
+          <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="min-w-48 max-w-full h-48" />
+          <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.titulo}</Heading>
+          <div class="flex">
+            <Badge
+              color={obj.tipo === 'achado' ? 'green' : 'red'}
+              class="absolute top-8 left-1/2 -translate-x-1/2"
+            >
+              {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
+            </Badge>
+            <P class="mb-2 text-sm text-primary-500 dark:text-primary-400">
+              <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
+              {obj.local}
+              <span class="italic">por</span>
+              {obj.usuario.username}
+            </P>
+          </div>
+        </Card>
+      {/each}
+    {/if}
     <div
       class="
 				flex flex-row items-center justify-center rounded-lg bg-primary-300 dark:bg-primary-700

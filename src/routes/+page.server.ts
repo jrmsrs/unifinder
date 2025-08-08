@@ -7,8 +7,11 @@ const makeObjetos = (tipo: 'achado' | 'perdido', qty: number) => {
     objetos.push({
       id: fk.string.uuid(),
       created_at: fk.date.past().toISOString(),
-      usuario: { id: fk.string.uuid(), username: fk.internet.username() },
-      avatar_url: fk.image.avatar(),
+      usuario: {
+        id: fk.string.uuid(),
+        username: fk.internet.username(),
+        avatar_url: fk.image.avatar()
+      },
       imagem: fk.image.urlPicsumPhotos({ width: 50, height: 50, blur: 10 }),
       titulo: fk.word.words(3).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
       descricao: fk.word
