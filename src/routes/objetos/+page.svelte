@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import { Alert, Badge, Card, Heading, P } from 'flowbite-svelte';
@@ -48,3 +49,11 @@
     {/await}
   </div>
 </div>
+
+<DevInfo
+  content={`\
+# debug
+  - signed_up=${Boolean(data.user)}
+# todo (tela objetos)
+  - (x) layout objetos`}
+/>

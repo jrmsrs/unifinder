@@ -122,6 +122,8 @@
 
 <DevInfo
   content={`\
+# debug
+  - signed_up=${Boolean(data.user)}
 # todo (tela inicial):
   - (x) layout objetos
   - (x) layout barra pesquisa filtrada

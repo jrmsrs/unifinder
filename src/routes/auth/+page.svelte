@@ -1,10 +1,10 @@
 <script lang="ts">
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
-  import { A, Button, Heading, Hr, Input, Label, P } from 'flowbite-svelte';
+  import { A, Alert, Button, Heading, Hr, Input, Label, P } from 'flowbite-svelte';
   import { GoogleSolid } from 'flowbite-svelte-icons';
+  import type { PageData } from './$types';
 
-  let { data, email = $bindable('') }: { data: { tab: string; error?: string }; email: string } =
-    $props();
+  let { data, email = $bindable('') }: { data: PageData; email: string } = $props();
 </script>
 
 <div
@@ -18,7 +18,7 @@
     <Heading tag="h3" class="mb-6 text-center">Redefinir senha</Heading>
     <form method="POST" action="?/reset">
       {#if data.error}
-        <p class="text-red-500">{data.error}</p>
+        <Alert color="red" dismissable>{data.error}</Alert>
       {/if}
       <div>
         <Label for="email" placeholder="Email">Email</Label>
@@ -47,7 +47,7 @@
     <Hr class="my-10 text-primary-500">ou</Hr>
     <form method="POST" action="?/signup">
       {#if data.error}
-        <p class="text-red-500">{data.error}</p>
+        <Alert color="red" dismissable>{data.error}</Alert>
       {/if}
       <div>
         <Label for="email" placeholder="Email">Email</Label>
@@ -77,7 +77,7 @@
     <Hr class="my-10 text-primary-500">ou</Hr>
     <form method="POST" action="?/login">
       {#if data.error}
-        <p class="text-red-500">{data.error}</p>
+        <Alert color="red" dismissable>{data.error}</Alert>
       {/if}
       <div>
         <Label for="email" placeholder="Email">Email</Label>
@@ -111,7 +111,8 @@
 <DevInfo
   content={`\
 # debug
-  - tab=${data.tab}
+  - signed_up=${Boolean(data.user)}
+  - auth_tab=${data.tab}
 # todo (tela autenticação)
   - (x) layout autenticação
   - (x) separar login e sign up em abas
