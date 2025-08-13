@@ -1,21 +1,246 @@
 <script lang="ts">
-  import { Button, Search } from 'flowbite-svelte';
-  import { FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
+  import {
+    Button,
+    Heading,
+    Helper,
+    Input,
+    Label,
+    Modal,
+    MultiSelect,
+    Toggle
+  } from 'flowbite-svelte';
+  import { CloseOutline, FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
+  import { scale } from 'svelte/transition';
+
+  let locations = [
+    { value: 'biblio', name: 'Biblioteca Central' },
+    { value: 'ru', name: 'Restaurante (Bandejão)' },
+    { value: 'ccetibio', name: 'CCET/IBIO' },
+    { value: 'cla', name: 'CLA' },
+    { value: 'cch', name: 'CCH' },
+    { value: 'ib', name: 'IB' },
+    { value: 'ccjp', name: 'CCJP' },
+    { value: 'intercampi', name: 'Intercampi' },
+    { value: 'outro', name: 'Outro (Praça, 513, 107, etc)' }
+  ];
+  let tipoChoices = [
+    { value: 'achado', label: 'Achados' },
+    { value: 'perdido', label: 'Perdidos' }
+  ];
+  let categoriaChoices = [
+    { value: 'documento', label: 'Documentos' },
+    { value: 'carteira', label: 'Carteiras' },
+    { value: 'mochila', label: 'Mochilas/Bolsas' },
+    { value: 'eletronico', label: 'Eletrônicos' },
+    { value: 'academico', label: 'Materiais Acadêmicos' },
+    { value: 'utensilio', label: 'Utensílios Pessoais' },
+    { value: 'vestuario', label: 'Vestuários' },
+    { value: 'chaveiro', label: 'Chaveiros' },
+    { value: 'outro', label: 'Outro' }
+  ];
+  let modal = $state(false);
+  let search = $state('');
+  let localidade = $state<string[]>([]);
+  let tipoSelected = $state([]);
+  let categoriaSelected = $state<string[]>([]);
+  let inativo = $state(false);
+  let acompanhado = $state(false);
+
+  function removeEmptyFields(obj: Record<string, any>): Record<string, any> {
+    return Object.fromEntries(
+      Object.entries(obj)
+        .filter(([_, v]) => {
+          if (Array.isArray(v)) return v.length > 0;
+          if (typeof v === 'string') return v.trim() !== '';
+          return Boolean(v);
+        })
+        .map(([k, v]) => [k, typeof v === 'object' && !Array.isArray(v) ? removeEmptyFields(v) : v])
+        .filter(([_, v]) => {
+          if (typeof v === 'object' && !Array.isArray(v)) return Object.keys(v).length > 0;
+          return true;
+        })
+    );
+  }
 </script>
 
-<div class="flex">
-  <div class="relative">
-    <Button
-      color="secondary"
-      class="rounded-e-none border border-e-0 border-primary-700 px-4 whitespace-nowrap"
+<div role="search" aria-label="Busca avançada" class="w-full max-w-full">
+  <button
+    type="button"
+    class="flex h-12 w-full items-center text-white [&>span]:h-full"
+    onclick={() => {
+      modal = true;
+    }}
+  >
+    <span
+      class="
+        content-center rounded-s-lg border border-e-0
+        border-primary-800 bg-primary-700 px-4 whitespace-nowrap hover:bg-primary-800
+        dark:border-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700
+      "
     >
       <FilterOutline class="my-0.5 h-6 w-6" />
-    </Button>
-  </div>
-  <Search
-    placeholder="Buscar objetos..."
-    size="lg"
-    class="[&>div]:hidden [&>input]:rounded-none [&>input]:ps-4"
-  />
-  <Button class="rounded-s-none px-4!"><SearchOutline class="h-6 w-6" /></Button>
+    </span>
+
+    <span
+      class="
+        flex w-full min-w-0 cursor-text items-center gap-2 border border-solid
+        border-gray-300 bg-white px-4 py-3
+        dark:border-gray-600 dark:bg-gray-700
+      "
+    >
+      <span
+        class="
+          block min-w-0 flex-1 overflow-hidden text-start text-ellipsis whitespace-nowrap
+          text-gray-500
+          dark:text-gray-400
+        "
+      >
+        Buscar objetos...
+      </span>
+    </span>
+
+    <span
+      class="
+        content-center rounded-e-lg
+        border-gray-800 bg-gray-700 px-4 hover:bg-gray-800
+        dark:border-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700
+      "
+    >
+      <SearchOutline class="h-6 w-6" />
+    </span>
+  </button>
+
+  <Modal
+    class="w-11/12 backdrop:bg-gray-500/50 backdrop:backdrop-blur-md"
+    form
+    dismissable={false}
+    transition={scale}
+    bind:open={modal}
+    onaction={() => {
+      modal = false;
+      const filters = removeEmptyFields({
+        search,
+        filtros: {
+          tipo: tipoSelected,
+          localidade,
+          categorias: categoriaSelected,
+          inativo,
+          acompanhado
+        }
+      });
+      alert(`GET /objetos\n${JSON.stringify(filters, null, 2)}`);
+    }}
+  >
+    {#snippet header()}
+      <Heading tag="h5" class="text-center">Pesquisa filtrada</Heading>
+    {/snippet}
+    <div class="flex flex-col gap-4">
+      <div>
+        <Label for="search">Pesquisa por termo, descrição, andar, sala, etc</Label>
+        <Input
+          bind:value={search}
+          id="search"
+          type="text"
+          placeholder="(opcional) Garrafinha, carregador, ..."
+          class="not-[:placeholder-shown]:border-primary-600! not-[:placeholder-shown]:outline-primary-600! 
+            dark:not-[:placeholder-shown]:border-primary-600! dark:not-[:placeholder-shown]:bg-primary-800
+            dark:not-[:placeholder-shown]:outline-primary-600!"
+        />
+      </div>
+      <div>
+        <Label>Tipo de objeto</Label>
+        <div
+          class="grid grid-cols-2 flex-row text-center [&>label]:rounded-none [&>label]:first:rounded-l-lg [&>label]:last:rounded-r-lg"
+        >
+          {#each tipoChoices as tipo (tipo.value)}
+            <label
+              class="
+                col-span-1 block border border-solid border-gray-300
+                p-2 text-gray-900 focus-within:outline-2
+                has-[:checked]:bg-primary-600
+                has-[:checked]:text-white
+                has-[:not(:checked)]:bg-transparent dark:border-gray-600
+                dark:text-gray-400
+              "
+            >
+              <input
+                type="checkbox"
+                id={tipo.value}
+                bind:group={tipoSelected}
+                value={tipo.value}
+                class="absolute z-10 opacity-0"
+              />
+              {tipo.label}
+            </label>
+          {/each}
+        </div>
+      </div>
+      <div>
+        <Label for="localidade">Prédio/Localidade</Label>
+        <MultiSelect
+          id="localidade"
+          class="[&>div]:top-[100%] [&>div]:max-h-64 [&>span>div]:bg-primary-100 [&>span>div]:text-primary-900 
+            dark:[&>span>div]:bg-primary-700 dark:[&>span>div]:text-primary-100"
+          bind:value={localidade}
+          items={locations}
+          placeholder="Todas"
+        />
+        <Helper>Selecione uma ou mais localidades</Helper>
+      </div>
+      <div>
+        <Label>Categoria(s)</Label>
+        <div class="mt-1 flex flex-wrap justify-center gap-x-2 gap-y-2 text-center">
+          {#each categoriaChoices as categoria (categoria.value)}
+            <label
+              class="
+                block rounded border border-solid
+                border-gray-300 p-2 text-gray-900
+                focus-within:outline-2
+                has-[:checked]:bg-primary-600
+                has-[:checked]:text-white has-[:not(:checked)]:bg-transparent
+                dark:border-gray-600 dark:text-gray-400
+              "
+            >
+              <input
+                type="checkbox"
+                id={categoria.value}
+                bind:group={categoriaSelected}
+                value={categoria.value}
+                class="absolute z-10 opacity-0"
+              />
+              {categoria.label}
+            </label>
+          {/each}
+        </div>
+        <Helper>Selecione uma ou mais categorias</Helper>
+      </div>
+      <div class="flex items-center justify-between">
+        <Label for="inativo">
+          Incluir objetos inativos
+          <Helper>Objetos/anúncios resolvidos ou expirados</Helper>
+        </Label>
+        <Toggle id="inativo" color="primary" class="px-1" bind:checked={inativo} />
+      </div>
+      <div class="flex items-center justify-between">
+        <Label for="acompanhado">
+          Apenas objetos acompanhados
+          <Helper>Objetos/anúncios registrados por você ou sob sua responsabilidade</Helper>
+        </Label>
+        <Toggle id="acompanhado" color="primary" class="px-1" bind:checked={acompanhado} />
+      </div>
+    </div>
+    {#snippet footer()}
+      <div class="flex w-full justify-end">
+        <Button type="submit" value="submit">Pesquisar</Button>
+        <button
+          type="button"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+          onclick={() => (modal = false)}
+        >
+          <span class="sr-only">Fechar modal</span>
+          <CloseOutline class="h-7 w-7" />
+        </button>
+      </div>
+    {/snippet}
+  </Modal>
 </div>

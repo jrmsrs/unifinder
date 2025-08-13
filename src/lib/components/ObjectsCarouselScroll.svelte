@@ -7,6 +7,8 @@
 
 <Button
   id={right ? 'scroll-right' : 'scroll-left'}
+  aria-hidden="true"
+  tabindex={-1}
   class="h-64 w-20 rounded-none bg-transparent! focus-within:ring-0 {right
     ? 'ps-12 pe-0'
     : 'ps-0 pe-12'} text-primary-500 hover:bg-primary-100 dark:text-primary-400 dark:hover:bg-primary-800"
