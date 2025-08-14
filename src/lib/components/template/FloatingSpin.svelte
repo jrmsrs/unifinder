@@ -10,7 +10,7 @@
     dismissable={false}
     outsideclose={false}
     modal={true}
-    class="h-48 w-48 rounded-3xl bg-primary-700/10! backdrop-blur-md backdrop:bg-transparent [&>*]:overflow-hidden"
+    class="h-48 w-48 rounded-3xl bg-gray-700/10! backdrop-blur-md backdrop:bg-transparent [&>*]:overflow-hidden"
     bodyClass="p-8"
     transition={scale}
   >

@@ -13,10 +13,10 @@
   <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">ou</Hr>
-  <Button color="red" class="">Cadastrar objeto perdido</Button>
+  <Button color="primary">Cadastrar objeto perdido</Button>
   <Hr />
   <P>Encontrou algum objeto na UNIRIO?</P>
-  <Button color="green">Cadastrar objeto achado</Button>
+  <Button color="primary">Cadastrar objeto achado</Button>
   <Hr />
   <Heading tag="h4">Objetos em acompanhamento</Heading>
   {#await data.streamed.tutelados}
@@ -25,9 +25,7 @@
     {#if tutelados.length > 0}
       <ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
     {:else}
-      <p class="text-center text-primary-500 dark:text-primary-400">
-        Nenhum objeto em acompanhamento.
-      </p>
+      <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto em acompanhamento.</p>
     {/if}
   {:catch error}
     <Alert color="red" dismissable>Erro: {error.message}</Alert>
@@ -40,7 +38,7 @@
     {#if latestObjetos.achados.length > 0}
       <ObjectsCarousel id="found-objects-carousel" objects={latestObjetos.achados} />
     {:else}
-      <p class="text-center text-primary-500 dark:text-primary-400">
+      <p class="text-center text-gray-500 dark:text-gray-400">
         Nenhum objeto achado está disponível.
       </p>
     {/if}
@@ -55,7 +53,7 @@
     {#if latestObjetos.perdidos.length > 0}
       <ObjectsCarousel id="lost-objects-carousel" objects={latestObjetos.perdidos} />
     {:else}
-      <p class="text-center text-primary-500 dark:text-primary-400">
+      <p class="text-center text-gray-500 dark:text-gray-400">
         Nenhum objeto perdido está disponível.
       </p>
     {/if}

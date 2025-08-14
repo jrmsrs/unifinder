@@ -42,7 +42,7 @@
           </Card>
         {/each}
       {:else}
-        <p class="text-center text-primary-500 dark:text-primary-400">Nenhum objeto encontrado.</p>
+        <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto encontrado.</p>
       {/if}
     {:catch error}
       <Alert color="red" dismissable>Erro: {error.message}</Alert>

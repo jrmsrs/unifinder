@@ -3,7 +3,7 @@
   import { NavUl } from 'flowbite-svelte';
   import { scale } from 'svelte/transition';
 
-  let activeUrl = $derived(page.url.pathname);
+  let activeUrl = $derived(page.url.pathname + page.url.search);
   let { children, id = undefined } = $props();
 </script>
 
@@ -14,17 +14,17 @@
   transitionParams={{ start: 0.8, duration: 200 }}
   class="
         w-11/12 not-md:mx-auto [&>*]:text-center [&>ul]:items-center not-md:[&>ul]:border-[1px]
-        not-md:[&>ul]:border-primary-300 not-md:[&>ul]:bg-primary-100 
-        not-md:dark:[&>ul]:border-primary-700 not-md:dark:[&>ul]:bg-primary-800 
+        not-md:[&>ul]:border-gray-300 not-md:[&>ul]:bg-gray-100 
+        not-md:dark:[&>ul]:border-gray-700 not-md:dark:[&>ul]:bg-gray-800 
         [&>ul>li]:mx-0.5 [&>ul>li]:w-full md:[&>ul>li]:w-auto
       "
   nonActiveClass="
-        dark:text-primary-400 dark:hover:text-primary-400! dark:bg-transparent dark:hover:bg-primary-700!
-        text-primary-700 hover:text-primary-700! bg-transparent hover:bg-primary-300!
+        dark:text-gray-400 dark:hover:text-gray-400! dark:bg-transparent dark:hover:bg-gray-700!
+        text-gray-700 hover:text-gray-700! bg-transparent hover:bg-gray-300!
       "
   activeClass="
-        dark:text-primary-800! dark:bg-primary-300! dark:hover:text-primary-400! dark:hover:bg-primary-700!
-        text-primary-300! bg-primary-700! hover:text-primary-800! hover:bg-primary-300!
+        dark:text-gray-50! dark:bg-primary-500! dark:hover:text-gray-400! dark:hover:bg-gray-700!
+        text-gray-50! bg-primary-600! hover:text-gray-800! hover:bg-gray-300!
       "
 >
   {@render children()}

@@ -37,7 +37,7 @@
             >
               {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
             </Badge>
-            <P class="mb-2 text-sm text-primary-500 dark:text-primary-400">
+            <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
               <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
               {obj.local}
               <span class="italic">por</span>
@@ -49,7 +49,7 @@
     {/if}
     <div
       class="
-				flex flex-row items-center justify-center rounded-lg bg-primary-300 dark:bg-primary-700
+				flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700
 			"
     >
       Ver todos

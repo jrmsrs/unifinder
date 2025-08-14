@@ -12,6 +12,8 @@
     UserSolid
   } from 'flowbite-svelte-icons';
   import HandHelpingIcon from 'lucide-svelte/icons/hand-helping';
+  import { bounceInOut } from 'svelte/easing';
+  import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
   import NavSeparator from './TheNavSep.svelte';
@@ -31,16 +33,24 @@
         if (htmlElement.classList.contains('dark')) theme.setAttribute('content', colorA);
         else theme.setAttribute('content', colorB);
       };
-      setTheme('#0f172a', '#ffffff');
-      themeButton.addEventListener('click', () => setTheme('#ffffff', '#0f172a'));
+      setTheme('#171616', '#ffffff');
+      themeButton.addEventListener('click', () => setTheme('#ffffff', '#171616'));
     }
+
+    window?.addEventListener('scroll', function () {
+      var scrollPosition = window.scrollY || window.pageYOffset;
+      var scrollThreshold = 32;
+      blueLine = scrollPosition > scrollThreshold;
+    });
   });
+
+  let blueLine = $state(false);
 
   let { session } = $props();
 </script>
 
 <header class="sticky top-0 z-10">
-  <Navbar class="bg-white dark:bg-primary-900">
+  <Navbar class="bg-white pb-0 dark:bg-gray-900">
     <NavBrand href="/">
       <img src="favicon.svg" class="me-3 h-6 sm:h-9" alt="UniFinder Logo" />
       <span
@@ -59,7 +69,7 @@
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
       <NavSeparator />
       {#if !session}
-        <NavItem href="/auth" icon={ArrowRightToBracketOutline} blue>Login</NavItem>
+        <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
@@ -67,5 +77,14 @@
       <NavSeparator />
       <NavItem id="theme-toggle" themeToggle />
     </NavList>
+    <div class="mt-2 flex h-0.5 w-full flex-col content-center items-center md:mt-0">
+      {#if blueLine}
+        <div
+          id="blue-line"
+          transition:slide={{ duration: 1000, axis: 'x', easing: bounceInOut }}
+          class="h-0.5 w-full bg-primary-500 md:mt-0"
+        ></div>
+      {/if}
+    </div>
   </Navbar>
 </header>

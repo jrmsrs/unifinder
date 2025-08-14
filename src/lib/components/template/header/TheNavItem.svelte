@@ -8,7 +8,7 @@
     href,
     children,
     icon,
-    blue = false,
+    green = false,
     red = false,
     themeToggle = false,
     class: extraClass = ''
@@ -17,7 +17,7 @@
     href?: string;
     children?: any;
     icon?: Component | any[];
-    blue?: boolean;
+    green?: boolean;
     red?: boolean;
     themeToggle?: boolean;
     class?: string;
@@ -29,8 +29,8 @@
     <DarkMode
       {id}
       class="
-				flex w-full content-center rounded-sm hover:bg-primary-300 
-				md:rounded-full dark:hover:bg-primary-700 [&>*]:mx-auto
+				flex w-full content-center rounded-sm hover:bg-gray-300 
+				md:rounded-full dark:hover:bg-gray-700 [&>*]:mx-auto
 				[&>*]:w-full md:[&>*]:w-min
 			"
     >
@@ -42,7 +42,7 @@
         </div>
       {/snippet}
       {#snippet darkIcon()}
-        <div class="flex content-between justify-between px-1 text-primary-700">
+        <div class="flex content-between justify-between px-1 text-gray-700">
           <MoonSolid class="me-1 inline h-5 w-5" />
           <span class="inline md:hidden">Modo Escuro</span>
           <hr class="h-5 w-5 opacity-0 md:hidden" />
@@ -55,8 +55,8 @@
     {href}
     class="
     flex content-between justify-between 
-    {blue
-      ? 'hover:bg-blue-500! hover:text-white! dark:hover:bg-blue-500! dark:hover:text-white!'
+    {green
+      ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!'
       : ''}
     {red
       ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!'

@@ -4,8 +4,8 @@
   "description": "...",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#64748b",
-  "theme_color": "#64748b",
+  "background_color": "#706f6f",
+  "theme_color": "#706f6f",
   "icons": [
     {
       "src": "/favicon.svg",

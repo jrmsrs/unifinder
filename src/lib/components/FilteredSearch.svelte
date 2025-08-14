@@ -74,8 +74,8 @@
     <span
       class="
         content-center rounded-s-lg border border-e-0
-        border-primary-800 bg-primary-700 px-4 whitespace-nowrap hover:bg-primary-800
-        dark:border-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700
+        border-gray-800 bg-gray-700 px-4 whitespace-nowrap hover:bg-gray-800
+        dark:border-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700
       "
     >
       <FilterOutline class="my-0.5 h-6 w-6" />
@@ -102,8 +102,8 @@
     <span
       class="
         content-center rounded-e-lg
-        border-gray-800 bg-gray-700 px-4 hover:bg-gray-800
-        dark:border-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700
+        border-primary-800 bg-primary-700 px-4 hover:bg-primary-800
+        dark:border-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700
       "
     >
       <SearchOutline class="h-6 w-6" />
@@ -189,7 +189,7 @@
       </div>
       <div>
         <Label>Categoria(s)</Label>
-        <div class="mt-1 flex flex-wrap justify-center gap-x-2 gap-y-2 text-center">
+        <div class="my-1 flex flex-wrap justify-center gap-x-2 gap-y-2 text-center">
           {#each categoriaChoices as categoria (categoria.value)}
             <label
               class="
