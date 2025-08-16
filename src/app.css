@@ -69,3 +69,35 @@
     user-select: none;
   }
 }
+
+.touch-device ::-webkit-scrollbar {
+  display: none;
+}
+
+html ::-webkit-scrollbar {
+  width: 16px;
+}
+
+html ::-webkit-scrollbar-track {
+  background: var(--color-gray-200);
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: var(--color-gray-800);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  border-color: var(--color-gray-800);
+}
+
+html ::-webkit-scrollbar-thumb {
+  background: var(--color-primary-500);
+  border: solid var(--color-gray-200);
+  border-left: 10px;
+  border-bottom: 10px;
+  border-top: 10px;
+}
+
+html ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}

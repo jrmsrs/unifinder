@@ -12,12 +12,33 @@
     <link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
     %sveltekit.head%
   </head>
-  <body style="overscroll-behavior-y: contain" data-sveltekit-preload-data="hover">
-    <div style="display: contents">%sveltekit.body%</div>
+  <body data-sveltekit-preload-data="hover">
+    <div id="scroll" class="scroll-wrapper">%sveltekit.body%</div>
+    <script>
+      if (/mobile|android|touch|ipad|iphone|ipod/.test(navigator.userAgent.toLowerCase()))
+        document.body.classList.add('touch-device');
+    </script>
   </body>
   <style>
+    html,
     body {
-      background-color: #706f6f;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      overscroll-behavior-y: contain;
+      overflow: hidden;
+    }
+
+    .scroll-wrapper {
+      height: 100%;
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
   </style>
 </html>

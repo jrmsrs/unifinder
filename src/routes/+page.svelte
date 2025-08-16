@@ -13,24 +13,30 @@
   <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">ou</Hr>
-  <Button color="primary">Cadastrar objeto perdido</Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">
+    Cadastrar objeto perdido
+  </Button>
   <Hr />
   <P>Encontrou algum objeto na UNIRIO?</P>
-  <Button color="primary">Cadastrar objeto achado</Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">
+    Cadastrar objeto achado
+  </Button>
   <Hr />
-  <Heading tag="h4">Objetos em acompanhamento</Heading>
-  {#await data.streamed.tutelados}
-    <ObjectsCarousel id="found-objects-carousel" objects={null} />
-  {:then tutelados}
-    {#if tutelados.length > 0}
-      <ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
-    {:else}
-      <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto em acompanhamento.</p>
-    {/if}
-  {:catch error}
-    <Alert color="red" dismissable>Erro: {error.message}</Alert>
-  {/await}
-  <Hr />
+  {#if data.user}
+    <Heading tag="h4">Objetos em acompanhamento</Heading>
+    {#await data.streamed.tutelados}
+      <ObjectsCarousel id="found-objects-carousel" objects={null} />
+    {:then tutelados}
+      {#if tutelados.length > 0}
+        <ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
+      {:else}
+        <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto em acompanhamento.</p>
+      {/if}
+    {:catch error}
+      <Alert color="red" dismissable>Erro: {error.message}</Alert>
+    {/await}
+    <Hr />
+  {/if}
   <Heading tag="h4">Últimos objetos achados</Heading>
   {#await data.streamed.latestObjetos}
     <ObjectsCarousel id="found-objects-carousel" objects={null} />

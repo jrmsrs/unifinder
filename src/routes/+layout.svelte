@@ -1,11 +1,11 @@
 <script lang="ts">
-  import '../app.css';
   import { invalidate } from '$app/navigation';
-  import { onMount } from 'svelte';
+  import AppContent from '$lib/components/template/AppContent.svelte';
   import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
   import Header from '$lib/components/template/header/Header.svelte';
-  import AppContent from '$lib/components/template/AppContent.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
+  import { onMount } from 'svelte';
+  import '../app.css';
 
   let { data, children } = $props();
   let { session, supabase } = $derived(data);

@@ -2,12 +2,14 @@
   import { DarkMode, NavLi } from 'flowbite-svelte';
   import { MoonSolid, SunSolid } from 'flowbite-svelte-icons';
   import type { Component } from 'svelte';
+  import TheNavSep from './TheNavSep.svelte';
 
   let {
     id,
     href,
     children,
     icon,
+    sep = false,
     green = false,
     red = false,
     themeToggle = false,
@@ -17,6 +19,7 @@
     href?: string;
     children?: any;
     icon?: Component | any[];
+    sep?: boolean;
     green?: boolean;
     red?: boolean;
     themeToggle?: boolean;
@@ -25,7 +28,7 @@
 </script>
 
 {#if themeToggle}
-  <div class="not-md:w-full">
+  <li class="not-md:w-full">
     <DarkMode
       {id}
       class="
@@ -49,8 +52,8 @@
         </div>
       {/snippet}
     </DarkMode>
-  </div>
-{:else}
+  </li>
+{:else if !sep}
   <NavLi
     {href}
     class="
@@ -82,4 +85,8 @@
     <span>{@render children()}</span>
     <hr class="h-5 w-5 opacity-0 md:hidden" />
   </NavLi>
+{:else}
+  <li>
+    <TheNavSep />
+  </li>
 {/if}

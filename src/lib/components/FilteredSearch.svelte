@@ -92,7 +92,7 @@
         class="
           block min-w-0 flex-1 overflow-hidden text-start text-ellipsis whitespace-nowrap
           text-gray-500
-          dark:text-gray-400
+          dark:text-gray-300
         "
       >
         Buscar objetos...
@@ -111,7 +111,7 @@
   </button>
 
   <Modal
-    class="w-11/12 backdrop:bg-gray-500/50 backdrop:backdrop-blur-md"
+    class="w-11/12 backdrop:bg-transparent backdrop:backdrop-blur-sm shadow-2xl shadow-black"
     form
     dismissable={false}
     transition={scale}

@@ -24,6 +24,7 @@
     const themeButton = document.getElementById('theme-toggle');
     const hamburger = document.getElementById('the-nav-hamburger');
     const navlist = document.getElementById('the-nav-list');
+    const scroll = document.getElementById('scroll');
 
     if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden'))
       hamburger.click();
@@ -37,11 +38,12 @@
       themeButton.addEventListener('click', () => setTheme('#ffffff', '#171616'));
     }
 
-    window?.addEventListener('scroll', function () {
-      var scrollPosition = window.scrollY || window.pageYOffset;
-      var scrollThreshold = 32;
-      blueLine = scrollPosition > scrollThreshold;
-    });
+    if (scroll)
+      scroll.addEventListener('scroll', function () {
+        var scrollPosition = scroll.scrollTop || window.pageYOffset;
+        var scrollThreshold = 32;
+        blueLine = scrollPosition > scrollThreshold;
+      });
   });
 
   let blueLine = $state(false);
@@ -52,14 +54,14 @@
 <header class="sticky top-0 z-10">
   <Navbar class="bg-white pb-0 dark:bg-gray-900">
     <NavBrand href="/">
-      <img src="favicon.svg" class="me-3 h-6 sm:h-9" alt="UniFinder Logo" />
+      <img src="favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
       <span
         class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"
       >
         UniFinder
       </span>
     </NavBrand>
-    <NavHamburger id="the-nav-hamburger" />
+    <NavHamburger id="the-nav-hamburger" class="m-0 p-0 [&>*]:m-0 [&>*]:p-3 [&>*]:w-12 [&>*]:h-12" />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
       <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>
@@ -67,14 +69,14 @@
       </NavItem>
       <NavItem href="/objetos?tipo=achado" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
-      <NavSeparator />
+      <NavItem sep />
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
       {/if}
-      <NavSeparator />
+      <NavItem sep />
       <NavItem id="theme-toggle" themeToggle />
     </NavList>
     <div class="mt-2 flex h-0.5 w-full flex-col content-center items-center md:mt-0">

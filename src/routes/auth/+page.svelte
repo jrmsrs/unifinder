@@ -25,7 +25,9 @@
         <Input id="email" name="email" type="email" bind:value={email} />
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
-        <Button type="submit">Enviar link de redefinição</Button>
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">
+          Enviar link de redefinição
+        </Button>
       </div>
     </form>
     <Hr class="my-10 text-gray-500" />
@@ -57,7 +59,9 @@
         <Input id="password" name="password" type="password" />
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
-        <Button type="submit">Cadastrar</Button>
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">
+          Cadastrar
+        </Button>
       </div>
     </form>
     <Hr class="my-10 text-gray-500" />
@@ -102,15 +106,12 @@
       <div>
         <Label for="password">Senha</Label>
         <Input id="password" name="password" type="password" />
-        <A href="/auth?tab=reset" class="text-sm text-gray-500 hover:underline"
-          >Esqueci minha senha</A
-        >
+        <A href="/auth?tab=reset" class="text-sm text-gray-500 hover:underline">
+          Esqueci minha senha
+        </A>
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
-        <Button type="submit">Entrar</Button>
-
-        <!-- <button formaction="?/signup">Cadastrar</button>
-			<button formaction="?/gauth">Entrar com Google</button> -->
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Entrar</Button>
       </div>
     </form>
     <Hr class="my-10 text-gray-500" />
