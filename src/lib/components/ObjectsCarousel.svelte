@@ -46,14 +46,15 @@
           </div>
         </Card>
       {/each}
+      <a
+        href={`/objetos?tipo=${objects[0].tipo}`}
+        class="
+          flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700
+        "
+      >
+        Ver todos
+      </a>
     {/if}
-    <div
-      class="
-				flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700
-			"
-    >
-      Ver todos
-    </div>
   </div>
   <div class="absolute top-1/2 left-0 -ml-7 -translate-y-1/2 bg-transparent">
     <ObjectsCarouselScroll carouselId={id} />
