@@ -5,6 +5,7 @@
   import Header from '$lib/components/template/header/Header.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
   import { onMount } from 'svelte';
+  import Seo from 'sk-seo';
   import '../app.css';
 
   let { data, children } = $props();
@@ -39,10 +40,7 @@
   });
 </script>
 
-<svelte:head>
-  <title>UniFinder</title>
-</svelte:head>
-
+<Seo /> <!-- handle title, seo headers at load() -->
 <FloatingSpin />
 <AppContent>
   <Header session={data.session} />

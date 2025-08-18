@@ -1,7 +1,7 @@
 {
   "name": "UniFinder",
   "short_name": "UniFinder",
-  "description": "...",
+  "description": "Perdeu ou achou algum pertence na UNIRIO? UniFinder é o lugar certo para procurar ou cadastrar perdidos e achados.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#706f6f",
@@ -18,6 +18,28 @@
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://gist.github.com/user-attachments/assets/3166f2ce-dc7c-498f-a8d9-3d8f1cacfc08",
+      "sizes": "1080x1920",
+      "type": "image/jpg"
+    },
+    {
+      "src": "https://gist.github.com/user-attachments/assets/98864230-08dd-401c-af42-bb97a919cb49",
+      "sizes":"1080x1920",
+      "type":"image/jpg"
+    },
+    {
+      "src": "https://gist.github.com/user-attachments/assets/36aae39f-ac87-4cf5-87d0-082218d9bc84",
+      "sizes": "1080x1920",
+      "type": "image/jpg"
+    },
+    {
+      "src": "https://gist.github.com/user-attachments/assets/9ee0112c-4b5f-415c-aea6-fc1d3ff98e7e",
+      "sizes": "1080x1920",
+      "type": "image/jpg"
     }
   ]
 }
