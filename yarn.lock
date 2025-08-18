@@ -2628,6 +2628,11 @@ sirv@^3.0.0, sirv@^3.0.1:
     mrmime "^2.0.0"
     totalist "^3.0.0"
 
+sk-seo@^0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/sk-seo/-/sk-seo-0.5.4.tgz#25077ee5a3957f5424b0314c253c68ed11d04555"
+  integrity sha512-+FxJj+3O17jgzem4bzwU1ucdJjkPw57W9RiKxnqm7foKKTNzYPHeCVl+6rvV0n9MTigmzKzDY15tZ6stQ8L4ZA==
+
 source-map-js@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
