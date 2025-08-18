@@ -28,7 +28,7 @@
       <ObjectsCarousel id="found-objects-carousel" objects={null} />
     {:then tutelados}
       {#if tutelados.length > 0}
-        <ObjectsCarousel id="tutelados-carousel" objects={tutelados} />
+        <ObjectsCarousel id="tutelados-carousel" objects={tutelados} tutela />
       {:else}
         <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto em acompanhamento.</p>
       {/if}

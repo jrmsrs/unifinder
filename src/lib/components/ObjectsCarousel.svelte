@@ -4,7 +4,8 @@
   import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
   import Skeleton from './Skeleton.svelte';
 
-  let { objects, id }: { objects: Objeto[] | null; id: string } = $props();
+  let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } =
+    $props();
 </script>
 
 <div class="relative w-full">
@@ -47,7 +48,7 @@
         </Card>
       {/each}
       <a
-        href={`/objetos?tipo=${objects[0].tipo}`}
+        href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo}`}
         class="
           flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700
         "
