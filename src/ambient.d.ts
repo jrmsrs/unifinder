@@ -1,4 +1,19 @@
+import { dictLocalidades } from '$lib/utils/dicionaries';
+
 declare global {
+  type ObjetoLocalidade = keyof typeof dictLocalidades;
+  type ObjetoCategoria =
+    | 'documento'
+    | 'carteira'
+    | 'mochila'
+    | 'eletronico'
+    | 'academico'
+    | 'utensilio'
+    | 'vestuario'
+    | 'chaveiro'
+    | 'outro';
+  type ObjetoTipo = 'achado' | 'perdido';
+
   type Objeto = {
     id: string;
     created_at: string;
@@ -6,11 +21,10 @@ declare global {
     imagem: string;
     titulo: string;
     descricao: string;
-    local: string;
+    local: ObjetoLocalidade;
     encaminhado?: string;
-    tipo: 'achado' | 'perdido';
-    categorias: string[];
-    descritores: string[];
+    tipo: ObjetoTipo;
+    categoria: ObjetoCategoria;
   };
 }
 

@@ -1,105 +1,120 @@
 import { fakerPT_BR as fk } from '@faker-js/faker';
 import type { PageServerLoad } from './$types';
 
-type filter = {
-  tipo?: 'achado' | 'perdido';
-  categorias?: string[];
-  descritores?: string[];
+// typescript: expect any string while suggest specific values
+type Suggestive<T extends string> = T | (string & {}) | undefined;
+
+type query = {
+  search?: string;
+  tipo?: ObjetoTipo[];
+  localidade?: ObjetoLocalidade[];
+  categoria?: Suggestive<ObjetoCategoria>[];
   usuario?: string;
+  inativo?: true;
 };
 
-const makeFilteredObjetos = (qty: number, filter?: filter) => {
+const allTipos: ObjetoTipo[] = ['achado', 'perdido'];
+
+const allLocals: ObjetoLocalidade[] = [
+  'biblio',
+  'ru',
+  'ccetibio',
+  'cla',
+  'cch',
+  'ib',
+  'ccjp',
+  'intercampi',
+  'outro'
+];
+
+const allCategorias: ObjetoCategoria[] = [
+  'documento',
+  'carteira',
+  'mochila',
+  'eletronico',
+  'academico',
+  'utensilio',
+  'vestuario',
+  'chaveiro',
+  'outro'
+];
+
+// mock purpose only
+const makeFilteredObjetos = (qty: number, query?: query) => {
   const objetos: Objeto[] = [];
   for (let i = 0; i < qty; i++) {
-    const tipo = filter?.tipo || fk.helpers.arrayElement(['achado', 'perdido']);
-    let categorias: string[] = [];
-    if (filter?.categorias) categorias = filter.categorias;
-    let descritores: string[] = [];
-    if (filter?.descritores) descritores = filter.descritores;
+    const search = query?.search || '';
+    const tipo = query?.tipo
+      ? fk.helpers.arrayElement(query.tipo)
+      : fk.helpers.arrayElement(allTipos);
+    const local = query?.localidade
+      ? fk.helpers.arrayElement(query.localidade)
+      : fk.helpers.arrayElement(allLocals);
+    const usuario = query?.usuario;
+    let categoria: Suggestive<ObjetoCategoria> = '';
+    if (query?.categoria) categoria = fk.helpers.arrayElement(query.categoria);
     objetos.push({
       id: fk.string.uuid(),
       created_at: fk.date.past().toISOString(),
       usuario: {
-        id: fk.string.uuid(),
-        username: fk.internet.username(),
-        avatar_url: fk.image.avatar()
+        id: usuario ? 'current-user-id' : fk.string.uuid(),
+        username: usuario || fk.internet.username(),
+        avatar_url: usuario ? 'current-user-avatar-url' : fk.image.avatar()
       },
       imagem: fk.image.urlPicsumPhotos({ width: 50, height: 50, blur: 10 }),
-      titulo: fk.word.words(3).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
+      titulo:
+        search +
+        fk.word.words(3).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
       descricao: fk.word
         .words(10)
         .replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
-      local: fk.location.city(),
-      encaminhado: tipo === 'achado' ? fk.location.city() : undefined,
+      local,
+      encaminhado: tipo === 'achado' ? fk.helpers.arrayElement(allLocals) : undefined,
       tipo,
-      categorias: categorias.length
-        ? categorias
-        : [fk.lorem.word(), fk.lorem.word(), fk.lorem.word()],
-      descritores: descritores.length
-        ? descritores
-        : [fk.lorem.word(), fk.lorem.word(), fk.lorem.word()]
+      categoria: (categoria ? categoria : fk.helpers.arrayElement(allCategorias)) as ObjetoCategoria
     });
   }
   return objetos;
 };
 
-const fetchFilteredObjetos = async (qty: number, filter?: filter) => {
+const fetchFilteredObjetos = async (qty: number, query?: query) => {
   await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-  return makeFilteredObjetos(qty, filter);
+  // mock (then fetch from API)
+  return makeFilteredObjetos(qty, query);
 };
 
-export const load: PageServerLoad = async ({ url }) => {
-  const tipoParam = url.searchParams.get('tipo');
-  const tipo = tipoParam === 'achado' || tipoParam === 'perdido' ? tipoParam : undefined;
-  const categorias = url.searchParams.getAll('categorias');
-  const descritores = url.searchParams.getAll('descritores');
-  const usuario = url.searchParams.get('usuario');
-  const filter: filter = {
+export const load: PageServerLoad = async ({ url, locals }) => {
+  const search = url.searchParams.get('search') ?? undefined;
+  const tipoParam =
+    url.searchParams.getAll('tipo').length > 0 ? url.searchParams.getAll('tipo') : undefined;
+  const tipo = tipoParam?.every((e): e is ObjetoTipo => allTipos.includes(e as ObjetoTipo))
+    ? tipoParam
+    : undefined;
+  const localidadeParam =
+    url.searchParams.getAll('localidade').length > 0
+      ? url.searchParams.getAll('localidade')
+      : undefined;
+  const localidade = localidadeParam?.every((e): e is ObjetoLocalidade =>
+    allLocals.includes(e as ObjetoLocalidade)
+  )
+    ? localidadeParam
+    : undefined;
+  const categoria = url.searchParams.get('categoria') as unknown as Suggestive<ObjetoCategoria>[];
+  const inativo = url.searchParams.get('inativo') === 'true' ? true : undefined;
+  const usuario = url.searchParams.get('tutela') && locals.user?.email; // .email temporariamente
+  const query: query = {
+    search,
     tipo,
-    categorias: categorias.length ? categorias : undefined,
-    descritores: descritores.length ? descritores : undefined,
-    usuario: usuario || undefined
+    localidade,
+    categoria,
+    usuario: usuario || undefined,
+    inativo
   };
 
   return {
+    query,
     streamed: {
-      objetos: fetchFilteredObjetos(10, filter)
+      objetos: fetchFilteredObjetos(10, query)
     }
   };
 };
-
-//       encaminhado: tipo === 'achado' ? fk.location.city() : undefined,
-//       tipo,
-//       categorias: [fk.lorem.word(), fk.lorem.word(), fk.lorem.word()],
-//       descritores: [fk.lorem.word(), fk.lorem.word(), fk.lorem.word()]
-//     });
-//   }
-//   return objetos;
-// };
-
-// const latestObjetos = {
-//   achados: makeObjetos('achado', 5),
-//   perdidos: makeObjetos('perdido', 5)
-// };
-
-// const fetchLatestObjetos = async () => {
-//   await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-//   return latestObjetos;
-// };
-
-// const fetchTutelados = async () => {
-//   await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-//   return [
-//     latestObjetos.achados[Math.floor(Math.random() * latestObjetos.achados.length)],
-//     latestObjetos.perdidos[Math.floor(Math.random() * latestObjetos.perdidos.length)]
-//   ];
-// };
-
-// export const load: PageServerLoad = () => {
-//   return {
-//     streamed: {
-//       latestObjetos: fetchLatestObjetos(),
-//       tutelados: fetchTutelados()
-//     }
-//   };
-// };

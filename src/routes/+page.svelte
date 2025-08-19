@@ -76,7 +76,7 @@
   - (x) layout objetos
   - (x) layout barra pesquisa filtrada
   - (x) layout modal pesquisa filtrada
-  - (-) mocks modal pesquisa filtrada
+  - (x) mocks modal pesquisa filtrada
   - (x) layout cards objetos em acompanhamento
   - (x) layout cards ultimos achados/perdidos
   - (x) mocks cards

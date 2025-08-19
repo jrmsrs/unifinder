@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { dictCategorias, dictLocalidades, dictTipos } from '$lib/utils/dicionaries';
   import {
     Button,
     Heading,
@@ -12,39 +14,27 @@
   import { CloseOutline, FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
   import { scale } from 'svelte/transition';
 
-  let locations = [
-    { value: 'biblio', name: 'Biblioteca Central' },
-    { value: 'ru', name: 'Restaurante (Bandejão)' },
-    { value: 'ccetibio', name: 'CCET/IBIO' },
-    { value: 'cla', name: 'CLA' },
-    { value: 'cch', name: 'CCH' },
-    { value: 'ib', name: 'IB' },
-    { value: 'ccjp', name: 'CCJP' },
-    { value: 'intercampi', name: 'Intercampi' },
-    { value: 'outro', name: 'Outro (Praça, 513, 107, etc)' }
-  ];
-  let tipoChoices = [
-    { value: 'achado', label: 'Achados' },
-    { value: 'perdido', label: 'Perdidos' }
-  ];
-  let categoriaChoices = [
-    { value: 'documento', label: 'Documentos' },
-    { value: 'carteira', label: 'Carteiras' },
-    { value: 'mochila', label: 'Mochilas/Bolsas' },
-    { value: 'eletronico', label: 'Eletrônicos' },
-    { value: 'academico', label: 'Materiais Acadêmicos' },
-    { value: 'utensilio', label: 'Utensílios Pessoais' },
-    { value: 'vestuario', label: 'Vestuários' },
-    { value: 'chaveiro', label: 'Chaveiros' },
-    { value: 'outro', label: 'Outro' }
-  ];
+  let { divClass, query }: { divClass?: string; query?: any } = $props();
+
+  let locations: { value: ObjetoLocalidade; name: string }[] = Object.entries(dictLocalidades).map(
+    ([value, name]) => ({ value: value as ObjetoLocalidade, name })
+  );
+
+  let tipoChoices: { value: ObjetoTipo; label: string }[] = Object.entries(dictTipos).map(
+    ([value, label]) => ({ value: value as ObjetoTipo, label })
+  );
+
+  let categoriaChoices: { value: ObjetoCategoria; label: string }[] = Object.entries(
+    dictCategorias
+  ).map(([value, label]) => ({ value: value as ObjetoCategoria, label }));
+
   let modal = $state(false);
-  let search = $state('');
-  let localidade = $state<string[]>([]);
-  let tipoSelected = $state([]);
-  let categoriaSelected = $state<string[]>([]);
-  let inativo = $state(false);
-  let acompanhado = $state(false);
+  let search = $state(query?.search ?? '');
+  let localidade = $state<string[]>(query?.localidade ?? []);
+  let tipoSelected = $state(query?.tipo ?? []);
+  let categoriaSelected = $state<string[]>(query?.categoria ?? []);
+  let inativo = $state(query?.inativo ?? false);
+  let tutela = $state(query?.usuario ? true : false);
 
   function removeEmptyFields(obj: Record<string, any>): Record<string, any> {
     return Object.fromEntries(
@@ -91,11 +81,10 @@
       <span
         class="
           block min-w-0 flex-1 overflow-hidden text-start text-ellipsis whitespace-nowrap
-          text-gray-500
-          dark:text-gray-300
+          {query?.search ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-300'}
         "
       >
-        Buscar objetos...
+        {query?.search ?? 'Buscar objetos...'}
       </span>
     </span>
 
@@ -111,7 +100,7 @@
   </button>
 
   <Modal
-    class="w-11/12 backdrop:bg-transparent backdrop:backdrop-blur-sm shadow-2xl shadow-black"
+    class="w-11/12 shadow-2xl shadow-black backdrop:bg-transparent backdrop:backdrop-blur-sm"
     form
     dismissable={false}
     transition={scale}
@@ -120,15 +109,24 @@
       modal = false;
       const filters = removeEmptyFields({
         search,
-        filtros: {
-          tipo: tipoSelected,
-          localidade,
-          categorias: categoriaSelected,
-          inativo,
-          acompanhado
-        }
+        tipo: tipoSelected,
+        localidade,
+        categorias: categoriaSelected,
+        inativo,
+        tutela
       });
-      alert(`GET /objetos\n${JSON.stringify(filters, null, 2)}`);
+      const queryParams = new URLSearchParams();
+      for (const key in filters) {
+        const value = filters[key];
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            queryParams.append(key, item);
+          });
+        } else {
+          queryParams.set(key, value);
+        }
+      }
+      goto(`/objetos?${queryParams.toString()}`);
     }}
   >
     {#snippet header()}
@@ -222,11 +220,11 @@
         <Toggle id="inativo" color="primary" class="px-1" bind:checked={inativo} />
       </div>
       <div class="flex items-center justify-between">
-        <Label for="acompanhado">
+        <Label for="tutela">
           Apenas objetos acompanhados
           <Helper>Objetos/anúncios registrados por você ou sob sua responsabilidade</Helper>
         </Label>
-        <Toggle id="acompanhado" color="primary" class="px-1" bind:checked={acompanhado} />
+        <Toggle id="tutela" color="primary" class="px-1" bind:checked={tutela} />
       </div>
     </div>
     {#snippet footer()}
