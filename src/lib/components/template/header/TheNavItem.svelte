@@ -58,12 +58,8 @@
     {href}
     class="
     flex content-between justify-between 
-    {green
-      ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!'
-      : ''}
-    {red
-      ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!'
-      : ''}
+    {green ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!' : ''}
+    {red ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!' : ''}
     {extraClass}
   "
   >
@@ -72,9 +68,7 @@
         <span class="relative me-1 inline-block h-5 w-5">
           {#each icon as ic, i}
             {@const IconComponent = ic}
-            <IconComponent
-              class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0"
-            />
+            <IconComponent class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0" />
           {/each}
         </span>
       {:else}

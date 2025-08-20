@@ -1,32 +1,26 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { dictCategorias, dictLocalidades, dictTipos } from '$lib/utils/dicionaries';
-  import {
-    Button,
-    Heading,
-    Helper,
-    Input,
-    Label,
-    Modal,
-    MultiSelect,
-    Toggle
-  } from 'flowbite-svelte';
+  import { Button, Heading, Helper, Input, Label, Modal, MultiSelect, Toggle } from 'flowbite-svelte';
   import { CloseOutline, FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
   import { scale } from 'svelte/transition';
 
   let { divClass, query }: { divClass?: string; query?: any } = $props();
 
-  let locations: { value: ObjetoLocalidade; name: string }[] = Object.entries(dictLocalidades).map(
-    ([value, name]) => ({ value: value as ObjetoLocalidade, name })
-  );
+  let locations: { value: ObjetoLocalidade; name: string }[] = Object.entries(dictLocalidades).map(([value, name]) => ({
+    value: value as ObjetoLocalidade,
+    name
+  }));
 
-  let tipoChoices: { value: ObjetoTipo; label: string }[] = Object.entries(dictTipos).map(
-    ([value, label]) => ({ value: value as ObjetoTipo, label })
-  );
+  let tipoChoices: { value: ObjetoTipo; label: string }[] = Object.entries(dictTipos).map(([value, label]) => ({
+    value: value as ObjetoTipo,
+    label
+  }));
 
-  let categoriaChoices: { value: ObjetoCategoria; label: string }[] = Object.entries(
-    dictCategorias
-  ).map(([value, label]) => ({ value: value as ObjetoCategoria, label }));
+  let categoriaChoices: { value: ObjetoCategoria; label: string }[] = Object.entries(dictCategorias).map(([value, label]) => ({
+    value: value as ObjetoCategoria,
+    label
+  }));
 
   let modal = $state(false);
   let search = $state(query?.search ?? '');
@@ -147,27 +141,18 @@
       </div>
       <div>
         <Label>Tipo de objeto</Label>
-        <div
-          class="grid grid-cols-2 flex-row text-center [&>label]:rounded-none [&>label]:first:rounded-l-lg [&>label]:last:rounded-r-lg"
-        >
+        <div class="grid grid-cols-2 flex-row text-center [&>label]:rounded-none [&>label]:first:rounded-l-lg [&>label]:last:rounded-r-lg">
           {#each tipoChoices as tipo (tipo.value)}
             <label
               class="
-                col-span-1 block border border-solid border-gray-300
-                p-2 text-gray-900 focus-within:outline-2
+                col-span-1 block border border-solid border-gray-300 p-2 text-gray-900 focus-within:outline-2
                 has-[:checked]:bg-primary-600
                 has-[:checked]:text-white
                 has-[:not(:checked)]:bg-transparent dark:border-gray-600
                 dark:text-gray-400
               "
             >
-              <input
-                type="checkbox"
-                id={tipo.value}
-                bind:group={tipoSelected}
-                value={tipo.value}
-                class="absolute z-10 opacity-0"
-              />
+              <input type="checkbox" id={tipo.value} bind:group={tipoSelected} value={tipo.value} class="absolute z-10 opacity-0" />
               {tipo.label}
             </label>
           {/each}

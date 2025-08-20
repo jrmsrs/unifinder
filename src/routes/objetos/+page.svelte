@@ -10,25 +10,15 @@
   let { data } = $props();
 </script>
 
-<div
-  class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64"
->
-  <div
-    class="mb-4 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-  >
-    <div
-      class="g col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
+<div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
+  <div class="mb-4 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="g col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <Heading class="col-span-1 lg:col-span-2 xl:col-span-3" tag="h4">Lista de Objetos</Heading>
       <FilteredSearch query={data.query}></FilteredSearch>
     </div>
     {#await data.streamed.objetos}
       {#each Array.from({ length: 4 }) as _, i}
-        <Skeleton
-          card={64}
-          paragraphSize={2}
-          class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''}
-        />
+        <Skeleton card={64} paragraphSize={2} class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''} />
       {/each}
     {:then { objetos }}
       {#if objetos.length > 0}
@@ -37,10 +27,7 @@
             <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="h-64" />
             <Heading tag="h5" class="line-clamp-1">{obj.titulo}</Heading>
             <P class="line-clamp-1">{obj.descricao}</P>
-            <Badge
-              color={obj.tipo === 'achado' ? 'green' : 'red'}
-              class="absolute top-8 left-1/2 -translate-x-1/2"
-            >
+            <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
               {obj.tipo}
             </Badge>
             <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">

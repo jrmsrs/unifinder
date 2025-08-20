@@ -25,17 +25,12 @@
         <Input id="email" name="email" type="email" bind:value={email} />
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
-        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">
-          Enviar link de redefinição
-        </Button>
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Enviar link de redefinição</Button>
       </div>
     </form>
     <Hr class="my-10 text-gray-500" />
     <div class="flex flex-col items-center justify-center gap-2">
-      <P
-        ><A href="/auth?tab=login" class="text-sm text-gray-500 hover:underline">Voltar ao login</A
-        ></P
-      >
+      <P><A href="/auth?tab=login" class="text-sm text-gray-500 hover:underline">Voltar ao login</A></P>
     </div>
   {:else if data.tab === 'signup'}
     <Heading tag="h3" class="mb-6 text-center">Cadastrar</Heading>
@@ -59,9 +54,7 @@
         <Input id="password" name="password" type="password" />
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
-        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">
-          Cadastrar
-        </Button>
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar</Button>
       </div>
     </form>
     <Hr class="my-10 text-gray-500" />
@@ -106,9 +99,7 @@
       <div>
         <Label for="password">Senha</Label>
         <Input id="password" name="password" type="password" />
-        <A href="/auth?tab=reset" class="text-sm text-gray-500 hover:underline">
-          Esqueci minha senha
-        </A>
+        <A href="/auth?tab=reset" class="text-sm text-gray-500 hover:underline">Esqueci minha senha</A>
       </div>
       <div class="flex flex-col items-center justify-center gap-2">
         <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Entrar</Button>
@@ -117,8 +108,7 @@
     <Hr class="my-10 text-gray-500" />
     <div class="flex flex-col items-center justify-center gap-2">
       <P>Não tem uma conta?</P>
-      <P><A href="/auth?tab=signup" class="text-sm text-gray-500 hover:underline">Cadastre-se</A></P
-      >
+      <P><A href="/auth?tab=signup" class="text-sm text-gray-500 hover:underline">Cadastre-se</A></P>
     </div>
   {/if}
 </div>

@@ -39,10 +39,7 @@ export const actions: Actions = {
       provider: 'google'
     });
     if (error) {
-      redirect(
-        303,
-        '/auth?tab=' + url.searchParams.get('tab') + '&error=' + encodeURIComponent(error.message)
-      );
+      redirect(303, '/auth?tab=' + url.searchParams.get('tab') + '&error=' + encodeURIComponent(error.message));
     } else {
       redirect(303, data.url);
     }

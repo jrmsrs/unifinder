@@ -4,8 +4,7 @@
   import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
   import Skeleton from './Skeleton.svelte';
 
-  let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } =
-    $props();
+  let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } = $props();
 </script>
 
 <div class="relative w-full">
@@ -32,10 +31,7 @@
           <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="min-w-48 max-w-full h-48" />
           <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.titulo}</Heading>
           <div class="flex">
-            <Badge
-              color={obj.tipo === 'achado' ? 'green' : 'red'}
-              class="absolute top-8 left-1/2 -translate-x-1/2"
-            >
+            <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
               {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
             </Badge>
             <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
@@ -49,9 +45,7 @@
       {/each}
       <a
         href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo}`}
-        class="
-          flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700
-        "
+        class=" flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
       >
         Ver todos
       </a>

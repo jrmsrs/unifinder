@@ -26,8 +26,7 @@
     const navlist = document.getElementById('the-nav-list');
     const scroll = document.getElementById('scroll');
 
-    if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden'))
-      hamburger.click();
+    if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden')) hamburger.click();
 
     if (theme && htmlElement && themeButton) {
       const setTheme = (colorA: string, colorB: string) => {
@@ -55,18 +54,12 @@
   <Navbar class="bg-white pb-0 dark:bg-gray-900">
     <NavBrand href="/">
       <img src="favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
-      <span
-        class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"
-      >
-        UniFinder
-      </span>
+      <span class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"> UniFinder </span>
     </NavBrand>
-    <NavHamburger id="the-nav-hamburger" class="m-0 p-0 [&>*]:m-0 [&>*]:p-3 [&>*]:w-12 [&>*]:h-12" />
+    <NavHamburger id="the-nav-hamburger" class="m-0 p-0 [&>*]:m-0 [&>*]:h-12 [&>*]:w-12 [&>*]:p-3" />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
-      <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>
-        Perdidos
-      </NavItem>
+      <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>
       <NavItem href="/objetos?tipo=achado" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
       <NavItem sep />

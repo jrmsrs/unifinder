@@ -40,7 +40,8 @@
   });
 </script>
 
-<Seo /> <!-- handle title, seo headers at load() -->
+<Seo />
+<!-- handle title, seo headers at load() -->
 <FloatingSpin />
 <AppContent>
   <Header session={data.session} />

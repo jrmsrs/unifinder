@@ -39,11 +39,9 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     session,
     user,
     title: 'UniFinder: Plataforma de Achados e Perdidos da UNIRIO',
-    description:
-      'Registre um pertence que tenha perdido ou encontre o dono de um objeto que achou pela UNIRIO.',
+    description: 'Registre um pertence que tenha perdido ou encontre o dono de um objeto que achou pela UNIRIO.',
     keywords: 'achados, perdidos, unirio, pertences, objetos, spotted, spottedunirio',
-    imageURL:
-      'https://gist.github.com/user-attachments/assets/24310ae2-3466-4791-afff-1636a218b7eb',
+    imageURL: 'https://gist.github.com/user-attachments/assets/24310ae2-3466-4791-afff-1636a218b7eb',
     logo: '/favicon.svg',
     author: 'jojoDev02 & jrmsrs',
     type: 'WebApplication'

@@ -16,15 +16,9 @@
 </script>
 
 {#if card}
-  <Card
-    class="relative col-span-1 flex min-w-full flex-col gap-2 p-6 {card === 48
-      ? 'w-48'
-      : ''} {customClass}"
-  >
+  <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6 {card === 48 ? 'w-48' : ''} {customClass}">
     <div class="{card === 64 ? 'h-64' : 'h-48'} bg-gray-300 dark:bg-gray-700"></div>
-    <div
-      class="mt-1 mb-0.5 flex animate-pulse flex-wrap [&>*]:me-2.5 [&>*]:h-7 [&>*]:rounded-xl [&>*]:bg-gray-300 dark:[&>*]:bg-gray-700"
-    >
+    <div class="mt-1 mb-0.5 flex animate-pulse flex-wrap [&>*]:me-2.5 [&>*]:h-7 [&>*]:rounded-xl [&>*]:bg-gray-300 dark:[&>*]:bg-gray-700">
       {#each new Array(headingSize) as _}
         <div class="w-1/5"></div>
         <div class="w-1/3"></div>
@@ -54,9 +48,7 @@
   </Card>
 {:else}
   <div class="flex w-full animate-pulse items-center space-x-4 {customClass}">
-    <div
-      class="my-2 flex h-12 w-12 animate-pulse items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700"
-    >
+    <div class="my-2 flex h-12 w-12 animate-pulse items-center justify-center rounded-full bg-gray-300 dark:bg-gray-700">
       <UserSolid class="h-12 w-12 [&>*]:fill-gray-50 dark:[&>*]:fill-gray-800" />
     </div>
     <div class="w-full">

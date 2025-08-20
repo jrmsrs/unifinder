@@ -7,13 +7,8 @@
 
 <div class="relative overflow-hidden bg-gray-200 dark:bg-gray-700 {divClass}">
   {#if isLoading}
-    <div
-      class="flex h-full w-full animate-pulse items-center justify-center bg-gray-300 dark:bg-gray-700"
-    >
-      <ImageSolid
-        class="h-1/3 w-1/3 text-gray-400 dark:text-gray-600"
-        aria-label="Carregando imagem..."
-      />
+    <div class="flex h-full w-full animate-pulse items-center justify-center bg-gray-300 dark:bg-gray-700">
+      <ImageSolid class="h-1/3 w-1/3 text-gray-400 dark:text-gray-600" aria-label="Carregando imagem..." />
     </div>
   {/if}
   <img

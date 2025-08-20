@@ -7,20 +7,14 @@
   let { data } = $props();
 </script>
 
-<div
-  class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64"
->
+<div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
   <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">ou</Hr>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">
-    Cadastrar objeto perdido
-  </Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto perdido</Button>
   <Hr />
   <P>Encontrou algum objeto na UNIRIO?</P>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">
-    Cadastrar objeto achado
-  </Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto achado</Button>
   <Hr />
   {#if data.user}
     <Heading tag="h4">Objetos em acompanhamento</Heading>
@@ -44,9 +38,7 @@
     {#if latestObjetos.achados.length > 0}
       <ObjectsCarousel id="found-objects-carousel" objects={latestObjetos.achados} />
     {:else}
-      <p class="text-center text-gray-500 dark:text-gray-400">
-        Nenhum objeto achado está disponível.
-      </p>
+      <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto achado está disponível.</p>
     {/if}
   {:catch error}
     <Alert color="red" dismissable>Erro: {error.message}</Alert>
@@ -59,9 +51,7 @@
     {#if latestObjetos.perdidos.length > 0}
       <ObjectsCarousel id="lost-objects-carousel" objects={latestObjetos.perdidos} />
     {:else}
-      <p class="text-center text-gray-500 dark:text-gray-400">
-        Nenhum objeto perdido está disponível.
-      </p>
+      <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto perdido está disponível.</p>
     {/if}
   {:catch error}
     <Alert color="red" dismissable>Erro: {error.message}</Alert>

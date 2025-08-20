@@ -5,8 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>UniFinder: {(page.status === 404 && 'Página não encontrada') || page.error?.message}</title
-  >
+  <title>UniFinder: {(page.status === 404 && 'Página não encontrada') || page.error?.message}</title>
   <meta name="description" content="Erro {page.status} - {page.error?.message}" />
 </svelte:head>
 <div class="flex min-h-screen flex-col items-center justify-center p-4 text-center">

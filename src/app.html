@@ -15,8 +15,7 @@
   <body data-sveltekit-preload-data="hover">
     <div id="scroll" class="scroll-wrapper">%sveltekit.body%</div>
     <script>
-      if (/mobile|android|touch|ipad|iphone|ipod/.test(navigator.userAgent.toLowerCase()))
-        document.body.classList.add('touch-device');
+      if (/mobile|android|touch|ipad|iphone|ipod/.test(navigator.userAgent.toLowerCase())) document.body.classList.add('touch-device');
     </script>
   </body>
   <style>
