@@ -25,30 +25,35 @@ const allCategorias: ObjetoCategoria[] = [
   'outro'
 ];
 
+const makeObjeto = (query?: query, id?: string): Objeto => {
+  const search = query?.search || '';
+  const tipo = query?.tipo ? fk.helpers.arrayElement(query.tipo) : fk.helpers.arrayElement(allTipos);
+  const local = query?.localidade ? fk.helpers.arrayElement(query.localidade) : fk.helpers.arrayElement(allLocals);
+  const categoria = query?.categoria ? fk.helpers.arrayElement(query.categoria) : fk.helpers.arrayElement(allCategorias);
+  const usuario = query?.usuario;
+
+  return {
+    id: id || fk.string.uuid(),
+    created_at: fk.date.past().toISOString(),
+    usuario: {
+      id: usuario ? 'current-user-id' : fk.string.uuid(),
+      username: usuario || fk.internet.username(),
+      avatar_url: usuario ? 'current-user-avatar-url' : fk.image.avatar()
+    },
+    imagem: fk.image.urlPicsumPhotos({ width: 50, height: 50, blur: 10 }),
+    titulo: search + fk.word.words(3).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
+    descricao: fk.word.words(10).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
+    local,
+    encaminhado: tipo === 'achado' ? fk.helpers.arrayElement(allLocals) : undefined,
+    tipo,
+    categoria: (categoria ? categoria : fk.helpers.arrayElement(allCategorias)) as ObjetoCategoria
+  };
+};
+
 const makeObjetosFiltered = (query?: query, qty: number = 10): Objeto[] => {
   const objetos: Objeto[] = [];
   for (let i = 0; i < qty; i++) {
-    const search = query?.search || '';
-    const tipo = query?.tipo ? fk.helpers.arrayElement(query.tipo) : fk.helpers.arrayElement(allTipos);
-    const local = query?.localidade ? fk.helpers.arrayElement(query.localidade) : fk.helpers.arrayElement(allLocals);
-    const categoria = query?.categoria ? fk.helpers.arrayElement(query.categoria) : fk.helpers.arrayElement(allCategorias);
-    const usuario = query?.usuario;
-    objetos.push({
-      id: fk.string.uuid(),
-      created_at: fk.date.past().toISOString(),
-      usuario: {
-        id: usuario ? 'current-user-id' : fk.string.uuid(),
-        username: usuario || fk.internet.username(),
-        avatar_url: usuario ? 'current-user-avatar-url' : fk.image.avatar()
-      },
-      imagem: fk.image.urlPicsumPhotos({ width: 50, height: 50, blur: 10 }),
-      titulo: search + fk.word.words(3).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
-      descricao: fk.word.words(10).replace(/^(\w)(.*)/, (_, f, r) => f.toUpperCase() + r.toLowerCase()),
-      local,
-      encaminhado: tipo === 'achado' ? fk.helpers.arrayElement(allLocals) : undefined,
-      tipo,
-      categoria: (categoria ? categoria : fk.helpers.arrayElement(allCategorias)) as ObjetoCategoria
-    });
+    objetos.push(makeObjeto(query));
   }
   return objetos;
 };
@@ -91,5 +96,20 @@ export const getObjetosLatest = async (data?: JSONGetObjetosLatestReq): Promise<
       achados[Math.floor(Math.random() * achados.length)] ?? perdidos[Math.floor(Math.random() * perdidos.length)],
       perdidos[Math.floor(Math.random() * perdidos.length)] ?? achados[Math.floor(Math.random() * achados.length)]
     ]
+  };
+};
+
+type PathGetById = {
+  id: string;
+};
+
+type JSONGetObjetoByIdRes = {
+  objeto: Objeto;
+};
+
+export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByIdRes> => {
+  const objeto = makeObjeto(undefined, path.id);
+  return {
+    objeto
   };
 };

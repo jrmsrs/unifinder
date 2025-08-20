@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ImageSolid } from 'flowbite-svelte-icons';
 
-  let { src, alt, divClass = '', imgClass = '' } = $props();
+  let { src, alt, class: divClass = '', imgClass = '' } = $props();
   let isLoading = $state(true);
 </script>
 

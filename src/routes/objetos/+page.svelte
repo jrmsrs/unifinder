@@ -23,34 +23,36 @@
     {:then { objetos }}
       {#if objetos.length > 0}
         {#each objetos as obj (obj.id)}
-          <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6">
-            <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="h-64" />
-            <Heading tag="h5" class="line-clamp-1">{obj.titulo}</Heading>
-            <P class="line-clamp-1">{obj.descricao}</P>
-            <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
-              {obj.tipo}
-            </Badge>
-            <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
-              <P class="col-span-2">
-                <MapPin class="mb-1 inline-block h-4 w-4" />
-                {dictLocalidades[obj.local]}
-              </P>
-              <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
-                {#if obj.encaminhado}Encaminhado{/if}
-              </P>
-              <P class="col-span-2">
-                <AtSign class="mb-1 inline-block h-4 w-4" />
-                {obj.usuario.username}
-              </P>
-              <P class="text-end">
-                {new Date(obj.created_at).toLocaleDateString('pt-BR', {
-                  year: '2-digit',
-                  month: '2-digit',
-                  day: '2-digit'
-                })}
-              </P>
-            </div>
-          </Card>
+          <a href={`/objetos/${obj.id}?ref=%2fobjetos`}>
+            <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6">
+              <ImageLoader src={obj.imagem} alt={obj.titulo} class="h-64" />
+              <Heading tag="h5" class="line-clamp-1">{obj.titulo}</Heading>
+              <P class="line-clamp-1">{obj.descricao}</P>
+              <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
+                {obj.tipo}
+              </Badge>
+              <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
+                <P class="col-span-2">
+                  <MapPin class="mb-1 inline-block h-4 w-4" />
+                  {dictLocalidades[obj.local]}
+                </P>
+                <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
+                  {#if obj.encaminhado}Encaminhado{/if}
+                </P>
+                <P class="col-span-2">
+                  <AtSign class="mb-1 inline-block h-4 w-4" />
+                  {obj.usuario.username}
+                </P>
+                <P class="text-end">
+                  {new Date(obj.created_at).toLocaleDateString('pt-BR', {
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit'
+                  })}
+                </P>
+              </div>
+            </Card>
+          </a>
         {/each}
       {:else}
         <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto encontrado.</p>

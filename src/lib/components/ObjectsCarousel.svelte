@@ -27,21 +27,23 @@
       {/each}
     {:else}
       {#each objects as obj}
-        <Card class="relative col-span-1 flex gap-2 p-6">
-          <ImageLoader src={obj.imagem} alt={obj.titulo} divClass="min-w-48 max-w-full h-48" />
-          <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.titulo}</Heading>
-          <div class="flex">
-            <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
-              {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
-            </Badge>
-            <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
-              {obj.local}
-              <span class="italic">por</span>
-              {obj.usuario.username}
-            </P>
-          </div>
-        </Card>
+        <a href={`/objetos/${obj.id}?ref=%2f`}>
+          <Card class="h-full relative col-span-1 flex gap-2 p-6">
+            <ImageLoader src={obj.imagem} alt={obj.titulo} class="min-w-48 max-w-full h-48" />
+            <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.titulo}</Heading>
+            <div class="flex">
+              <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
+                {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
+              </Badge>
+              <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
+                {obj.local}
+                <span class="italic">por</span>
+                {obj.usuario.username}
+              </P>
+            </div>
+          </Card>
+        </a>
       {/each}
       <a
         href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo}`}
