@@ -30,7 +30,7 @@
           class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''}
         />
       {/each}
-    {:then objetos}
+    {:then { objetos }}
       {#if objetos.length > 0}
         {#each objetos as obj (obj.id)}
           <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6">

@@ -24,10 +24,10 @@
   <Hr />
   {#if data.user}
     <Heading tag="h4">Objetos em acompanhamento</Heading>
-    {#await data.streamed.tutelados}
+    {#await data.streamed.objetos}
       <ObjectsCarousel id="found-objects-carousel" objects={null} />
-    {:then tutelados}
-      {#if tutelados.length > 0}
+    {:then { tutelados }}
+      {#if tutelados && tutelados.length > 0}
         <ObjectsCarousel id="tutelados-carousel" objects={tutelados} tutela />
       {:else}
         <p class="text-center text-gray-500 dark:text-gray-400">Nenhum objeto em acompanhamento.</p>
@@ -38,9 +38,9 @@
     <Hr />
   {/if}
   <Heading tag="h4">Últimos objetos achados</Heading>
-  {#await data.streamed.latestObjetos}
+  {#await data.streamed.objetos}
     <ObjectsCarousel id="found-objects-carousel" objects={null} />
-  {:then latestObjetos}
+  {:then { latestObjetos }}
     {#if latestObjetos.achados.length > 0}
       <ObjectsCarousel id="found-objects-carousel" objects={latestObjetos.achados} />
     {:else}
@@ -53,9 +53,9 @@
   {/await}
   <Hr />
   <Heading tag="h4">Últimos objetos perdidos</Heading>
-  {#await data.streamed.latestObjetos}
+  {#await data.streamed.objetos}
     <ObjectsCarousel id="found-objects-carousel" objects={null} />
-  {:then latestObjetos}
+  {:then { latestObjetos }}
     {#if latestObjetos.perdidos.length > 0}
       <ObjectsCarousel id="lost-objects-carousel" objects={latestObjetos.perdidos} />
     {:else}
