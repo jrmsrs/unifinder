@@ -10,6 +10,6 @@
   });
 </script>
 
-<div class="fixed h-full w-full inset-0 z-30 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm">
+<div class="fixed h-[calc(100%-4rem)] md:h-[calc(100%-8rem)] w-full bottom-0 left-0 right-0 z-30 flex items-center justify-center p-4 backdrop-blur-sm">
   <slot />
 </div>

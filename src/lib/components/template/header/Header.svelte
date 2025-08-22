@@ -16,7 +16,6 @@
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
-  import NavSeparator from './TheNavSep.svelte';
 
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
@@ -50,7 +49,7 @@
   let { session } = $props();
 </script>
 
-<header class="sticky top-0 z-10">
+<header class="sticky top-0 z-35">
   <Navbar class="bg-white pb-0 dark:bg-gray-900">
     <NavBrand href="/">
       <img src="/favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
