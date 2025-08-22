@@ -53,7 +53,7 @@
 <header class="sticky top-0 z-10">
   <Navbar class="bg-white pb-0 dark:bg-gray-900">
     <NavBrand href="/">
-      <img src="favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
+      <img src="/favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
       <span class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"> UniFinder </span>
     </NavBrand>
     <NavHamburger id="the-nav-hamburger" class="m-0 p-0 [&>*]:m-0 [&>*]:h-12 [&>*]:w-12 [&>*]:p-3" />
