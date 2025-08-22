@@ -25,12 +25,15 @@ const allCategorias: ObjetoCategoria[] = [
   'outro'
 ];
 
+const allStatus: ObjetoStatus[] = ['ABERTO', 'FINALIZADO'];
+
 const makeObjeto = (query?: query, id?: string): Objeto => {
   const search = query?.search || '';
   const tipo = query?.tipo ? fk.helpers.arrayElement(query.tipo) : fk.helpers.arrayElement(allTipos);
   const local = query?.localidade ? fk.helpers.arrayElement(query.localidade) : fk.helpers.arrayElement(allLocals);
   const categoria = query?.categoria ? fk.helpers.arrayElement(query.categoria) : fk.helpers.arrayElement(allCategorias);
   const usuario = query?.usuario;
+  const inativo = query?.inativo;
 
   return {
     id: id || fk.string.uuid(),
@@ -46,7 +49,8 @@ const makeObjeto = (query?: query, id?: string): Objeto => {
     local,
     encaminhado: tipo === 'achado' ? fk.helpers.arrayElement(allLocals) : undefined,
     tipo,
-    categoria: (categoria ? categoria : fk.helpers.arrayElement(allCategorias)) as ObjetoCategoria
+    categoria: (categoria ? categoria : fk.helpers.arrayElement(allCategorias)) as ObjetoCategoria,
+    status: inativo ? fk.helpers.arrayElement(allStatus) : 'ABERTO'
   };
 };
 
