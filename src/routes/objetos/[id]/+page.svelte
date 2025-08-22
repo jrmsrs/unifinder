@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
@@ -8,10 +9,10 @@
   import ObjetoTable from '$lib/components/routes/ObjetoTable.svelte';
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictLocalidades } from '$lib/utils/dicionaries.js';
-  import { Badge, Button, Heading, Hr, Modal, P } from 'flowbite-svelte';
+  import { faker as fk } from '@faker-js/faker';
+  import { A, Badge, Button, Heading, Hr, Modal, P } from 'flowbite-svelte';
+  import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft, AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
-  // get page searchParams "ref"
-  import { page } from '$app/state';
   let ref = page.url.searchParams.get('ref') || '/objetos';
   let { data } = $props();
 </script>
@@ -43,14 +44,12 @@
   </div>
 {/if}
 
-<div class="fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm"></div>
-
 <ModalContainer>
   <Modal
     modal={false}
     class="
       relative! top-auto left-auto max-h-full w-11/12
-      max-w-sm -translate-x-0 -translate-y-0 text-gray-900 shadow-2xl shadow-black backdrop:bg-none sm:max-w-md
+      max-w-sm -translate-x-0 -translate-y-0 text-gray-900 shadow-2xl shadow-black sm:max-w-md
       md:max-w-3xl xl:max-w-4xl dark:text-white [&>*]:grid [&>*]:grid-cols-5 [&>*]:gap-4 [&>*]:p-4
     "
     size="lg"
@@ -101,20 +100,63 @@
       class="g-f col-span-5 flex flex-col gap-4 md:col-span-2 [&>div]:rounded-lg [&>div]:bg-gray-100 [&>div]:p-4 [&>div]:dark:bg-gray-900"
     >
       <div id="acoes">
-        <Heading tag="h3" class="text-xl font-bold">Ações</Heading>
-        <pre>Botões pra:
-  - Visitante: 
-    - reivindicar;
-  - Usuário: 
-    - modificar;
-    - finalizar;
-    - excluir;</pre>
+        <Heading tag="h3" class="text-xl font-bold">Ações (WIP)</Heading>
+        <div class="my-1 grid grid-cols-5 gap-1">
+          <Button color="green" class="col-span-3 flex justify-between">
+            <CheckOutline />Finalizar
+            <div class="h-5 w-5"></div>
+          </Button>
+          <Button color="yellow"><EditSolid /></Button>
+          <Button color="red"><TrashBinSolid /></Button>
+          <code class="col-span-5">(com tutela)</code>
+        </div>
+        <div class="my-1 flex flex-col gap-1">
+          <Button color="primary" class="flex justify-between">
+            <FilePenSolid class="h-5 w-5 shrink-0" /> Reivindicar
+            <div class="h-5 w-5"></div>
+          </Button>
+          <code>(sem tutela)</code>
+        </div>
       </div>
       <div id="comentarios" class="h-full">
-        <Heading tag="h3" class="text-xl font-bold">Comentários</Heading>
-        <P class="text-gray-700 dark:text-gray-400">
-          Esta seção está em desenvolvimento. Em breve você poderá comentar e interagir com outros usuários sobre este objeto.
-        </P>
+        <Heading tag="h3" class="text-xl font-bold">Comentários (WIP)</Heading>
+        <div id="novo-comentario" class="mb-2 flex flex-col">
+          <P class="text-gray-700 dark:text-gray-400">
+            Faça <A href="/auth">login</A> para comentar.
+          </P>
+          <code>(não logado)</code>
+          <textarea
+            class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+            placeholder="Escreva seu comentário..."
+          ></textarea>
+          <Button color="primary" class="mt-2">Comentar</Button>
+          <code>(logado)</code>
+        </div>
+        <div id="lista-comentarios">
+          <P class="text-gray-700 dark:text-gray-400">Nenhum comentário ainda.</P>
+          <code>(0 comentários)</code>
+          <div>
+            <div class="text-sm">
+              <div class="mb-1 flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background-color: {fk.color.human()}">U</div>
+                <div>
+                  <span class="font-semibold">username</span>
+                  <span class="text-xs font-normal">•</span>
+                  <span class="text-xs font-normal">01/01/2024</span>
+                </div>
+                <div class="ml-auto">
+                  <Button outline color="red" size="xs">
+                    <TrashBinSolid class="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <p>Comentário de exemplo.</p>
+              </div>
+            </div>
+          </div>
+          <code>(algum comentário / usuario pode excluir)</code>
+        </div>
       </div>
     </div>
   </Modal>
@@ -127,6 +169,24 @@
   - signed_up=${Boolean(data.user)}
   - objeto=${JSON.stringify(objeto, null, 2)}
 # todo (tela objeto)
-  - ( ) layout objeto`}
+  - (-) layout objeto
+    - (-) exibir informações do objeto
+      - (x) mock objeto
+    - (-) exibir ações
+      - (x) botões de ações do responsável
+      - (x) botões de ações do usuário
+      - ( ) modal finalizar
+      - ( ) modal editar
+      - ( ) modal excluir
+    - (-) exibir comentários
+      - (x) ações do dono
+      - ( ) mock comentários
+      - ( ) modal excluir comentário
+  - ( ) integração
+    - ( ) autorização
+    - ( ) get objeto
+    - ( ) get comentarios
+    - ( ) ações (put/delete) de objeto
+    - ( ) ações (delete) de comentário`}
   />
 {/await}
