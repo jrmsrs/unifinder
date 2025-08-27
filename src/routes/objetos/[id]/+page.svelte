@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
@@ -63,7 +64,7 @@
         absolute top-4 left-4 z-10 flex h-16 w-16 items-center justify-center rounded-full bg-transparent p-4
         text-sm font-semibold text-white transition hover:bg-gray-900/50
       "
-        onclick={() => history.back()}
+        onclick={() => goto(decodeURIComponent(ref))}
       >
         <ArrowLeft class="drop-shadow-xs drop-shadow-gray-900" />
       </button>
@@ -129,7 +130,7 @@
             class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
             placeholder="Escreva seu comentário..."
           ></textarea>
-          <Button color="primary" class="mt-2">Comentar</Button>
+          <Button outline color="primary" class="mt-2">Comentar</Button>
           <code>(logado)</code>
         </div>
         <div id="lista-comentarios">
