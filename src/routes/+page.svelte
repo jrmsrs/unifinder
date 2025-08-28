@@ -70,5 +70,11 @@
   - (x) layout cards objetos em acompanhamento
   - (x) layout cards ultimos achados/perdidos
   - (x) mocks cards
+  - ( ) integração
+# todo (autenticação):
+  - (x) login padrão
+  - (x) sign up padrão
+  - (x) recuperação de senha padrão
+  - ( ) usuario tem username (etapa adicional)
   - ( ) integração`}
 />

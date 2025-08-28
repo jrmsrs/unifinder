@@ -98,18 +98,23 @@
       {/await}
     </div>
     <div
-      class="g-f col-span-5 flex flex-col gap-4 md:col-span-2 [&>div]:rounded-lg [&>div]:bg-gray-100 [&>div]:p-4 [&>div]:dark:bg-gray-900"
+      class="g-f col-span-5 flex flex-col gap-4 md:col-span-2 [&>div]:rounded-lg [&>div]:bg-gray-50 [&>div]:p-4 [&>div]:dark:bg-gray-900"
     >
       <div id="acoes">
         <Heading tag="h3" class="text-xl font-bold">Ações (WIP)</Heading>
         <div class="my-1 grid grid-cols-5 gap-1">
-          <Button color="green" class="col-span-3 flex justify-between">
-            <CheckOutline />Finalizar
-            <div class="h-5 w-5"></div>
-          </Button>
-          <Button color="yellow"><EditSolid /></Button>
-          <Button color="red"><TrashBinSolid /></Button>
-          <code class="col-span-5">(com tutela)</code>
+          {#await data.streamed.objeto}
+            <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
+            <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
+          {:then { objeto }}
+            <Button color="green" class="col-span-3 flex justify-between">
+              <CheckOutline />Finalizar
+              <div class="h-5 w-5"></div>
+            </Button>
+            <Button color="yellow"><EditSolid /></Button>
+            <Button color="red"><TrashBinSolid /></Button>
+            <code class="col-span-5">(com tutela)</code>
+          {/await}
         </div>
         <div class="my-1 flex flex-col gap-1">
           <Button color="primary" class="flex justify-between">
@@ -122,41 +127,57 @@
       <div id="comentarios" class="h-full">
         <Heading tag="h3" class="text-xl font-bold">Comentários (WIP)</Heading>
         <div id="novo-comentario" class="mb-2 flex flex-col">
-          <P class="text-gray-700 dark:text-gray-400">
-            Faça <A href="/auth">login</A> para comentar.
-          </P>
-          <code>(não logado)</code>
-          <textarea
-            class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
-            placeholder="Escreva seu comentário..."
-          ></textarea>
-          <Button outline color="primary" class="mt-2">Comentar</Button>
-          <code>(logado)</code>
+          {#await data.streamed.comentarios then}
+            {#if data.user}
+              <textarea
+                class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+                placeholder="Escreva seu comentário..."
+              ></textarea>
+              <Button outline color="primary" class="mt-2">Comentar</Button>
+            {:else}
+              <P class="text-gray-700 dark:text-gray-400">
+                Faça <A href="/auth">login</A> para comentar.
+              </P>
+            {/if}
+          {/await}
         </div>
         <div id="lista-comentarios">
-          <P class="text-gray-700 dark:text-gray-400">Nenhum comentário ainda.</P>
-          <code>(0 comentários)</code>
-          <div>
-            <div class="text-sm">
-              <div class="mb-1 flex items-center gap-2">
-                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background-color: {fk.color.human()}">U</div>
-                <div>
-                  <span class="font-semibold">username</span>
-                  <span class="text-xs font-normal">•</span>
-                  <span class="text-xs font-normal">01/01/2024</span>
+          {#await data.streamed.comentarios}
+            {#each { length: 4 }}
+              <Skeleton />
+            {/each}
+          {:then { comentarios }}
+            {#if comentarios.length > 0}
+              {#each comentarios as comentario}
+                <div class="mb-4 text-sm">
+                  <div class="mb-1 flex items-center gap-2">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background-color: {fk.color.human()}">
+                      {comentario.usuario.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <span class="font-semibold">{comentario.usuario.username}</span>
+                      <span class="text-xs font-normal">•</span>
+                      <span class="text-xs font-normal">{new Date(comentario.created_at).toLocaleDateString()}</span>
+                    </div>
+                    {#if data.user?.email === comentario.usuario.username}
+                      <div class="ml-auto">
+                        <Button outline color="red" size="xs">
+                          <TrashBinSolid class="h-4 w-4" />
+                        </Button>
+                      </div>
+                    {/if}
+                  </div>
+                  <div class="flex gap-2">
+                    <p>{comentario.texto}</p>
+                  </div>
                 </div>
-                <div class="ml-auto">
-                  <Button outline color="red" size="xs">
-                    <TrashBinSolid class="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div class="flex gap-2">
-                <p>Comentário de exemplo.</p>
-              </div>
-            </div>
-          </div>
-          <code>(algum comentário / usuario pode excluir)</code>
+              {/each}
+            {:else}
+              <P class="text-gray-700 dark:text-gray-400">Nenhum comentário ainda.</P>
+            {/if}
+          {:catch error}
+            <p class="text-red-500">Erro ao carregar os comentários: {error.message}</p>
+          {/await}
         </div>
       </div>
     </div>
@@ -181,12 +202,13 @@
       - ( ) modal excluir
     - (-) exibir comentários
       - (x) ações do dono
-      - ( ) mock comentários
+      - (x) mock comentários
       - ( ) modal excluir comentário
   - ( ) integração
-    - ( ) autorização
     - ( ) get objeto
     - ( ) get comentarios
+    - ( ) autorização nivel dono do objeto
+    - ( ) autorização nivel dono do comentario
     - ( ) ações (put/delete) de objeto
     - ( ) ações (delete) de comentário`}
   />

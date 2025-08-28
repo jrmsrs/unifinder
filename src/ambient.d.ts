@@ -28,6 +28,13 @@ declare global {
     categoria: ObjetoCategoria;
     status: ObjetoStatus;
   };
+
+  type Comentario = {
+    id: string;
+    created_at: string;
+    usuario: { id: string; username: string; avatar_url: string };
+    texto: string;
+  };
 }
 
 export {};

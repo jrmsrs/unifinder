@@ -1,5 +1,6 @@
-import type { PageServerLoad } from './$types';
 import { getObjetos } from '$lib/api';
+import { ur } from '@faker-js/faker';
+import type { PageServerLoad } from './$types';
 
 type query = {
   search?: string;
@@ -32,33 +33,26 @@ const fetchFilteredObjetos = async (qty: number, query?: query) => {
   return objetos;
 };
 
-export const load: PageServerLoad = async ({ url, locals }) => {
-  const search = url.searchParams.get('search') ?? undefined;
-  const tipoParam = url.searchParams.getAll('tipo').length > 0 ? url.searchParams.getAll('tipo') : undefined;
-  const tipo = tipoParam?.every((e): e is ObjetoTipo => allTipos.includes(e as ObjetoTipo)) ? tipoParam : undefined;
-  const localidadeParam = url.searchParams.getAll('localidade').length > 0 ? url.searchParams.getAll('localidade') : undefined;
-  const localidade = localidadeParam?.every((e): e is ObjetoLocalidade => allLocals.includes(e as ObjetoLocalidade))
-    ? localidadeParam
-    : undefined;
-  const categoriaParam = url.searchParams.getAll('categoria').length > 0 ? url.searchParams.getAll('categoria') : undefined;
-  const categoria = categoriaParam?.every((e): e is ObjetoCategoria => allCategorias.includes(e as ObjetoCategoria))
-    ? categoriaParam
-    : undefined;
-  const inativo = url.searchParams.get('inativo') === 'true' ? true : undefined;
-  const usuario = url.searchParams.get('tutela') && locals.user?.email; // .email temporariamente
-  const query: query = {
-    search,
-    tipo,
-    localidade,
-    categoria,
-    usuario: usuario || undefined,
-    inativo
-  };
-
+const buildObjetoQuery = (url: URL, email?: string): query => {
+  const tipoUnf = url.searchParams.getAll('tipo').length > 0 ? url.searchParams.getAll('tipo') : undefined;
+  const localidadeUnf = url.searchParams.getAll('localidade').length > 0 ? url.searchParams.getAll('localidade') : undefined;
+  const categoriaUnf = url.searchParams.getAll('categoria').length > 0 ? url.searchParams.getAll('categoria') : undefined;
   return {
-    query,
+    search: url.searchParams.get('search') ?? undefined,
+    tipo: tipoUnf?.every((e): e is ObjetoTipo => allTipos.includes(e as ObjetoTipo)) ? tipoUnf : undefined,
+    localidade: localidadeUnf?.every((e): e is ObjetoLocalidade => allLocals.includes(e as ObjetoLocalidade)) ? localidadeUnf : undefined,
+    categoria: categoriaUnf?.every((e): e is ObjetoCategoria => allCategorias.includes(e as ObjetoCategoria)) ? categoriaUnf : undefined,
+    inativo: url.searchParams.get('inativo') === 'true' ? true : undefined,
+    usuario: url.searchParams.get('tutela') ? email : undefined
+  };
+};
+
+export const load: PageServerLoad = async ({ url, locals }) => {
+  const objetoQuery = buildObjetoQuery(url, locals.user?.email);
+  return {
+    query: objetoQuery,
     streamed: {
-      objetos: fetchFilteredObjetos(10, query)
+      objetos: fetchFilteredObjetos(10, objetoQuery)
     }
   };
 };

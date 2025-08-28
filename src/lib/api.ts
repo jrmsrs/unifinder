@@ -54,6 +54,23 @@ const makeObjeto = (query?: query, id?: string): Objeto => {
   };
 };
 
+const makeComentarios = (id: string): Comentario[] => {
+  const comentarios: Comentario[] = [];
+  for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
+    comentarios.push({
+      id: fk.string.uuid(),
+      created_at: fk.date.past().toISOString(),
+      usuario: {
+        id: fk.string.uuid(),
+        username: fk.internet.userName(),
+        avatar_url: fk.image.avatar()
+      },
+      texto: fk.lorem.sentence()
+    });
+  }
+  return comentarios;
+};
+
 const makeObjetosFiltered = (query?: query, qty: number = 10): Objeto[] => {
   const objetos: Objeto[] = [];
   for (let i = 0; i < qty; i++) {
@@ -115,5 +132,16 @@ export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByI
   const objeto = makeObjeto(undefined, path.id);
   return {
     objeto
+  };
+};
+
+type JSONGetComentariosByObjetoIdRes = {
+  comentarios: Comentario[];
+};
+
+export const getComentariosByObjetoId = async (path: PathGetById): Promise<JSONGetComentariosByObjetoIdRes> => {
+  const comentarios = makeComentarios(path.id);
+  return {
+    comentarios
   };
 };
