@@ -81,7 +81,7 @@
           <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
           <ObjetoTable>
             <Row key="Postado:" value={new Date(objeto.created_at).toLocaleDateString()} icon={Calendar} />
-            <Row key="{objeto.tipo === 'achado' ? 'Coletado por:' : 'Dono'}:" value={objeto.usuario.username} icon={AtSign} />
+            <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.usuario.username} icon={AtSign} />
             <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local]} icon={MapPin} />
             {#if objeto.tipo === 'achado'}
               <Row key="Encaminhado:" value={objeto.encaminhado ?? 'Em mãos'} icon={MapPin} />
@@ -107,25 +107,28 @@
             <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
             <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
           {:then { objeto }}
-            <Button color="green" class="col-span-3 flex justify-between">
-              <CheckOutline />Finalizar
-              <div class="h-5 w-5"></div>
-            </Button>
-            <Button color="yellow"><EditSolid /></Button>
-            <Button color="red"><TrashBinSolid /></Button>
-            <code class="col-span-5">(com tutela)</code>
+            {#if objeto.usuario.email === data.user?.email}
+              <Button color="green" class="col-span-3 flex justify-between">
+                <CheckOutline />Finalizar
+                <div class="h-5 w-5"></div>
+              </Button>
+              <Button color="yellow"><EditSolid /></Button>
+              <Button color="red"><TrashBinSolid /></Button>
+            {:else}
+              <Button color="primary" class="col-span-5 flex justify-between">
+                <FilePenSolid class="h-5 w-5 shrink-0" /> Reivindicar
+                <div class="h-5 w-5"></div>
+              </Button>
+            {/if}
           {/await}
-        </div>
-        <div class="my-1 flex flex-col gap-1">
-          <Button color="primary" class="flex justify-between">
-            <FilePenSolid class="h-5 w-5 shrink-0" /> Reivindicar
-            <div class="h-5 w-5"></div>
-          </Button>
-          <code>(sem tutela)</code>
         </div>
       </div>
       <div id="comentarios" class="h-full">
-        <Heading tag="h3" class="text-xl font-bold">Comentários (WIP)</Heading>
+        <Heading tag="h3" class="text-xl font-bold">
+          Comentários
+          {#await data.streamed.comentarios then { comentarios: c }}({c.length}){/await}
+          (WIP)
+        </Heading>
         <div id="novo-comentario" class="mb-2 flex flex-col">
           {#await data.streamed.comentarios then}
             {#if data.user}
@@ -159,13 +162,15 @@
                       <span class="text-xs font-normal">•</span>
                       <span class="text-xs font-normal">{new Date(comentario.created_at).toLocaleDateString()}</span>
                     </div>
-                    {#if data.user?.email === comentario.usuario.username}
-                      <div class="ml-auto">
-                        <Button outline color="red" size="xs">
-                          <TrashBinSolid class="h-4 w-4" />
-                        </Button>
-                      </div>
-                    {/if}
+                    {#await data.streamed.objeto then { objeto }}
+                      {#if data.user?.email === comentario.usuario.email || data.user?.email === objeto.usuario.email}
+                        <div class="ml-auto">
+                          <Button outline color="red" size="xs">
+                            <TrashBinSolid class="h-4 w-4" />
+                          </Button>
+                        </div>
+                      {/if}
+                    {/await}
                   </div>
                   <div class="flex gap-2">
                     <p>{comentario.texto}</p>

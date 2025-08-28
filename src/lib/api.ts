@@ -27,7 +27,8 @@ const allCategorias: ObjetoCategoria[] = [
 
 const allStatus: ObjetoStatus[] = ['ABERTO', 'FINALIZADO'];
 
-const makeObjeto = (query?: query, id?: string): Objeto => {
+const makeObjeto = (query?: query, id?: string, userEmail?: string): Objeto => {
+  const isOwn = Boolean(Math.random() > 0.5 && userEmail);
   const search = query?.search || '';
   const tipo = query?.tipo ? fk.helpers.arrayElement(query.tipo) : fk.helpers.arrayElement(allTipos);
   const local = query?.localidade ? fk.helpers.arrayElement(query.localidade) : fk.helpers.arrayElement(allLocals);
@@ -40,7 +41,8 @@ const makeObjeto = (query?: query, id?: string): Objeto => {
     created_at: fk.date.past().toISOString(),
     usuario: {
       id: usuario ? 'current-user-id' : fk.string.uuid(),
-      username: usuario || fk.internet.username(),
+      username: (usuario || isOwn) && userEmail ? userEmail.split('@')[0] : fk.internet.username(),
+      email: (usuario || isOwn) && userEmail ? userEmail : fk.internet.email(),
       avatar_url: usuario ? 'current-user-avatar-url' : fk.image.avatar()
     },
     imagem: fk.image.urlPicsumPhotos({ width: 50, height: 50, blur: 10 }),
@@ -54,15 +56,20 @@ const makeObjeto = (query?: query, id?: string): Objeto => {
   };
 };
 
-const makeComentarios = (id: string): Comentario[] => {
+const makeComentarios = (userEmail?: string): Comentario[] => {
   const comentarios: Comentario[] = [];
   for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
+    const isOwn = Boolean(Math.random() > 0.5 && userEmail);
+    const genre = Math.random() > 0.5 ? 'female' : 'male';
+    const firstName = fk.person.firstName(genre);
+    const lastName = fk.person.lastName(genre);
     comentarios.push({
       id: fk.string.uuid(),
       created_at: fk.date.past().toISOString(),
       usuario: {
         id: fk.string.uuid(),
-        username: fk.internet.userName(),
+        username: isOwn ? (userEmail as string).split('@')[0] : fk.internet.username({ firstName, lastName }),
+        email: isOwn ? (userEmail as string) : fk.internet.email({ firstName, lastName }),
         avatar_url: fk.image.avatar()
       },
       texto: fk.lorem.sentence()
@@ -128,8 +135,8 @@ type JSONGetObjetoByIdRes = {
   objeto: Objeto;
 };
 
-export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByIdRes> => {
-  const objeto = makeObjeto(undefined, path.id);
+export const getObjetoById = async (path: PathGetById, email?: string): Promise<JSONGetObjetoByIdRes> => {
+  const objeto = makeObjeto(undefined, path.id, email);
   return {
     objeto
   };
@@ -139,8 +146,8 @@ type JSONGetComentariosByObjetoIdRes = {
   comentarios: Comentario[];
 };
 
-export const getComentariosByObjetoId = async (path: PathGetById): Promise<JSONGetComentariosByObjetoIdRes> => {
-  const comentarios = makeComentarios(path.id);
+export const getComentariosByObjetoId = async (path: PathGetById, userEmail?: string): Promise<JSONGetComentariosByObjetoIdRes> => {
+  const comentarios = makeComentarios(userEmail);
   return {
     comentarios
   };
