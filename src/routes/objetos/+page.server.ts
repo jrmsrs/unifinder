@@ -50,6 +50,7 @@ const buildObjetoQuery = (url: URL, email?: string): query => {
 export const load: PageServerLoad = async ({ url, locals }) => {
   const objetoQuery = buildObjetoQuery(url, locals.user?.email);
   return {
+    newObjeto: url.searchParams.get('new') === 'true',
     query: objetoQuery,
     streamed: {
       objetos: fetchFilteredObjetos(10, objetoQuery)

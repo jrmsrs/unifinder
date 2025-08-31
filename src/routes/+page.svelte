@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
@@ -11,10 +12,14 @@
   <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">ou</Hr>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto perdido</Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true&tipo=perdido')}>
+    Cadastrar objeto perdido
+  </Button>
   <Hr />
   <P>Encontrou algum objeto na UNIRIO?</P>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto achado</Button>
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true&tipo=achado')}>
+    Cadastrar objeto achado
+  </Button>
   <Hr />
   {#if data.user}
     <Heading tag="h4">Objetos em acompanhamento</Heading>
