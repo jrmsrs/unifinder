@@ -16,6 +16,6 @@
   };
 </script>
 
-That's a página privada do: {data.user?.email}
+That's a página privada do: {data.user?.user_metadata.username}
 
 <Button onclick={logout}>Logout</Button>

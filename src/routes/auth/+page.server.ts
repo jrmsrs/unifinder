@@ -11,11 +11,28 @@ export function load({ locals: { supabase }, url }) {
 
 export const actions: Actions = {
   signup: async ({ request, locals: { supabase } }) => {
+    let validationErrors = [];
     const formData = await request.formData();
     const email = formData.get('email') as string;
+    const username = formData.get('username') as string;
     const password = formData.get('password') as string;
-
-    const { error } = await supabase.auth.signUp({ email, password });
+    const passwordConfirm = formData.get('passwordConfirm') as string;
+    if (!email || !username || !password || !passwordConfirm) {
+      validationErrors.push('Todos os campos são obrigatórios');
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      validationErrors.push('E-mail inválido');
+    }
+    if (password !== passwordConfirm) {
+      validationErrors.push('As duas senhas não combinam');
+    }
+    if (password.length < 6) {
+      validationErrors.push('A senha deve ter pelo menos 6 caracteres');
+    }
+    if (validationErrors.length > 0) {
+      redirect(303, '/auth?tab=signup&error=' + encodeURIComponent(validationErrors.join('; ')));
+    }
+    const { error } = await supabase.auth.signUp({ email, password, options: { data: { username } } });
     if (error) {
       redirect(303, '/auth?tab=signup&error=' + encodeURIComponent(error.message));
     } else {
