@@ -1,11 +1,14 @@
+import { PUBLIC_VERCEL_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export function load({ locals: { supabase }, url }) {
   return {
+    finish: url.searchParams.get('finish') === 'true',
     tab: url.searchParams.get('tab') || 'login',
     error: url.searchParams.get('error') || null,
-    user: supabase.auth.getUser()
+    // user: supabase.auth.getUser(),
+    session: supabase.auth.getSession()
   };
 }
 
@@ -53,12 +56,31 @@ export const actions: Actions = {
   },
   gauth: async ({ locals: { supabase }, url }) => {
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
+      provider: 'google',
+      options: {
+        redirectTo: PUBLIC_VERCEL_URL ? `${PUBLIC_VERCEL_URL}/auth?finish=true` : 'http://localhost:5173/auth?finish=true'
+      }
     });
     if (error) {
       redirect(303, '/auth?tab=' + url.searchParams.get('tab') + '&error=' + encodeURIComponent(error.message));
     } else {
       redirect(303, data.url);
+    }
+  },
+  gauthFinish: async ({ request, locals: { supabase } }) => {
+    const formData = await request.formData();
+    const username = formData.get('username') as string;
+
+    if (!username) return;
+
+    const { error } = await supabase.auth.updateUser({
+      data: { username }
+    });
+
+    if (error) {
+      redirect(303, '/?&error=' + encodeURIComponent(error.message));
+    } else {
+      redirect(303, '/');
     }
   }
 };

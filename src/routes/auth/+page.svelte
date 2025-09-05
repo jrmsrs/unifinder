@@ -1,6 +1,6 @@
 <script lang="ts">
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
-  import { A, Alert, Button, Heading, Hr, Input, Label, P } from 'flowbite-svelte';
+  import { A, Alert, Button, Heading, Hr, Input, Label, Modal, P } from 'flowbite-svelte';
   import { GoogleSolid } from 'flowbite-svelte-icons';
   import { AtSign } from 'lucide-svelte';
   import type { PageData } from './$types';
@@ -27,7 +27,41 @@
 		[&>*]:min-[420px]:min-w-[380px]
   "
 >
-  {#if data.tab === 'reset'}
+  {#if data.user || data.finish}
+    <Heading tag="h3" class="mb-6 text-center">Finalize seu cadastro</Heading>
+    <form method="POST" action="?/gauthFinish">
+      {#if data.error}
+        <Alert color="red" dismissable>{data.error}</Alert>
+      {/if}
+
+      <div>
+        <Label>Email</Label>
+        <Input disabled value={data.user?.email} />
+      </div>
+
+      <div>
+        <Label for="username">Nome de usuário</Label>
+        <div class="flex items-center justify-between gap-2">
+          <div><AtSign class="inline-block h-8 w-8" /></div>
+          <Input
+            placeholder="Digite seu nome de usuário"
+            autocomplete="on"
+            required
+            id="username"
+            name="username"
+            type="text"
+            bind:value={username}
+          />
+          <div class="flex h-12 w-16 items-center justify-center rounded-full bg-green-500 text-4xl">
+            {username.charAt(0).toUpperCase() || '*'}
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-2">
+        <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Finalizar cadastro</Button>
+      </div>
+    </form>
+  {:else if data.tab === 'reset'}
     <Heading tag="h3" class="mb-6 text-center">Redefinir senha</Heading>
     <form method="POST" action="?/reset">
       {#if data.error}
@@ -59,18 +93,18 @@
       <div class="flex flex-col items-center justify-center gap-2">
         <div
           class="
-            rounded-[10px] bg-linear-to-r/longer
-            from-[#EA4335] to-[#4285F4] p-0.5
-            hover:dark:from-[#A50E0E] hover:dark:to-[#174EA6]
-          "
+              rounded-[10px] bg-linear-to-r/longer
+              from-[#EA4335] to-[#4285F4] p-0.5
+              hover:dark:from-[#A50E0E] hover:dark:to-[#174EA6]
+            "
         >
           <Button
             type="submit"
             class="
-              bg-white! text-gray-900! 
-              hover:bg-linear-to-r/longer! hover:from-[#FAD2CF]! hover:to-[#D2E3FC]! 
-              hover:text-gray-900! dark:bg-gray-900! dark:text-white!
-            "
+                bg-white! text-gray-900! 
+                hover:bg-linear-to-r/longer! hover:from-[#FAD2CF]! hover:to-[#D2E3FC]! 
+                hover:text-gray-900! dark:bg-gray-900! dark:text-white!
+              "
           >
             <GoogleSolid class="me-2" /> Cadastrar com Google
           </Button>
@@ -100,7 +134,7 @@
             bind:value={username}
           />
           <div class="flex h-12 w-16 items-center justify-center rounded-full bg-green-500 text-4xl">
-            {username.charAt(0).toUpperCase() || '@'}
+            {username.charAt(0).toUpperCase() || '*'}
           </div>
         </div>
       </div>
