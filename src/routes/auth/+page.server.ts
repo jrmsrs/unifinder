@@ -1,4 +1,5 @@
 import { PUBLIC_VERCEL_URL } from '$env/static/public';
+import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -7,6 +8,7 @@ export function load({ locals: { supabase }, url }) {
     finish: url.searchParams.get('finish') === 'true',
     tab: url.searchParams.get('tab') || 'login',
     error: url.searchParams.get('error') || null,
+    form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
     // user: supabase.auth.getUser(),
     session: supabase.auth.getSession()
   };
@@ -23,6 +25,9 @@ export const actions: Actions = {
     if (!email || !username || !password || !passwordConfirm) {
       validationErrors.push('Todos os campos são obrigatórios');
     }
+    if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9_]+$/.test(username)) {
+      validationErrors.push('Nome de usuário inválido (permitido apenas letras, números e underscores - pelo menos uma letra)');
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       validationErrors.push('E-mail inválido');
     }
@@ -33,11 +38,17 @@ export const actions: Actions = {
       validationErrors.push('A senha deve ter pelo menos 6 caracteres');
     }
     if (validationErrors.length > 0) {
-      redirect(303, '/auth?tab=signup&error=' + encodeURIComponent(validationErrors.join('; ')));
+      redirect(
+        303,
+        `/auth?tab=signup&error=${encodeURIComponent(validationErrors.join('; '))}&form=${stringToBase64URL(JSON.stringify({ email, username }))}`
+      );
     }
-    const { error } = await supabase.auth.signUp({ email, password, options: { data: { username } } });
+    const { error } = await supabase.auth.signUp({ email, password, options: { data: { username, role: 'user' } } });
     if (error) {
-      redirect(303, '/auth?tab=signup&error=' + encodeURIComponent(error.message));
+      redirect(
+        303,
+        `/auth?tab=signup&error=${encodeURIComponent(error.message)}&form=${stringToBase64URL(JSON.stringify({ email, username }))}`
+      );
     } else {
       redirect(303, '/');
     }
@@ -49,7 +60,7 @@ export const actions: Actions = {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      redirect(303, '/auth?tab=login&error=' + encodeURIComponent(error.message));
+      redirect(303, `/auth?tab=login&error=${encodeURIComponent(error.message)}&form=${stringToBase64URL(JSON.stringify({ email }))}`);
     } else {
       redirect(303, '/private');
     }
@@ -62,7 +73,7 @@ export const actions: Actions = {
       }
     });
     if (error) {
-      redirect(303, '/auth?tab=' + url.searchParams.get('tab') + '&error=' + encodeURIComponent(error.message));
+      redirect(303, `/auth?tab=${url.searchParams.get('tab')}&error=${encodeURIComponent(error.message)}`);
     } else {
       redirect(303, data.url);
     }
@@ -74,11 +85,14 @@ export const actions: Actions = {
     if (!username) return;
 
     const { error } = await supabase.auth.updateUser({
-      data: { username }
+      data: { username, role: 'user' }
     });
 
     if (error) {
-      redirect(303, '/?&error=' + encodeURIComponent(error.message));
+      redirect(
+        303,
+        `/auth?&error=${encodeURIComponent(error.message)}&form=${stringToBase64URL(JSON.stringify({ username }))}&finish=true`
+      );
     } else {
       redirect(303, '/');
     }

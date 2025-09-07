@@ -7,8 +7,8 @@
 
   let {
     data,
-    username = $bindable(''),
-    email = $bindable(''),
+    username = $bindable(data.form ? (data.form.username ?? '') : ''),
+    email = $bindable(data.form ? (data.form.email ?? '') : ''),
     senha = $bindable(''),
     confirmaSenha = $bindable('')
   }: {
@@ -27,7 +27,7 @@
 		[&>*]:min-[420px]:min-w-[380px]
   "
 >
-  {#if data.user || data.finish}
+  {#if data.user || (data.finish && data.error !== 'server_error')}
     <Heading tag="h3" class="mb-6 text-center">Finalize seu cadastro</Heading>
     <form method="POST" action="?/gauthFinish">
       {#if data.error}

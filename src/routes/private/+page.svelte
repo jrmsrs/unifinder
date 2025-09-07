@@ -18,4 +18,6 @@
 
 That's a página privada do: {data.user?.user_metadata.username}
 
+<pre>{JSON.stringify(data.user, null, 2)}</pre>
+
 <Button onclick={logout}>Logout</Button>

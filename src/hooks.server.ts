@@ -65,16 +65,13 @@ const authGuard: Handle = async ({ event, resolve }) => {
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;
   event.locals.user = user;
+  const email = user?.email ?? 'no-email';
+  const username = (user?.user_metadata?.username as string | undefined);
 
-  if (
-    event.locals.session &&
-    !event.locals.user?.user_metadata.username &&
-    event.url.pathname !== '/auth' &&
-    event.url.pathname !== '/auth/logout'
-  )
+  if (event.locals.session && !(username && username !== email) && event.url.pathname !== '/auth' && event.url.pathname !== '/auth/logout')
     redirect(303, '/auth');
   if (!event.locals.session && event.url.pathname.startsWith('/private')) redirect(303, '/auth');
-  if (event.locals.session && event.url.pathname === '/auth' && event.locals.user?.user_metadata.username) redirect(303, '/');
+  if (event.locals.session && event.url.pathname === '/auth' && (username && username !== email)) redirect(303, '/');
 
   return resolve(event);
 };
