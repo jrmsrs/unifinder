@@ -4,9 +4,9 @@
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import { dictCategorias, dictLocalidades } from '$lib/utils/dicionaries.js';
-  import { Alert, Badge, Button, Card, Fileupload, Heading, Input, Label, Modal, P, RadioButton, Select, Textarea } from 'flowbite-svelte';
+  import { Alert, Badge, Button, Card, Heading, Hr, Input, Label, Modal, P, RadioButton, Select, Spinner, Textarea } from 'flowbite-svelte';
   import { CloseOutline } from 'flowbite-svelte-icons';
-  import { AtSign, MapPin } from 'lucide-svelte';
+  import { AtSign, ImageUp, MapPin } from 'lucide-svelte';
   import { scale } from 'svelte/transition';
 
   let { data } = $props();
@@ -39,12 +39,69 @@
     { value: 'outro', name: dictCategorias.outro }
   ];
   let objetoCategoria = $state('');
+
+  let imageInput: HTMLInputElement;
+  let objetoImage: File | null = null;
+  let objetoImageURL: string | null = $state(null);
+  let isUploadingImage = $state(false);
+  let uploadImageError = $state<string | null>(null);
+
+  async function handleImageUpload(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const file = target.files ? target.files[0] : null;
+
+    target.value = '';
+
+    if (!file || (file && file.size > 5 * 1024 * 1024)) {
+      uploadImageError = 'Arquivo inválido ou muito grande (máx 5MB)';
+      objetoImage = null;
+      objetoImageURL = null;
+      return;
+    }
+
+    uploadImageError = null;
+    objetoImage = file;
+    isUploadingImage = true;
+
+    try {
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExtension}`;
+      const filePath = `objetos/${fileName}`;
+
+      const { data: storageData, error: storageError } = await data.supabase.storage
+        .from('objetos')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (storageError) {
+        throw storageError;
+      }
+
+      const { data: urlData } = data.supabase.storage.from('objetos').getPublicUrl(filePath);
+      objetoImageURL = urlData.publicUrl;
+    } catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+      uploadImageError = 'Erro ao enviar imagem. Tente novamente.';
+      objetoImage = null;
+      objetoImageURL = null;
+    } finally {
+      isUploadingImage = false;
+    }
+  }
+
+  function handleRemoveImage() {
+    objetoImage = null;
+    objetoImageURL = null;
+    uploadImageError = null;
+  }
 </script>
 
 <div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
   <div class="mb-4 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <div class="g col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <Heading class="col-span-1 lg:col-span-2 xl:col-span-3" tag="h4">Lista de Objetos</Heading>
+      <Heading class="col-span-1 lg:col-span-2 xl:col-span-3" tag="h4">
+        Lista de Objetos
+        {data.query?.tipo && data.query?.tipo?.length === 1 ? (data.query?.tipo?.[0] === 'achado' ? 'Achados' : 'Perdidos') : undefined}
+      </Heading>
       <FilteredSearch query={data.query}></FilteredSearch>
     </div>
     {#await data.streamed.objetos}
@@ -94,6 +151,27 @@
   </div>
 </div>
 
+<Hr />
+
+<div class="m-auto mb-8 flex max-w-3xl flex-col items-center gap-4 p-4">
+  <P class="text-center text-lg">
+    {data.query?.tipo?.[0]
+      ? data.query?.tipo?.[0] === 'achado'
+        ? 'Não encontrou o que procurava? Anuncie um objeto perdido!'
+        : 'Achou algo? Anuncie o objeto encontrado!'
+      : 'Anuncie um objeto perdido ou encontrado!'}
+  </P>
+  <Button
+    class="ml-2"
+    onclick={() => {
+      newObjeto = true;
+      objetoTipo = data.query?.tipo?.[0] ? (data.query?.tipo?.[0] === 'achado' ? 'perdido' : 'achado') : undefined;
+    }}
+  >
+    {data.query?.tipo?.[0] ? (data.query?.tipo?.[0] === 'achado' ? 'Novo objeto perdido' : 'Novo objeto achado') : 'Novo objeto'}
+  </Button>
+</div>
+
 <Modal
   class="w-11/12 shadow-2xl shadow-black backdrop:bg-transparent backdrop:backdrop-blur-sm"
   form
@@ -139,15 +217,67 @@
     <div>
       <Label>
         Descrição
-        <Textarea bind:value={objetoDescricao} placeholder="Descreva informações adicionais sobre o objeto" class="w-full" rows={5} />
+        <Textarea
+          bind:value={objetoDescricao}
+          placeholder="Descreva informações adicionais sobre o objeto"
+          class="w-full dark:border-gray-600! dark:bg-gray-700!"
+          rows={5}
+        />
       </Label>
     </div>
     <div>
       <Label>
         <span class="text-gray-500"> (WIP: tratar imagem) </span>
         Imagem
-        <Fileupload class="mb-2" />
       </Label>
+      <div
+        class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        onclick={() => !isUploadingImage && imageInput.click()}
+        role="button"
+        aria-label="Upload de imagem"
+        tabindex="0"
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            !isUploadingImage && imageInput.click();
+          }
+        }}
+      >
+        <input type="file" bind:this={imageInput} accept="image/png, image/jpeg" class="sr-only" onchange={handleImageUpload} />
+
+        {#if isUploadingImage}
+          <div class="flex flex-col items-center">
+            <Spinner class="h-8 w-8" aria-label="Carregando imagem..." />
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Carregando...</p>
+          </div>
+        {:else if objetoImageURL}
+          <div class="relative h-full w-full">
+            <ImageLoader class="relative h-full w-full" src={objetoImageURL} alt="Prévia da imagem" imgClass="object-contain" />
+            <button
+              type="button"
+              class="absolute top-2 right-2 rounded-full bg-red-500/80 p-1 text-white hover:bg-red-600/80"
+              onclick={(e) => {
+                e.stopPropagation();
+                handleRemoveImage();
+              }}
+              aria-label="Remover imagem selecionada"
+            >
+              <CloseOutline class="h-4 w-4" />
+            </button>
+          </div>
+        {:else}
+          <div class="flex flex-col items-center justify-center">
+            <ImageUp class="mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">Clique para enviar uma imagem</p>
+            <P class="text-xs text-gray-500 dark:text-gray-400">PNG ou JPG (MAX. 5MB)</P>
+          </div>
+        {/if}
+      </div>
+      {#if uploadImageError}
+        <Alert color="red" dismissable class="mt-2" onclose={() => (uploadImageError = null)}>
+          {uploadImageError}
+        </Alert>
+      {/if}
     </div>
     <div>
       <Label>
@@ -166,7 +296,6 @@
       <div>
         <Label>
           Local para o qual o objeto foi encaminhado (se aplicável)
-          <!-- WIP -->
           <Select
             placeholder={objetoLocalidade !== '' && objetoLocalidade !== 'intercampi' && objetoLocalidade !== 'outro'
               ? `Locais em ${dictLocalidades[objetoLocalidade]}`
@@ -175,7 +304,7 @@
           >
             <option value="wip-nenhum"> (objeto em mãos) </option>
             <option value="wip-blabla">
-              <!-- wip --> Guarita do {objetoLocalidade !== '' && objetoLocalidade !== 'intercampi' && objetoLocalidade !== 'outro'
+              Guarita do {objetoLocalidade !== '' && objetoLocalidade !== 'intercampi' && objetoLocalidade !== 'outro'
                 ? dictLocalidades[objetoLocalidade]
                 : 'Campus'}
             </option>
@@ -184,7 +313,6 @@
         </Label>
       </div>
     {/if}
-    <!-- {#if encaminhadoValue == 'outro'} -->
     <div>
       <Label>
         <span class="text-gray-500"> (WIP: aparecer apenas se encaminhado para "Outro local") </span>
@@ -192,7 +320,6 @@
         <Input value={'WIP bind:encaminhadoValue'} placeholder="Digite o local" />
       </Label>
     </div>
-    <!-- {/if} -->
     <div>
       <Label>
         Categoria
