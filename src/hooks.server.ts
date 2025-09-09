@@ -46,8 +46,10 @@ const supabase: Handle = async ({ event, resolve }) => {
       // JWT validation has failed
       return { session: null, user: null };
     }
+    // @ts-expect-error: user property may not be optional in type definition
+    delete session?.user;
 
-    return { session, user };
+    return { session: Object.assign({}, session, { user }), user };
   };
 
   return resolve(event, {
@@ -66,12 +68,12 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session;
   event.locals.user = user;
   const email = user?.email ?? 'no-email';
-  const username = (user?.user_metadata?.username as string | undefined);
+  const username = user?.user_metadata?.username as string | undefined;
 
   if (event.locals.session && !(username && username !== email) && event.url.pathname !== '/auth' && event.url.pathname !== '/auth/logout')
     redirect(303, '/auth');
   if (!event.locals.session && event.url.pathname.startsWith('/private')) redirect(303, '/auth');
-  if (event.locals.session && event.url.pathname === '/auth' && (username && username !== email)) redirect(303, '/');
+  if (event.locals.session && event.url.pathname === '/auth' && username && username !== email) redirect(303, '/');
 
   return resolve(event);
 };

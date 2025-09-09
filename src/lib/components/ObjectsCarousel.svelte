@@ -29,24 +29,24 @@
       {#each objects as obj}
         <a href={`/objetos/${obj.id}?ref=%2f`}>
           <Card class="h-full relative col-span-1 flex gap-2 p-6">
-            <ImageLoader src={obj.imagem} alt={obj.titulo} class="min-w-48 max-w-full h-48" />
-            <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.titulo}</Heading>
+            <ImageLoader src={obj.imagem} alt={obj.nome} class="min-w-48 max-w-full h-48" />
+            <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.nome}</Heading>
             <div class="flex">
               <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
                 {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
               </Badge>
               <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
                 <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
-                {obj.local}
+                {obj.local_ocorrencia}
                 <span class="italic">por</span>
-                {obj.usuario.username}
+                obj.usuario.username
               </P>
             </div>
           </Card>
         </a>
       {/each}
       <a
-        href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo}`}
+        href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo.toLowerCase()}`}
         class=" flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
       >
         Ver todos

@@ -4,8 +4,15 @@
   import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import { Alert, Button, Heading, Hr, P } from 'flowbite-svelte';
+  import { onMount } from 'svelte';
 
   let { data } = $props();
+
+  onMount(() => {
+    if (data.user && data.user.email && !data.user.user_metadata.username) {
+      goto('/auth?finish=true');
+    }
+  });
 </script>
 
 <div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
@@ -75,11 +82,11 @@
   - (x) layout cards objetos em acompanhamento
   - (x) layout cards ultimos achados/perdidos
   - (x) mocks cards
-  - ( ) integração
+  - (-) integração
 # todo (autenticação):
   - (x) login padrão
   - (x) sign up padrão
   - (x) recuperação de senha padrão
-  - ( ) usuario tem username (etapa adicional)
-  - ( ) integração`}
+  - (x) usuario tem username (etapa adicional)
+  - (-) integração`}
 />

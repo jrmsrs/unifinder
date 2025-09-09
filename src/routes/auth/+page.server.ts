@@ -3,14 +3,14 @@ import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
-export function load({ locals: { supabase }, url }) {
+export function load({ locals: { safeGetSession }, url }) {
   return {
     finish: url.searchParams.get('finish') === 'true',
     tab: url.searchParams.get('tab') || 'login',
     error: url.searchParams.get('error') || null,
     form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
     // user: supabase.auth.getUser(),
-    session: supabase.auth.getSession()
+    session: safeGetSession()
   };
 }
 
@@ -69,7 +69,7 @@ export const actions: Actions = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: PUBLIC_VERCEL_URL ? `${PUBLIC_VERCEL_URL}/auth?finish=true` : 'http://localhost:5173/auth?finish=true'
+        redirectTo: PUBLIC_VERCEL_URL ? `${PUBLIC_VERCEL_URL}/` : 'http://localhost:5173/'
       }
     });
     if (error) {

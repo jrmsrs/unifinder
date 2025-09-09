@@ -1,6 +1,6 @@
 <script lang="ts">
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
-  import { A, Alert, Button, Heading, Hr, Input, Label, Modal, P } from 'flowbite-svelte';
+  import { A, Alert, Button, Heading, Hr, Input, Label, P } from 'flowbite-svelte';
   import { GoogleSolid } from 'flowbite-svelte-icons';
   import { AtSign } from 'lucide-svelte';
   import type { PageData } from './$types';
@@ -232,8 +232,8 @@
 # todo (tela autenticação)
   - (x) layout autenticação
   - (x) separar login e sign up em abas
-  - ( ) campos de perfil em signup
-  - ( ) validação de formulário
+  - (x) campos de perfil em signup
+  - (x) validação de formulário
   - (x) integração com autenticador
-  - ( ) integração com backend`}
+  - (-) integração com backend`}
 />

@@ -17,13 +17,13 @@ declare global {
 
   type Objeto = {
     id: string;
-    created_at: string;
+    data_registro: string;
     usuario: { id: string; username: string; email: string; avatar_url: string };
     imagem: string;
-    titulo: string;
+    nome: string;
     descricao: string;
-    local: ObjetoLocalidade;
-    encaminhado?: string;
+    local_ocorrencia: ObjetoLocalidade;
+    local_armazenamento?: string;
     tipo: ObjetoTipo;
     categoria: ObjetoCategoria;
     status: ObjetoStatus;

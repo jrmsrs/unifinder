@@ -1,16 +1,15 @@
-import type { PageServerLoad } from './$types';
 import { getObjetosLatest } from '$lib/api';
+import type { PageServerLoad } from './$types';
 
-const fetchLatestObjetos = async () => {
-  await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-  const latestObjetos = await getObjetosLatest();
+const fetchLatestObjetos = async (user?: { id: string; email: string }) => {
+  const latestObjetos = await getObjetosLatest(user);
   return latestObjetos;
 };
 
-export const load: PageServerLoad = () => {
+export const load: PageServerLoad = ({ locals }) => {
   return {
     streamed: {
-      objetos: fetchLatestObjetos()
+      objetos: fetchLatestObjetos(locals.user ? { id: locals.user.id, email: locals.user.email ?? '' } : undefined)
     }
   };
 };

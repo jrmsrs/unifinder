@@ -70,29 +70,37 @@
       </button>
       {#await data.streamed.objeto}
         <Skeleton card={64} paragraphSize={2} />
-      {:then { objeto }}
-        <div class="flex flex-col">
-          <ImageLoader src={objeto.imagem} alt={objeto.titulo} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
-          <div class="grid grid-cols-2 overflow-hidden rounded-b-lg [&>*]:mt-0 [&>*]:h-8 [&>*]:rounded-none">
-            <Badge color={objeto.tipo === 'achado' ? 'green' : 'red'}>{objeto.tipo}</Badge>
-            <Badge color="gray" class="mt-2">{objeto.categoria}</Badge>
+      {:then objeto}
+        {#if objeto === null}
+          <p class="text-red-500">Objeto não encontrado.</p>
+        {:else}
+          <div class="flex flex-col">
+            <ImageLoader src={objeto.imagem} alt={objeto.nome} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
+            <div class="grid grid-cols-2 overflow-hidden rounded-b-lg [&>*]:mt-0 [&>*]:h-8 [&>*]:rounded-none">
+              <Badge color={objeto.tipo === 'achado' ? 'green' : 'red'}>{objeto.tipo}</Badge>
+              <Badge color="gray" class="mt-2">objeto.categoria</Badge>
+            </div>
+            <Heading tag="h2" class="mt-2 text-2xl font-bold">{objeto.nome}</Heading>
+            <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
+            <ObjetoTable>
+              <Row key="Postado:" value={new Date(objeto.data_registro).toLocaleDateString()} icon={Calendar} />
+              <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value="objeto.usuario.username" icon={AtSign} />
+              <Row
+                key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:"
+                value={dictLocalidades[objeto.local_ocorrencia]}
+                icon={MapPin}
+              />
+              {#if objeto.tipo === 'achado'}
+                <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />
+              {/if}
+              <Row
+                key="Status:"
+                value={objeto.status === 'FINALIZADO' ? 'Finalizado' : 'Ativo'}
+                icon={objeto.status === 'FINALIZADO' ? CheckCircle : Play}
+              />
+            </ObjetoTable>
           </div>
-          <Heading tag="h2" class="mt-2 text-2xl font-bold">{objeto.titulo}</Heading>
-          <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
-          <ObjetoTable>
-            <Row key="Postado:" value={new Date(objeto.created_at).toLocaleDateString()} icon={Calendar} />
-            <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.usuario.username} icon={AtSign} />
-            <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local]} icon={MapPin} />
-            {#if objeto.tipo === 'achado'}
-              <Row key="Encaminhado:" value={objeto.encaminhado ?? 'Em mãos'} icon={MapPin} />
-            {/if}
-            <Row
-              key="Status:"
-              value={objeto.status === 'FINALIZADO' ? 'Finalizado' : 'Ativo'}
-              icon={objeto.status === 'FINALIZADO' ? CheckCircle : Play}
-            />
-          </ObjetoTable>
-        </div>
+        {/if}
       {:catch error}
         <p class="text-red-500">Erro ao carregar o objeto: {error.message}</p>
       {/await}
@@ -106,17 +114,19 @@
           {#await data.streamed.objeto}
             <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
             <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
-          {:then { objeto }}
-            {#if objeto.usuario.email === data.user?.email}
+          {:then objeto}
+            {#if false && objeto?.usuario.email === data.user?.email}
               <Button color="green" class="col-span-3 flex justify-between">
-                <CheckOutline />Finalizar
+                <CheckOutline />
+                Finalizar
                 <div class="h-5 w-5"></div>
               </Button>
               <Button color="yellow"><EditSolid /></Button>
               <Button color="red"><TrashBinSolid /></Button>
             {:else}
               <Button color="primary" class="col-span-5 flex justify-between">
-                <FilePenSolid class="h-5 w-5 shrink-0" /> Reivindicar
+                <FilePenSolid class="h-5 w-5 shrink-0" />
+                Reivindicar
                 <div class="h-5 w-5"></div>
               </Button>
             {/if}
@@ -162,8 +172,8 @@
                       <span class="text-xs font-normal">•</span>
                       <span class="text-xs font-normal">{new Date(comentario.created_at).toLocaleDateString()}</span>
                     </div>
-                    {#await data.streamed.objeto then { objeto }}
-                      {#if data.user?.email === comentario.usuario.email || data.user?.email === objeto.usuario.email}
+                    {#await data.streamed.objeto then objeto}
+                      {#if false && (data.user?.email === comentario.usuario.email || data.user?.email === objeto?.usuario.email)}
                         <div class="ml-auto">
                           <Button outline color="red" size="xs">
                             <TrashBinSolid class="h-4 w-4" />
@@ -189,7 +199,7 @@
   </Modal>
 </ModalContainer>
 
-{#await data.streamed.objeto then { objeto }}
+{#await data.streamed.objeto then objeto}
   <DevInfo
     content={`\
 # debug
@@ -209,8 +219,8 @@
       - (x) ações do dono
       - (x) mock comentários
       - ( ) modal excluir comentário
-  - ( ) integração
-    - ( ) get objeto
+  - (-) integração
+    - (x) get objeto
     - ( ) get comentarios
     - ( ) autorização nivel dono do objeto
     - ( ) autorização nivel dono do comentario

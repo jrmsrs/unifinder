@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 
 type query = {
   search?: string;
-  tipo?: ObjetoTipo[];
+  tipo?: ObjetoTipo;
   localidade?: ObjetoLocalidade[];
   categoria?: ObjetoCategoria[];
   usuario?: string;
@@ -28,7 +28,6 @@ const allCategorias: ObjetoCategoria[] = [
 ];
 
 const fetchFilteredObjetos = async (qty: number, query?: query) => {
-  await new Promise<void>((resolve) => setTimeout(resolve, 2000));
   const objetos = await getObjetos({ query, limit: qty });
   return objetos;
 };
@@ -39,7 +38,7 @@ const buildObjetoQuery = (url: URL, email?: string): query => {
   const categoriaUnf = url.searchParams.getAll('categoria').length > 0 ? url.searchParams.getAll('categoria') : undefined;
   return {
     search: url.searchParams.get('search') ?? undefined,
-    tipo: tipoUnf?.every((e): e is ObjetoTipo => allTipos.includes(e as ObjetoTipo)) ? tipoUnf : undefined,
+    tipo: tipoUnf?.length === 1 && allTipos.includes(tipoUnf[0] as ObjetoTipo) ? (tipoUnf[0] as ObjetoTipo) : undefined,
     localidade: localidadeUnf?.every((e): e is ObjetoLocalidade => allLocals.includes(e as ObjetoLocalidade)) ? localidadeUnf : undefined,
     categoria: categoriaUnf?.every((e): e is ObjetoCategoria => allCategorias.includes(e as ObjetoCategoria)) ? categoriaUnf : undefined,
     inativo: url.searchParams.get('inativo') === 'true' ? true : undefined,

@@ -108,13 +108,13 @@
       {#each Array.from({ length: 4 }) as _, i}
         <Skeleton card={64} paragraphSize={2} class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''} />
       {/each}
-    {:then { objetos }}
-      {#if objetos.length > 0}
+    {:then { items: objetos }}
+      {#if objetos.length && objetos.length > 0}
         {#each objetos as obj (obj.id)}
           <a href={`/objetos/${obj.id}?ref=%2fobjetos`}>
             <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6">
-              <ImageLoader src={obj.imagem} alt={obj.titulo} class="h-64" />
-              <Heading tag="h5" class="line-clamp-1">{obj.titulo}</Heading>
+              <ImageLoader src={obj.imagem} alt={obj.nome} class="h-64" />
+              <Heading tag="h5" class="line-clamp-1">{obj.nome}</Heading>
               <P class="line-clamp-1">{obj.descricao}</P>
               <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
                 {obj.tipo}
@@ -122,17 +122,17 @@
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
                   <MapPin class="mb-1 inline-block h-4 w-4" />
-                  {dictLocalidades[obj.local]}
+                  {dictLocalidades[obj.local_ocorrencia]}
                 </P>
                 <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
-                  {#if obj.encaminhado}Encaminhado{/if}
+                  {#if obj.local_armazenamento}Encaminhado{/if}
                 </P>
                 <P class="col-span-2">
                   <AtSign class="mb-1 inline-block h-4 w-4" />
-                  {obj.usuario.username}
+                  obj.usuario.username
                 </P>
                 <P class="text-end">
-                  {new Date(obj.created_at).toLocaleDateString('pt-BR', {
+                  {new Date(obj.data_registro).toLocaleDateString('pt-BR', {
                     year: '2-digit',
                     month: '2-digit',
                     day: '2-digit'

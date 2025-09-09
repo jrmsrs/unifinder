@@ -2,8 +2,8 @@ import { getComentariosByObjetoId, getObjetoById } from '$lib/api';
 import type { PageServerLoad } from './$types';
 
 const fetchObjeto = async (id: string, email?: string) => {
-  await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-  const objeto = await getObjetoById({ id }, email);
+  // const objeto = await getObjetoById({ id }, email);
+  const objeto = await getObjetoById({ id });
   return objeto;
 };
 
