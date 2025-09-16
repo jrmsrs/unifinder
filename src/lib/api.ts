@@ -1,5 +1,4 @@
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
-import { fakerPT_BR as fk } from '@faker-js/faker';
 
 const baseObjetoApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
 const baseGetOptions = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
@@ -11,28 +10,6 @@ type query = {
   categoria?: ObjetoCategoria[];
   usuario?: string;
   inativo?: true;
-};
-
-const makeComentarios = (userEmail?: string): Comentario[] => {
-  const comentarios: Comentario[] = [];
-  for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
-    const isOwn = Boolean(Math.random() > 0.5 && userEmail);
-    const genre = Math.random() > 0.5 ? 'female' : 'male';
-    const firstName = fk.person.firstName(genre);
-    const lastName = fk.person.lastName(genre);
-    comentarios.push({
-      id: fk.string.uuid(),
-      created_at: fk.date.past().toISOString(),
-      usuario: {
-        id: fk.string.uuid(),
-        username: isOwn ? (userEmail as string).split('@')[0] : fk.internet.username({ firstName, lastName }),
-        email: isOwn ? (userEmail as string) : fk.internet.email({ firstName, lastName }),
-        avatar_url: fk.image.avatar()
-      },
-      texto: fk.lorem.sentence()
-    });
-  }
-  return comentarios;
 };
 
 type JSONGetObjetosReq = {
@@ -128,9 +105,24 @@ type JSONGetComentariosByObjetoIdRes = {
   comentarios: Comentario[];
 };
 
-export const getComentariosByObjetoId = async (path: PathGetById, userEmail?: string): Promise<JSONGetComentariosByObjetoIdRes> => {
-  const comentarios = makeComentarios(userEmail);
-  return {
-    comentarios
-  };
+export const getComentariosByObjetoId = async (path: PathGetById): Promise<JSONGetComentariosByObjetoIdRes> => {
+  const url = new URL(`/objetos/${path.id}/comentarios`, PUBLIC_API_BASE_URL);
+  try {
+    const response = await fetch(url.toString(), baseGetOptions).then((res) => res.json());
+    return {
+      comentarios: response.items
+    };
+  } catch (error) {
+    console.error('API error:', error);
+    return {
+      comentarios: []
+    };
+  }
 };
+
+// export const getComentariosByObjetoId = async (path: PathGetById, userEmail?: string): Promise<JSONGetComentariosByObjetoIdRes> => {
+//   const comentarios = makeComentarios(userEmail);
+//   return {
+//     comentarios
+//   };
+// };

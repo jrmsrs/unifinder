@@ -31,9 +31,10 @@ declare global {
 
   type Comentario = {
     id: string;
-    created_at: string;
+    publicado_em: string;
+    objeto_id: string;
     usuario: { id: string; username: string; email: string; avatar_url: string };
-    texto: string;
+    conteudo: string;
   };
 }
 

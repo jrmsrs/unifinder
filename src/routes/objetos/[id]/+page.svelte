@@ -165,12 +165,12 @@
                 <div class="mb-4 text-sm">
                   <div class="mb-1 flex items-center gap-2">
                     <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background-color: {fk.color.human()}">
-                      {comentario.usuario.username.charAt(0).toUpperCase()}
+                      {'ucomentario.usuario.username'.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <span class="font-semibold">{comentario.usuario.username}</span>
+                      <span class="font-semibold">comentario.usuario.username</span>
                       <span class="text-xs font-normal">•</span>
-                      <span class="text-xs font-normal">{new Date(comentario.created_at).toLocaleDateString()}</span>
+                      <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
                     </div>
                     {#await data.streamed.objeto then objeto}
                       {#if false && (data.user?.email === comentario.usuario.email || data.user?.email === objeto?.usuario.email)}
@@ -183,7 +183,7 @@
                     {/await}
                   </div>
                   <div class="flex gap-2">
-                    <p>{comentario.texto}</p>
+                    <p>{comentario.conteudo}</p>
                   </div>
                 </div>
               {/each}
