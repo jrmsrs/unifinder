@@ -3,6 +3,8 @@
   import ImageLoader from './ImageLoader.svelte';
   import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
   import Skeleton from './Skeleton.svelte';
+  import { AtSign, MapPin } from 'lucide-svelte';
+  import { dictLocalidades } from '$lib/utils/dicionaries';
 
   let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } = $props();
 </script>
@@ -18,7 +20,7 @@
 				lg:first:px-[calc(1024px-50vw-10rem)]
 				xl:first:px-[calc(1280px-50vw-10rem)]
 				2xl:first:px-[calc(1536px-50vw-10rem)]
-				[&>*]:min-h-64 [&>*]:min-w-64
+				[&>*]:min-h-64 [&>*]:min-w-64 [&>*]:max-w-64 
 			"
   >
     {#if objects === null}
@@ -35,12 +37,26 @@
               <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
                 {obj.tipo === 'achado' ? 'Achado' : 'Perdido'}
               </Badge>
-              <P class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                <span class="italic">{obj.tipo === 'achado' ? 'Encontrado em' : 'Perdido em'}</span>
-                {obj.local_ocorrencia}
-                <span class="italic">por</span>
-                obj.usuario.username
-              </P>
+              <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
+                <P class="col-span-2">
+                  <MapPin class="mb-1 inline-block h-4 w-4" />
+                  {dictLocalidades[obj.local_ocorrencia]}
+                </P>
+                <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
+                  {#if obj.local_armazenamento}Encaminhado{/if}
+                </P>
+                <P class="col-span-2">
+                  <AtSign class="mb-1 inline-block h-4 w-4" />
+                  obj.usuario.username
+                </P>
+                <P class="text-end">
+                  {new Date(obj.data_registro).toLocaleDateString('pt-BR', {
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit'
+                  })}
+                </P>
+              </div>
             </div>
           </Card>
         </a>

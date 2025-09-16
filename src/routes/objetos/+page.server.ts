@@ -1,5 +1,4 @@
 import { getObjetos } from '$lib/api';
-import { ur } from '@faker-js/faker';
 import type { PageServerLoad } from './$types';
 
 type query = {
