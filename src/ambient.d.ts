@@ -13,7 +13,7 @@ declare global {
     | 'chaveiro'
     | 'outro';
   type ObjetoTipo = 'achado' | 'perdido';
-  type ObjetoStatus = 'ABERTO' | 'FINALIZADO';
+  type ObjetoStatus = 'aberto' | 'finalizado';
 
   type Objeto = {
     id: string;

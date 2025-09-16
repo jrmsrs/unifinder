@@ -1,20 +1,17 @@
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
 
 const baseObjetoApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
-const baseGetOptions = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
-
-type query = {
-  search?: string;
-  tipo?: ObjetoTipo;
-  localidade?: ObjetoLocalidade[];
-  categoria?: ObjetoCategoria[];
-  usuario?: string;
-  inativo?: true;
-};
+const baseGetOptions: RequestInit = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
 
 type JSONGetObjetosReq = {
-  query?: query;
-  limit?: number;
+  search?: string;
+  tipo?: ObjetoTipo;
+  usuario?: string;
+  localidade?: ObjetoLocalidade[];
+  categoria?: ObjetoCategoria[];
+  page?: number;
+  size?: number;
+  inativo?: true;
 };
 
 type JSONGetObjetosRes = {
@@ -26,7 +23,16 @@ type JSONGetObjetosRes = {
 };
 
 export const getObjetos = async (data?: JSONGetObjetosReq): Promise<JSONGetObjetosRes> => {
-  const url = `${baseObjetoApiURL}?${new URLSearchParams({ page: '1', size: (data?.limit || 10).toString() })}`;
+  const dataTransformed = new URLSearchParams();
+  if (data?.search) dataTransformed.append('search', data.search);
+  if (data?.tipo) dataTransformed.append('tipo', data.tipo);
+  if (data?.usuario) dataTransformed.append('usuario', data.usuario);
+  if (data?.localidade) data.localidade.forEach((loc) => dataTransformed.append('localidade', loc));
+  if (data?.categoria) data.categoria.forEach((cat) => dataTransformed.append('categoria', cat));
+  if (data?.page) dataTransformed.append('page', data.page.toString());
+  if (data?.size) dataTransformed.append('size', data.size.toString());
+  dataTransformed.append('status', data?.inativo ? 'finalizado' : 'aberto');
+  const url = `${baseObjetoApiURL}?${dataTransformed.toString()}`;
   try {
     const response = await fetch(url, baseGetOptions).then((res) => res.json());
     return response;
@@ -36,7 +42,7 @@ export const getObjetos = async (data?: JSONGetObjetosReq): Promise<JSONGetObjet
       items: [],
       total: 0,
       page: 1,
-      size: data?.limit || 10,
+      size: 100,
       pages: 0
     };
   }
