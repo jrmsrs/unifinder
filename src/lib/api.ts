@@ -3,6 +3,39 @@ import { PUBLIC_API_BASE_URL } from '$env/static/public';
 const baseObjetoApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
 const baseGetOptions: RequestInit = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
 
+type JSONPostObjetoReq = {
+  tipo: ObjetoTipo;
+  titulo: string;
+  descricao: string;
+  localidade: ObjetoLocalidade;
+  local_especifico: string;
+  local_encaminhado?: string | null;
+  categoria: ObjetoCategoria;
+  image_url?: string | null;
+};
+
+type JSONPostObjetoRes = Objeto | null;
+
+export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promise<JSONPostObjetoRes> => {
+  const url = new URL('/objetos', PUBLIC_API_BASE_URL);
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        nome: data.titulo,
+        descricao: data.descricao,
+        local_ocorrencia: data.localidade,
+        tipo: data.tipo.toUpperCase(),
+      })
+    }).then((res) => res.json());
+    return response;
+  } catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+};
+
 type JSONGetObjetosReq = {
   search?: string;
   tipo?: ObjetoTipo;
