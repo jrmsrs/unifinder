@@ -70,8 +70,8 @@
     const file = target.files?.[0];
 
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Arquivo muito grande (máx 5MB)');
+      if (file.size > 15 * 1024 * 1024) {
+        alert('Arquivo muito grande (máx 15MB)');
         target.value = '';
         objetoImageFile = undefined;
         objetoImagePreviewURL = undefined;
@@ -287,6 +287,7 @@
           </div>
         {/if}
       </div>
+      <input type="text" class="sr-only" placeholder="URL da imagem" name="image_url" bind:value={objetoImagePreviewURL} />
     </div>
     <div>
       <Label>

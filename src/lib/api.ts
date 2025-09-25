@@ -17,7 +17,8 @@ type JSONPostObjetoReq = {
 type JSONPostObjetoRes = Objeto | null;
 
 export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promise<JSONPostObjetoRes> => {
-  const url = new URL('/objetos', PUBLIC_API_BASE_URL);
+  const userId = JSON.parse(atob(token.split('.')[1])).sub;
+  const url = new URL(`/users/${userId}/objetos`, PUBLIC_API_BASE_URL);
   try {
     const response = await fetch(url.toString(), {
       method: 'POST',

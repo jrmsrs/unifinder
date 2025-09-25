@@ -75,7 +75,8 @@ const objetoSchema = z
     imagem_arquivo: z
       .instanceof(File)
       .refine((file) => file.size < 15 * 1024 * 1024, 'A imagem deve ter no máximo 15MB.')
-      .optional()
+      .optional(),
+    image_url: z.string().optional()
   })
   .superRefine((data, ctx) => {
     if (data.tipo === 'achado') {
@@ -153,7 +154,7 @@ export const actions: Actions = {
         local_especifico: otherData.local_especifico as string,
         local_encaminhado: localArmazenamento,
         categoria: otherData.categoria as ObjetoCategoria,
-        image_url: imageUrl
+        image_url: imageUrl ?? otherData.image_url
       },
       session.session?.access_token as string
     );
