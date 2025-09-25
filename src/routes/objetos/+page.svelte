@@ -61,59 +61,33 @@
   ];
   let objetoCategoria: ObjetoCategoria | '' = $state(data.form?.categoria ?? '');
 
-  let objetoImageURL: string | null = $state(data.form?.image_url ?? null);
-  let imageInput: HTMLInputElement;
-  let objetoImage: File | null = null;
-  let isUploadingImage = $state(false);
-  let uploadImageError = $state<string | null>(null);
+  let objetoImageFile: File | undefined = $state(undefined);
+  let objetoImagePreviewURL: string | undefined = $state(data.form?.image_url ?? undefined);
   let objetoSubmiting = $state(false);
 
-  async function handleImageUpload(e: Event) {
+  function handleFileSelect(e: Event) {
     const target = e.target as HTMLInputElement;
-    const file = target.files ? target.files[0] : null;
+    const file = target.files?.[0];
 
-    target.value = '';
-
-    if (!file || (file && file.size > 5 * 1024 * 1024)) {
-      uploadImageError = 'Arquivo inválido ou muito grande (máx 5MB)';
-      objetoImage = null;
-      objetoImageURL = null;
-      return;
-    }
-
-    uploadImageError = null;
-    objetoImage = file;
-    isUploadingImage = true;
-
-    try {
-      const fileExtension = file.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExtension}`;
-      const filePath = `objetos/${fileName}`;
-
-      const { data: storageData, error: storageError } = await data.supabase.storage
-        .from('objetos')
-        .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-      if (storageError) {
-        throw storageError;
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Arquivo muito grande (máx 5MB)');
+        target.value = '';
+        objetoImageFile = undefined;
+        objetoImagePreviewURL = undefined;
+        return;
       }
-
-      const { data: urlData } = data.supabase.storage.from('objetos').getPublicUrl(filePath);
-      objetoImageURL = urlData.publicUrl;
-    } catch (error) {
-      console.error('Erro ao enviar imagem:', error);
-      uploadImageError = 'Erro ao enviar imagem. Tente novamente.';
-      objetoImage = null;
-      objetoImageURL = null;
-    } finally {
-      isUploadingImage = false;
+      objetoImageFile = file;
+      objetoImagePreviewURL = URL.createObjectURL(file);
     }
   }
 
   function handleRemoveImage() {
-    objetoImage = null;
-    objetoImageURL = null;
-    uploadImageError = null;
+    objetoImageFile = undefined;
+    if (objetoImagePreviewURL) {
+      URL.revokeObjectURL(objetoImagePreviewURL);
+      objetoImagePreviewURL = undefined;
+    }
   }
 
   $effect(() => {
@@ -209,7 +183,18 @@
   {#snippet header()}
     <Heading tag="h5" class="text-center">Novo objeto {objetoTipo ? (objetoTipo === 'achado' ? 'encontrado' : 'perdido') : ''}</Heading>
   {/snippet}
-  <form class="flex flex-col gap-4" method="POST" action="?/createObjeto" onsubmit={() => (objetoSubmiting = true)} use:enhance>
+  <form
+    class="flex flex-col gap-4"
+    method="POST"
+    action="?/createObjeto"
+    enctype="multipart/form-data"
+    use:enhance={() => {
+      objetoSubmiting = true;
+      return async ({ update }) => {
+        await update();
+      };
+    }}
+  >
     <div class="flex flex-col-reverse gap-4">
       <div>
         <Label>
@@ -262,34 +247,26 @@
       </Label>
     </div>
     <div>
-      <Label>
-        <span class="text-gray-500"> (WIP: tratar imagem) </span>
-        Imagem
-      </Label>
+      <Label>Imagem</Label>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
         class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-        onclick={() => !isUploadingImage && imageInput.click()}
+        onclick={() => document.getElementById('imageInput')?.click()}
         role="button"
-        aria-label="Upload de imagem"
         tabindex="0"
-        onkeydown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            !isUploadingImage && imageInput.click();
-          }
-        }}
       >
-        <input type="file" bind:this={imageInput} accept="image/png, image/jpeg" class="sr-only" onchange={handleImageUpload} />
+        <input
+          type="file"
+          id="imageInput"
+          name="imagem_arquivo"
+          accept="image/png, image/jpeg"
+          class="sr-only"
+          onchange={handleFileSelect}
+        />
 
-        {#if isUploadingImage}
-          <div class="flex flex-col items-center">
-            <Spinner class="h-8 w-8" aria-label="Carregando imagem..." />
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Carregando...</p>
-          </div>
-        {:else if objetoImageURL}
+        {#if objetoImagePreviewURL}
           <div class="relative h-full w-full">
-            <ImageLoader class="relative h-full w-full" src={objetoImageURL} alt="Prévia da imagem" imgClass="object-contain" />
-            <input class="sr-only" type="hidden" name="image_url" value={objetoImageURL} />
+            <img class="relative h-full w-full object-contain" src={objetoImagePreviewURL} alt="Prévia da imagem" />
             <button
               type="button"
               class="absolute top-2 right-2 rounded-full bg-red-500/80 p-1 text-white hover:bg-red-600/80"
@@ -310,11 +287,6 @@
           </div>
         {/if}
       </div>
-      {#if uploadImageError}
-        <Alert color="red" dismissable class="mt-2" onclose={() => (uploadImageError = null)}>
-          {uploadImageError}
-        </Alert>
-      {/if}
     </div>
     <div>
       <Label>
@@ -355,7 +327,6 @@
         e então preenchê-lo. É possível marcar como "Objeto em mãos" e modificar mais tarde quando realizar o encaminhamento.
       </Helper>
     {/if}
-
     {#if objetoTipo === 'achado' && objetoLocalEncaminhado === 'outro'}
       <div>
         <Label>
@@ -368,7 +339,6 @@
         Área correta?) e é seguro e apropriado para armazenar o objeto até que o dono possa recuperá-lo.
       </Helper>
     {/if}
-
     <div>
       <Label>
         Categoria <span class="text-red-400">*</span>
@@ -377,7 +347,17 @@
     </div>
 
     {#if data.error}
-      <Alert color="red">{data.error}</Alert>
+      <Alert color="red">
+        Erro ao registrar o objeto:
+        <ul class="list-inside list-disc">
+          {#each data.error.split('; ') as err}
+            <li>{err}</li>
+            {#if err.includes('Por favor, tente novamente.')}
+              <pre class="overflow-x-scroll">{'\n'}POST /objeto {JSON.stringify(data.form, null, 2)}</pre>
+            {/if}
+          {/each}
+        </ul>
+      </Alert>
     {/if}
 
     <div class="flex shrink-0 items-center space-x-3 rounded-b-lg p-4 md:p-5 rtl:space-x-reverse">
@@ -390,8 +370,7 @@
             !objetoTitulo.trim() ||
             !objetoDescricao.trim() ||
             !objetoLocalidade ||
-            !objetoCategoria ||
-            isUploadingImage}
+            !objetoCategoria}
         >
           Cadastrar
         </Button>
