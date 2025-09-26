@@ -18,6 +18,7 @@ declare global {
   type Objeto = {
     id: string;
     data_registro: string;
+    user_id: string;
     usuario: { id: string; username: string; email: string; avatar_url: string };
     imagem: string;
     nome: string;
@@ -33,6 +34,7 @@ declare global {
     id: string;
     publicado_em: string;
     objeto_id: string;
+    user_id: string;
     usuario: { id: string; username: string; email: string; avatar_url: string };
     conteudo: string;
   };

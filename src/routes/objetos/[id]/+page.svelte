@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
@@ -11,11 +12,14 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictLocalidades } from '$lib/utils/dicionaries.js';
   import { faker as fk } from '@faker-js/faker';
-  import { A, Badge, Button, Heading, Hr, Modal, P } from 'flowbite-svelte';
+  import { A, Alert, Badge, Button, Heading, Hr, Modal, P } from 'flowbite-svelte';
   import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft, AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
   let ref = page.url.searchParams.get('ref') || '/objetos';
   let { data } = $props();
+  let comentario = $state(data.form ?? '');
+  let comentarioSubmiting = $state(false);
+  let comentarioRemoving = $state(false);
 </script>
 
 {#if ref === '/objetos'}
@@ -95,8 +99,8 @@
               {/if}
               <Row
                 key="Status:"
-                value={objeto.status === 'FINALIZADO' ? 'Finalizado' : 'Ativo'}
-                icon={objeto.status === 'FINALIZADO' ? CheckCircle : Play}
+                value={objeto.status.toLowerCase() === 'finalizado' ? 'Finalizado' : 'Ativo'}
+                icon={objeto.status.toLowerCase() === 'finalizado' ? CheckCircle : Play}
               />
             </ObjetoTable>
           </div>
@@ -137,16 +141,30 @@
         <Heading tag="h3" class="text-xl font-bold">
           Comentários
           {#await data.streamed.comentarios then { comentarios: c }}({c.length}){/await}
-          (WIP)
         </Heading>
         <div id="novo-comentario" class="mb-2 flex flex-col">
           {#await data.streamed.comentarios then}
             {#if data.user}
-              <textarea
-                class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
-                placeholder="Escreva seu comentário..."
-              ></textarea>
-              <Button outline color="primary" class="mt-2">Comentar</Button>
+              <form
+                method="post"
+                action="?/createComentario"
+                use:enhance={() => {
+                  comentarioSubmiting = true;
+                  return async ({ update }) => {
+                    await update();
+                    comentarioSubmiting = false;
+                  };
+                }}
+              >
+                <textarea
+                  name="conteudo"
+                  class="mt-1 h-24 w-full resize-none rounded-lg border border-gray-300 bg-white p-2 text-sm shadow-sm outline-none placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+                  placeholder="Escreva seu comentário..."
+                  bind:value={comentario}
+                  required
+                ></textarea>
+                <Button type="submit" outline color="primary" class="mt-2" disabled={comentarioSubmiting}>Comentar</Button>
+              </form>
             {:else}
               <P class="text-gray-700 dark:text-gray-400">
                 Faça <A href="/auth">login</A> para comentar.
@@ -154,7 +172,10 @@
             {/if}
           {/await}
         </div>
-        <div id="lista-comentarios">
+        {#if data.commentError}
+          <Alert color="red" class="mb-2" dismissable>{data.commentError}</Alert>
+        {/if}
+        <div id="lista-comentarios" class="mt-6">
           {#await data.streamed.comentarios}
             {#each { length: 4 }}
               <Skeleton />
@@ -168,17 +189,29 @@
                       {'ucomentario.usuario.username'.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <span class="font-semibold">comentario.usuario.username</span>
+                      <span class="font-semibold">comentario.user</span>
                       <span class="text-xs font-normal">•</span>
                       <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
                     </div>
                     {#await data.streamed.objeto then objeto}
-                      {#if false && (data.user?.email === comentario.usuario.email || data.user?.email === objeto?.usuario.email)}
-                        <div class="ml-auto">
-                          <Button outline color="red" size="xs">
+                      {#if data.user?.id === comentario.user_id || data.user?.id === objeto?.user_id}
+                        <form
+                          class="ml-auto"
+                          method="post"
+                          action="?/deleteComentario"
+                          use:enhance={() => {
+                            comentarioRemoving = true;
+                            return async ({ update }) => {
+                              await update();
+                              comentarioRemoving = false;
+                            };
+                          }}
+                        >
+                          <input type="hidden" name="id" value={comentario.id} />
+                          <Button type="submit" outline color="red" size="xs" disabled={comentarioRemoving}>
                             <TrashBinSolid class="h-4 w-4" />
                           </Button>
-                        </div>
+                        </form>
                       {/if}
                     {/await}
                   </div>

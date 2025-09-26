@@ -27,7 +27,7 @@ export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promis
         nome: data.titulo,
         descricao: data.descricao,
         local_ocorrencia: data.localidade,
-        tipo: data.tipo.toUpperCase(),
+        tipo: data.tipo.toUpperCase()
       })
     }).then((res) => res.json());
     return response;
@@ -160,9 +160,49 @@ export const getComentariosByObjetoId = async (path: PathGetById): Promise<JSONG
   }
 };
 
-// export const getComentariosByObjetoId = async (path: PathGetById, userEmail?: string): Promise<JSONGetComentariosByObjetoIdRes> => {
-//   const comentarios = makeComentarios(userEmail);
-//   return {
-//     comentarios
-//   };
-// };
+type JSONPostComentarioReq = {
+  conteudo: string;
+  user_id: string;
+  objeto_id: string;
+};
+
+type JSONPostComentarioRes = Comentario | null;
+
+export const postComentario = async (data: JSONPostComentarioReq, token: string): Promise<JSONPostComentarioRes> => {
+  const userId = JSON.parse(atob(token.split('.')[1])).sub;
+  const url = new URL('/comentarios', PUBLIC_API_BASE_URL);
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        conteudo: data.conteudo,
+        user_id: userId,
+        objeto_id: data.objeto_id
+      })
+    }).then((res) => res.json());
+    return response;
+  } catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+};
+
+type PathDeleteComentario = {
+  id: string;
+};
+
+export const deleteComentario = async (path: PathDeleteComentario, token: string): Promise<boolean> => {
+  const url = new URL(`/comentarios/${path.id}`, PUBLIC_API_BASE_URL);
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
