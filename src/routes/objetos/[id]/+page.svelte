@@ -189,7 +189,7 @@
                       {'ucomentario.usuario.username'.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <span class="font-semibold">comentario.user</span>
+                      <span class="font-semibold">{comentario.username}</span>
                       <span class="text-xs font-normal">•</span>
                       <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
                     </div>

@@ -170,6 +170,7 @@ type JSONPostComentarioRes = Comentario | null;
 
 export const postComentario = async (data: JSONPostComentarioReq, token: string): Promise<JSONPostComentarioRes> => {
   const userId = JSON.parse(atob(token.split('.')[1])).sub;
+  const username = JSON.parse(atob(token.split('.')[1])).user_metadata?.username;
   const url = new URL('/comentarios', PUBLIC_API_BASE_URL);
 
   try {
@@ -179,7 +180,8 @@ export const postComentario = async (data: JSONPostComentarioReq, token: string)
       body: JSON.stringify({
         conteudo: data.conteudo,
         user_id: userId,
-        objeto_id: data.objeto_id
+        objeto_id: data.objeto_id,
+        username
       })
     }).then((res) => res.json());
     return response;

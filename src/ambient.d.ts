@@ -35,7 +35,7 @@ declare global {
     publicado_em: string;
     objeto_id: string;
     user_id: string;
-    usuario: { id: string; username: string; email: string; avatar_url: string };
+    username: string;
     conteudo: string;
   };
 }
