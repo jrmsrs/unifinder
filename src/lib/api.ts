@@ -1,6 +1,8 @@
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
 
-const baseObjetoApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
+const baseObjetosApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
+const baseComentariosApiURL = new URL('/comentarios', PUBLIC_API_BASE_URL);
+const baseUsersApiURL = new URL('/users', PUBLIC_API_BASE_URL);
 const baseGetOptions: RequestInit = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
 
 type JSONPostObjetoReq = {
@@ -18,9 +20,8 @@ type JSONPostObjetoRes = Objeto | null;
 
 export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promise<JSONPostObjetoRes> => {
   const userId = JSON.parse(atob(token.split('.')[1])).sub;
-  const url = new URL(`/users/${userId}/objetos`, PUBLIC_API_BASE_URL);
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${baseUsersApiURL}/${userId}/objetos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -67,9 +68,8 @@ export const getObjetos = async (data?: JSONGetObjetosReq): Promise<JSONGetObjet
   if (data?.page) dataTransformed.append('page', data.page.toString());
   if (data?.size) dataTransformed.append('size', data.size.toString());
   dataTransformed.append('status', data?.inativo ? 'finalizado' : 'aberto');
-  const url = `${baseObjetoApiURL}?${dataTransformed.toString()}`;
   try {
-    const response = await fetch(url, baseGetOptions).then((res) => res.json());
+    const response = await fetch(`${baseObjetosApiURL}?${dataTransformed.toString()}`, baseGetOptions).then((res) => res.json());
     return response;
   } catch (error: any) {
     console.error('API error:', error?.message);
@@ -90,12 +90,12 @@ type JSONGetObjetosLatestRes = {
 
 export const getObjetosLatest = async (user?: { id: string; email: string }): Promise<JSONGetObjetosLatestRes> => {
   const requests = [
-    fetch(`${baseObjetoApiURL}?${new URLSearchParams({ tipo: 'achado', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions),
-    fetch(`${baseObjetoApiURL}?${new URLSearchParams({ tipo: 'perdido', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
+    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'achado', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions),
+    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'perdido', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
   ];
   if (user)
     requests.push(
-      fetch(`${baseObjetoApiURL}?${new URLSearchParams({ usuario: user.email, status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
+      fetch(`${baseUsersApiURL}/${user.id}/objetos?${new URLSearchParams({ status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
     );
   try {
     const responses = await Promise.all(requests);
@@ -128,9 +128,8 @@ type PathGetById = {
 type JSONGetObjetoByIdRes = Objeto | null;
 
 export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByIdRes> => {
-  const url = `${baseObjetoApiURL}/${path.id}`;
   try {
-    const response = await fetch(url.toString(), baseGetOptions).then((res) => {
+    const response = await fetch(`${baseObjetosApiURL}/${path.id}`, baseGetOptions).then((res) => {
       if (res.status === 404) return null;
       return res.json();
     });
@@ -161,9 +160,8 @@ type JSONPutObjetoReq = {
 type JSONPutObjetoRes = Objeto | null;
 
 export const putObjeto = async (path: PathPutObjeto, data: JSONPutObjetoReq, token: string): Promise<JSONPutObjetoRes> => {
-  const url = new URL(`/objetos/${path.id}`, PUBLIC_API_BASE_URL);
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${baseObjetosApiURL}/${path.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -176,8 +174,7 @@ export const putObjeto = async (path: PathPutObjeto, data: JSONPutObjetoReq, tok
       })
     }).then((res) => res.json());
     return response;
-  }
-  catch (error) {
+  } catch (error) {
     console.error('API error:', error);
     return null;
   }
@@ -188,9 +185,8 @@ type PathDeleteObjeto = {
 };
 
 export const deleteObjeto = async (path: PathDeleteObjeto, token: string): Promise<boolean> => {
-  const url = new URL(`/objetos/${path.id}`, PUBLIC_API_BASE_URL);
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${baseObjetosApiURL}/${path.id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
@@ -206,9 +202,8 @@ type JSONGetComentariosByObjetoIdRes = {
 };
 
 export const getComentariosByObjetoId = async (path: PathGetById): Promise<JSONGetComentariosByObjetoIdRes> => {
-  const url = new URL(`/objetos/${path.id}/comentarios`, PUBLIC_API_BASE_URL);
   try {
-    const response = await fetch(url.toString(), baseGetOptions).then((res) => res.json());
+    const response = await fetch(`${baseObjetosApiURL}/${path.id}/comentarios`, baseGetOptions).then((res) => res.json());
     return {
       comentarios: response.items
     };
@@ -231,10 +226,9 @@ type JSONPostComentarioRes = Comentario | null;
 export const postComentario = async (data: JSONPostComentarioReq, token: string): Promise<JSONPostComentarioRes> => {
   const userId = JSON.parse(atob(token.split('.')[1])).sub;
   const username = JSON.parse(atob(token.split('.')[1])).user_metadata?.username;
-  const url = new URL('/comentarios', PUBLIC_API_BASE_URL);
 
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(baseComentariosApiURL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -256,9 +250,8 @@ type PathDeleteComentario = {
 };
 
 export const deleteComentario = async (path: PathDeleteComentario, token: string): Promise<boolean> => {
-  const url = new URL(`/comentarios/${path.id}`, PUBLIC_API_BASE_URL);
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${baseComentariosApiURL}/${path.id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
