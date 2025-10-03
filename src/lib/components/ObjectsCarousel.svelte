@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { dictLocalidades } from '$lib/utils/dicionaries';
   import { Badge, Card, Heading, P } from 'flowbite-svelte';
+  import { AtSign, MapPin } from 'lucide-svelte';
   import ImageLoader from './ImageLoader.svelte';
   import ObjectsCarouselScroll from './ObjectsCarouselScroll.svelte';
   import Skeleton from './Skeleton.svelte';
-  import { AtSign, MapPin } from 'lucide-svelte';
-  import { dictLocalidades } from '$lib/utils/dicionaries';
 
   let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } = $props();
 </script>
@@ -20,7 +20,7 @@
 				lg:first:px-[calc(1024px-50vw-10rem)]
 				xl:first:px-[calc(1280px-50vw-10rem)]
 				2xl:first:px-[calc(1536px-50vw-10rem)]
-				[&>*]:min-h-64 [&>*]:min-w-64 [&>*]:max-w-64 
+				[&>*]:min-h-64 [&>*]:max-w-64 [&>*]:min-w-64
 			"
   >
     {#if objects === null}
@@ -30,8 +30,8 @@
     {:else}
       {#each objects as obj}
         <a href={`/objetos/${obj.id}?ref=%2f`}>
-          <Card class="h-full relative col-span-1 flex gap-2 p-6">
-            <ImageLoader src={obj.imagem} alt={obj.nome} class="min-w-48 max-w-full h-48" />
+          <Card class="relative col-span-1 flex h-full gap-2 p-6">
+            <ImageLoader src={obj.url_imagem} alt={obj.nome} class="h-48 max-w-full min-w-48" />
             <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.nome}</Heading>
             <div class="flex">
               <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
@@ -47,7 +47,7 @@
                 </P>
                 <P class="col-span-2">
                   <AtSign class="mb-1 inline-block h-4 w-4" />
-                  obj.usuario.username
+                  {obj.user_id.slice(0, 8)}
                 </P>
                 <P class="text-end">
                   {new Date(obj.data_registro).toLocaleDateString('pt-BR', {
