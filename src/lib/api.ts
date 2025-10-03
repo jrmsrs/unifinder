@@ -27,7 +27,8 @@ export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promis
         nome: data.titulo,
         descricao: data.descricao,
         local_ocorrencia: data.localidade,
-        tipo: data.tipo.toUpperCase()
+        tipo: data.tipo.toUpperCase(),
+        url_imagem: data.image_url ?? undefined
       })
     }).then((res) => res.json());
     return response;

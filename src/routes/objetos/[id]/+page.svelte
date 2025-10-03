@@ -79,7 +79,7 @@
           <p class="text-red-500">Objeto não encontrado.</p>
         {:else}
           <div class="flex flex-col">
-            <ImageLoader src={objeto.imagem} alt={objeto.nome} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
+            <ImageLoader src={objeto.url_imagem} alt={objeto.nome} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
             <div class="grid grid-cols-2 overflow-hidden rounded-b-lg [&>*]:mt-0 [&>*]:h-8 [&>*]:rounded-none">
               <Badge color={objeto.tipo === 'achado' ? 'green' : 'red'}>{objeto.tipo}</Badge>
               <Badge color="gray" class="mt-2">objeto.categoria</Badge>
@@ -119,7 +119,7 @@
             <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
             <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
           {:then objeto}
-            {#if false && objeto?.usuario.email === data.user?.email}
+            {#if objeto?.user_id === data.user?.id}
               <Button color="green" class="col-span-3 flex justify-between">
                 <CheckOutline />
                 Finalizar

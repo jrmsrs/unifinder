@@ -19,8 +19,7 @@ declare global {
     id: string;
     data_registro: string;
     user_id: string;
-    usuario: { id: string; username: string; email: string; avatar_url: string };
-    imagem: string;
+    url_imagem: string;
     nome: string;
     descricao: string;
     local_ocorrencia: ObjetoLocalidade;

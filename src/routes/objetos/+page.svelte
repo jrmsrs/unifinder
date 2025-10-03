@@ -115,7 +115,7 @@
         {#each objetos as obj (obj.id)}
           <a href={`/objetos/${obj.id}?ref=%2fobjetos`}>
             <Card class="relative col-span-1 flex min-w-full flex-col gap-2 p-6">
-              <ImageLoader src={obj.imagem} alt={obj.nome} class="h-64" />
+              <ImageLoader src={obj.url_imagem} alt={obj.nome} class="h-64" />
               <Heading tag="h5" class="line-clamp-1">{obj.nome}</Heading>
               <P class="line-clamp-1">{obj.descricao}</P>
               <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
