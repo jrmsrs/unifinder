@@ -117,7 +117,7 @@ export const actions: Actions = {
         const imageBuffer = Buffer.from(await imagem_arquivo.arrayBuffer());
         const processedImageBuffer = await sharp(imageBuffer).resize(800).jpeg({ quality: 70 }).toBuffer();
         const fileName = `${crypto.randomUUID()}.jpg`;
-        const filePath = `objetos/${fileName}`;
+        const filePath = `${session.user?.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('objetos')
