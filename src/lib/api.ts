@@ -142,6 +142,65 @@ export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByI
   }
 };
 
+type PathPutObjeto = {
+  id: string;
+};
+
+type JSONPutObjetoReq = {
+  tipo?: ObjetoTipo;
+  titulo?: string;
+  descricao?: string;
+  localidade?: ObjetoLocalidade;
+  local_especifico?: string;
+  local_encaminhado?: string | null;
+  categoria?: ObjetoCategoria;
+  image_url?: string | null;
+  status?: ObjetoStatus;
+};
+
+type JSONPutObjetoRes = Objeto | null;
+
+export const putObjeto = async (path: PathPutObjeto, data: JSONPutObjetoReq, token: string): Promise<JSONPutObjetoRes> => {
+  const url = new URL(`/objetos/${path.id}`, PUBLIC_API_BASE_URL);
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        nome: data.titulo,
+        descricao: data.descricao,
+        local_ocorrencia: data.localidade,
+        tipo: data.tipo?.toUpperCase(),
+        url_imagem: data.image_url ?? undefined,
+        status: data.status?.toUpperCase()
+      })
+    }).then((res) => res.json());
+    return response;
+  }
+  catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+};
+
+type PathDeleteObjeto = {
+  id: string;
+};
+
+export const deleteObjeto = async (path: PathDeleteObjeto, token: string): Promise<boolean> => {
+  const url = new URL(`/objetos/${path.id}`, PUBLIC_API_BASE_URL);
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
+
 type JSONGetComentariosByObjetoIdRes = {
   comentarios: Comentario[];
 };

@@ -2,9 +2,7 @@
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
-  import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import ModalContainer from '$lib/components/routes/ObjetoModalContainer.svelte';
@@ -12,42 +10,20 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictLocalidades } from '$lib/utils/dicionaries.js';
   import { faker as fk } from '@faker-js/faker';
-  import { A, Alert, Badge, Button, Heading, Hr, Modal, P } from 'flowbite-svelte';
+  import { A, Alert, Badge, Button, Heading, Modal, P } from 'flowbite-svelte';
   import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft, AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
+  import CosmeticObjetosBg from './CosmeticObjetosBg.svelte';
+
   let ref = page.url.searchParams.get('ref') || '/objetos';
   let { data } = $props();
+  let objetoRemoving = $state(false);
   let comentario = $state(data.form ?? '');
   let comentarioSubmiting = $state(false);
   let comentarioRemoving = $state(false);
 </script>
 
-{#if ref === '/objetos'}
-  <div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
-    <div class="mb-4 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <div class="g col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Heading class="col-span-1 lg:col-span-2 xl:col-span-3" tag="h4">Lista de Objetos</Heading>
-        <FilteredSearch />
-      </div>
-      {#each Array.from({ length: 4 }) as _, i}
-        <Skeleton card={64} paragraphSize={2} class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''} />
-      {/each}
-    </div>
-  </div>
-{:else if ref === '/'}
-  <div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
-    <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
-    <FilteredSearch></FilteredSearch>
-    <Hr class="my-0!">ou</Hr>
-    <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto perdido</Button>
-    <Hr />
-    <P>Encontrou algum objeto na UNIRIO?</P>
-    <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800">Cadastrar objeto achado</Button>
-    <Hr />
-    <Heading tag="h4">Objetos em acompanhamento</Heading>
-    <ObjectsCarousel id="found-objects-carousel" objects={null} />
-  </div>
-{/if}
+<CosmeticObjetosBg />
 
 <ModalContainer>
   <Modal
@@ -126,7 +102,26 @@
                 <div class="h-5 w-5"></div>
               </Button>
               <Button color="yellow"><EditSolid /></Button>
-              <Button color="red"><TrashBinSolid /></Button>
+              <form
+                class="ml-auto"
+                method="post"
+                action="?/deleteObjeto"
+                use:enhance={() => {
+                  objetoRemoving = true;
+                  return async ({ update }) => {
+                    await update();
+                    objetoRemoving = false;
+                  };
+                }}
+              >
+                <Button color="red" type="submit" outline size="sm" disabled={objetoRemoving}>
+                  {#if objetoRemoving}
+                    <div class="h-5 w-5 animate-spin rounded-full border-2 border-t-2 border-gray-200"></div>
+                  {:else}
+                    <TrashBinSolid />
+                  {/if}
+                </Button>
+              </form>
             {:else}
               <Button color="primary" class="col-span-5 flex justify-between">
                 <FilePenSolid class="h-5 w-5 shrink-0" />

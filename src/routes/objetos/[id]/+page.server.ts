@@ -1,4 +1,4 @@
-import { deleteComentario, getComentariosByObjetoId, getObjetoById, postComentario } from '$lib/api';
+import { deleteComentario, deleteObjeto, getComentariosByObjetoId, getObjetoById, postComentario } from '$lib/api';
 import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect, type Actions } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -9,7 +9,6 @@ const fetchObjeto = async (id: string) => {
   return objeto;
 };
 
-// parametro email só pra mock, excluir na integração
 const fetchComentarios = async (id: string) => {
   await new Promise<void>((resolve) => setTimeout(resolve, 2000));
   const comentarios = await getComentariosByObjetoId({ id });
@@ -31,7 +30,17 @@ export const actions: Actions = {
   updateObjeto: async () => {},
   finishObjeto: async () => {},
   claimObjeto: async () => {},
-  deleteObjeto: async () => {},
+  deleteObjeto: async ({ request, params, locals: { safeGetSession } }) => {
+    const session = await safeGetSession();
+    if (!session.session) {
+      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+    }
+    const success = await deleteObjeto({ id: params.id as string }, session.session.access_token);
+    if (!success) {
+      throw redirect(303, `/objetos/${params.id}?error=${encodeURIComponent('Erro ao excluir objeto. Tente novamente.')}`);
+    }
+    throw redirect(303, `/objetos`);
+  },
   createComentario: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
