@@ -16,16 +16,11 @@
 </script>
 
 <div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
-  <P>Perdeu algum pertence na UNIRIO? Procure aqui</P>
+  <P>Perdeu ou encontrou algum pertence na UNIRIO? Procure pelo objeto ou o registro do dono no UniFinder</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">ou</Hr>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true&tipo=perdido')}>
-    Cadastrar objeto perdido
-  </Button>
-  <Hr />
-  <P>Encontrou algum objeto na UNIRIO?</P>
-  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true&tipo=achado')}>
-    Cadastrar objeto achado
+  <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true')}>
+    Registrar Objeto Perdido/Achado
   </Button>
   <Hr />
   {#if data.user}
