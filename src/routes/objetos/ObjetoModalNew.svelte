@@ -7,7 +7,7 @@
   import { scale } from 'svelte/transition';
 
   let { new: newObjeto = $bindable(), form, query, error } = $props();
-  let objetoTipo: ObjetoTipo | undefined = $state(form?.tipo ?? query?.tipo?.[0] ?? undefined);
+  let objetoTipo: ObjetoTipo | undefined = $state(form?.tipo ?? query?.tipo ?? undefined);
   let objetoTitulo: string = $state(form?.titulo ?? '');
   let objetoDescricao: string = $state(form?.descricao ?? '');
   const listaLocalidades: Array<{ value: ObjetoLocalidade; name: string }> = [

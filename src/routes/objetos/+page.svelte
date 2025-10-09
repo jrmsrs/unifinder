@@ -11,7 +11,10 @@
 
   let { data } = $props();
   let newObjeto = $state(data.newObjeto);
-  let objetoTipo: ObjetoTipo | undefined = $state(data.form?.tipo ?? data.query?.tipo?.[0] ?? undefined);
+  let objetoTipo: ObjetoTipo | undefined = $state(data.form?.tipo ?? data.query?.tipo ?? undefined);
+  console.log(data.form)
+  console.log(data.query)
+  
 </script>
 
 <div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
@@ -74,10 +77,10 @@
 
 <div class="m-auto mb-8 flex max-w-3xl flex-col items-center gap-4 p-4">
   <P class="text-center text-lg">
-    {data.query?.tipo?.[0]
-      ? data.query?.tipo?.[0] === 'achado'
+    {data.query?.tipo
+      ? data.query?.tipo === 'achado'
         ? 'Não encontrou o que procurava? Anuncie um objeto perdido!'
-        : 'Achou algo? Anuncie o objeto encontrado!'
+        : 'O dono não registrou a perda do objeto? Anuncie o objeto encontrado!'
       : 'Anuncie um objeto perdido ou encontrado'}
   </P>
   <Button
@@ -85,10 +88,10 @@
     onclick={() => {
       newObjeto = true;
       console.log(newObjeto)
-      objetoTipo = data.query?.tipo?.[0] ? (data.query?.tipo?.[0] === 'achado' ? 'perdido' : 'achado') : undefined;
+      objetoTipo = data.query?.tipo ? (data.query?.tipo === 'achado' ? 'perdido' : 'achado') : undefined;
     }}
   >
-    {data.query?.tipo?.[0] ? (data.query?.tipo?.[0] === 'achado' ? 'Novo objeto perdido' : 'Novo objeto achado') : 'Novo objeto'}
+    {data.query?.tipo ? (data.query?.tipo === 'achado' ? 'Novo objeto perdido' : 'Novo objeto achado') : 'Novo objeto'}
   </Button>
 </div>
 

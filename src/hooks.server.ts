@@ -63,17 +63,28 @@ const supabase: Handle = async ({ event, resolve }) => {
   });
 };
 
-const authGuard: Handle = async ({ event, resolve }) => {
+const protectedRoutes: Array<(route: { pathname: string; searchParams: URLSearchParams }) => boolean> = [
+  ({ pathname }) => pathname.startsWith('/private'),
+  ({ pathname, searchParams }) => pathname === '/objetos' && searchParams.has('new'),
+  // ...
+];
+
+export const authGuard: Handle = async ({ event, resolve }) => {
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;
   event.locals.user = user;
-  const email = user?.email ?? 'no-email';
-  const username = user?.user_metadata?.username as string | undefined;
 
-  if (event.locals.session && !(username && username !== email) && event.url.pathname !== '/auth' && event.url.pathname !== '/auth/logout')
-    redirect(303, '/auth');
-  if (!event.locals.session && event.url.pathname.startsWith('/private')) redirect(303, '/auth');
-  if (event.locals.session && event.url.pathname === '/auth' && username && username !== email) redirect(303, '/');
+  const hasSession = !!session;
+  const { pathname, searchParams } = event.url;
+  const username = user?.user_metadata?.username as string | undefined;
+  const isUsernameSet = !!username && username !== user?.email;
+  const isAuthPage = pathname === '/auth' || pathname === '/auth/logout';
+
+  const isProtectedRoute = protectedRoutes.some((rule) => rule({ pathname, searchParams }));
+
+  if (hasSession && !isUsernameSet && !isAuthPage) return redirect(303, '/auth');
+  if (!hasSession && isProtectedRoute) return redirect(303, '/auth');
+  if (hasSession && isUsernameSet && pathname === '/auth') return redirect(303, '/');
 
   return resolve(event);
 };

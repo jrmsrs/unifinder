@@ -16,9 +16,9 @@
 </script>
 
 <div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
-  <P>Perdeu ou encontrou algum pertence na UNIRIO? Procure pelo objeto ou o registro do dono no UniFinder</P>
+  <P>Perdeu ou achou algum pertence na UNIRIO? Procure pelo objeto entre os Achados ou o registro do dono entre os Perdidos:</P>
   <FilteredSearch></FilteredSearch>
-  <Hr class="my-0!">ou</Hr>
+  <Hr class="my-0!">não encontrou?</Hr>
   <Button color="primary" class="dark:bg-primary-700 dark:hover:bg-primary-800" onclick={() => goto('/objetos?new=true')}>
     Registrar Objeto Perdido/Achado
   </Button>
