@@ -4,6 +4,7 @@
   import {
     ArrowLeftToBracketOutline,
     ArrowRightToBracketOutline,
+    BellSolid,
     CubeSolid,
     CubesStackedSolid,
     HomeSolid,
@@ -16,6 +17,9 @@
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
+  import NotificationBell from '$lib/components/NotificationBell.svelte';
+  import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
+
 
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
@@ -55,7 +59,7 @@
       <img src="/favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
       <span class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"> UniFinder </span>
     </NavBrand>
-    <NavHamburger id="the-nav-hamburger" class="m-0 p-0 [&>*]:m-0 [&>*]:h-12 [&>*]:w-12 [&>*]:p-3" />
+    <NotificationHamburger id="the-nav-hamburger" class="m-0 p-0" session={session} />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
       <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>
@@ -65,6 +69,11 @@
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
+        <!-- Sino de notificação apenas para usuários logados -->
+        <div class="flex items-center">
+          <NotificationBell />
+        </div>
+        <NavItem href="/notifys" icon={BellSolid}>Notificações</NavItem>
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
       {/if}
