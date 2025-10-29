@@ -4,16 +4,18 @@
   import { page } from '$app/state';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
-  import Objeto from './Objeto.svelte';
-  import ObjetoComentarios from './ObjetoComentarios.svelte';
   import CosmeticObjetosBg from '$lib/components/routes/ObjetoCosmeticBg.svelte';
   import ModalContainer from '$lib/components/routes/ObjetoModalContainer.svelte';
   import { Button, Heading } from 'flowbite-svelte';
   import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft } from 'lucide-svelte';
+  import ObjetoClaimNew from '../ObjetoModalClaim.svelte';
+  import Objeto from './Objeto.svelte';
+  import ObjetoComentarios from './ObjetoComentarios.svelte';
 
   let ref = page.url.searchParams.get('ref') || '/objetos';
   let { data } = $props();
+  let objetoClaim = $state(false);
   let objetoRemoving = $state(false);
 </script>
 
@@ -81,7 +83,7 @@
               </Button>
             </form>
           {:else}
-            <Button color="primary" class="col-span-5 flex justify-between">
+            <Button color="primary" class="col-span-5 flex justify-between" onclick={() => (objetoClaim = true)}>
               <FilePenSolid class="h-5 w-5 shrink-0" />
               Reivindicar
               <div class="h-5 w-5"></div>
@@ -93,6 +95,9 @@
     <ObjetoComentarios {data} />
   </div>
 </ModalContainer>
+
+<ObjetoClaimNew bind:objetoClaim error={null} />
+<!-- <ObjetoClaimNew objetoClaim={false} error={data.claimError} /> -->
 
 {#await data.streamed.objeto then objeto}
   <DevInfo
