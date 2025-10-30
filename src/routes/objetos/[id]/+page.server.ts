@@ -1,4 +1,4 @@
-import { deleteComentario, deleteObjeto, getComentariosByObjetoId, getObjetoById, postComentario } from '$lib/api';
+import { deleteComentario, deleteObjeto, getComentariosByObjetoId, getObjetoById, postClaim, postComentario } from '$lib/api';
 import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect, type Actions } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -26,10 +26,56 @@ export const load: PageServerLoad = ({ params, url }) => {
   };
 };
 
+const claimSchema = z.object({
+  descricao: z.string(),
+  evidencias: z
+    .array(z.instanceof(File))
+    .max(5, 'Você pode enviar no máximo 5 arquivos como evidência.')
+    .refine((files) => files.every((file) => file.size <= 5 * 1024 * 1024), 'Cada arquivo deve ter no máximo 5MB.')
+    .optional()
+});
+
 export const actions: Actions = {
   updateObjeto: async () => {},
   finishObjeto: async () => {},
-  claimObjeto: async () => {},
+  claimObjeto: async ({ request, params, locals: { safeGetSession } }) => {
+    const session = await safeGetSession();
+    if (!session.session) {
+      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+    }
+    const formData = await request.formData();
+    const formPayload = {
+      descricao: formData.get('descricao'),
+      evidencias: Array.from(formData.getAll('evidencias')).filter((item) => item instanceof File)
+    };
+    const validation = claimSchema.safeParse(formPayload);
+
+    if (!validation.success) {
+      console.error('Erro de validação:', validation.error);
+      const { evidencias, ...rest } = formPayload;
+      throw redirect(
+        303,
+        `/objetos/${params.id}?error=${encodeURIComponent(validation.error.message)}&form=${stringToBase64URL(JSON.stringify(rest))}`
+      );
+    }
+
+    const result = await postClaim(
+      {
+        objeto_id: params.id as string,
+        descricao: validation.data.descricao,
+        evidencias: ['upload-nao-implementado']
+      },
+      session.session.access_token
+    );
+    if (!result) {
+      throw redirect(
+        303,
+        `/objetos/${params.id}?error=${encodeURIComponent('Erro ao enviar reivindicação. Tente novamente.')}&form=${stringToBase64URL(
+          JSON.stringify({ descricao: formPayload.descricao })
+        )}`
+      );
+    }
+  },
   deleteObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {

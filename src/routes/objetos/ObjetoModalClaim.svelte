@@ -2,31 +2,48 @@
   import { enhance } from '$app/forms';
   import { Alert, Button, Heading, Helper, Label, Modal, Textarea } from 'flowbite-svelte';
   import { CloseOutline } from 'flowbite-svelte-icons';
-  import { FileUp } from 'lucide-svelte';
+  import { FileUp, X } from 'lucide-svelte';
   import { scale } from 'svelte/transition';
 
   let { objetoClaim = $bindable(), error } = $props();
   let claimDescricao: string = $state('');
-  let claimAttachFile: File | undefined = $state(undefined);
+  let claimAttachFiles: FileList | null = $state(null);
   let claimSubmiting = $state(false);
 
   function handleFileSelect(e: Event) {
     const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
+    const files = target.files;
 
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Arquivo muito grande (máx 5MB)');
+    if (files) {
+      if (files.length > 5) {
+        alert('Você pode enviar no máximo 5 arquivos como evidência.');
         target.value = '';
-        claimAttachFile = undefined;
+        claimAttachFiles = null;
         return;
       }
-      claimAttachFile = file;
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].size > 5 * 1024 * 1024) {
+          alert(`O arquivo ${files[i].name} é muito grande (máx 5MB)`);
+          target.value = '';
+          claimAttachFiles = null;
+          return;
+        }
+      }
+      claimAttachFiles = files;
     }
   }
 
-  function handleRemoveImage() {
-    claimAttachFile = undefined;
+  function handleRemoveFile(i: number) {
+    if (!claimAttachFiles) return;
+
+    const dataTransfer = new DataTransfer();
+    for (let j = 0; j < claimAttachFiles.length; j++) {
+      if (j !== i) {
+        dataTransfer.items.add(claimAttachFiles[j]);
+      }
+    }
+    claimAttachFiles = dataTransfer.files;
+    (document.getElementById('fileInput') as HTMLInputElement).files = claimAttachFiles;
   }
 
   $effect(() => {
@@ -46,6 +63,7 @@
     <Heading tag="h5" class="text-center">Reivindicação de Objeto</Heading>
   {/snippet}
   <form
+    id="claimObjetoForm"
     class="flex flex-col gap-4"
     method="POST"
     action="?/claimObjeto"
@@ -54,6 +72,9 @@
       claimSubmiting = true;
       return async ({ update }) => {
         await update();
+        claimSubmiting = false;
+        claimAttachFiles = null;
+        (document.getElementById('claimObjetoForm') as HTMLFormElement).reset();
       };
     }}
   >
@@ -70,42 +91,41 @@
       </Label>
     </div>
     <div>
-      <Label>Anexe documentos/imagens comprobatórios (opcional)</Label>
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <div
-        class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-        onclick={() => document.getElementById('imageInput')?.click()}
-        role="button"
-        tabindex="0"
-      >
-        {#if claimAttachFile}
-          <div class="flex h-full w-full flex-col items-center justify-center p-4">
-            <p class="mb-2 text-center text-sm">{claimAttachFile.name}</p>
-            <Button
-              outline
-              color="red"
-              onclick={(e: Event) => {
-                e.stopPropagation();
-                handleRemoveImage();
-              }}
-            >
-              Remover arquivo
-            </Button>
-          </div>
-        {:else}
-          <div class="flex flex-col items-center justify-center">
-            <FileUp class="mb-2 h-12 w-12" />
-            <p class="text-center text-sm">Clique para selecionar um arquivo (máx 5MB)</p>
-          </div>
-        {/if}
-        <input
-          type="file"
-          id="imageInput"
-          name="comprovativo"
-          accept="image/*,application/pdf"
-          class="absolute inset-0 h-full w-full opacity-0"
-          onchange={handleFileSelect}
-        />
+      <Label for="fileInput">Anexe documentos comprobatórios (opcional)</Label>
+
+      <div class="flex flex-col">
+        <div
+          class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        >
+          <input
+            type="file"
+            id="fileInput"
+            name="evidencias"
+            class="absolute inset-0 h-full w-full opacity-0"
+            onchange={handleFileSelect}
+            multiple
+          />
+          <FileUp class="mr-2 h-6 w-6 text-gray-400" />
+          <span class="text-sm text-gray-600 dark:text-gray-400">carregue arquivos. i.e. uma foto do objeto, um recibo, etc.</span>
+        </div>
+
+        <div class="mt-2 flex flex-col">
+          {#each claimAttachFiles as file, i}
+            <div class="mb-1 flex items-center justify-between rounded bg-gray-100 p-2 dark:bg-gray-600">
+              <span class="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+              <button
+                type="button"
+                class="p-1 text-red-500 hover:text-red-700"
+                onclick={(e: Event) => {
+                  e.stopPropagation();
+                  handleRemoveFile(i);
+                }}
+              >
+                <X class="h-6 w-6" />
+              </button>
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
 

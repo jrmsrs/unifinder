@@ -262,3 +262,40 @@ export const deleteComentario = async (path: PathDeleteComentario, token: string
     return false;
   }
 };
+
+// claim api
+
+type JSONPostClaimReq = {
+  objeto_id: string;
+  descricao: string;
+  evidencias?: string[];
+};
+
+type JSONPostClaimRes = {
+  id: string;
+  objeto_id: string;
+  descricao: string;
+  evidencias: string[];
+  data_registro: string;
+  status: ClaimStatus;
+  user_id: string;
+  tutor_id: string;
+} | null;
+
+export const postClaim = async (data: JSONPostClaimReq, token: string): Promise<JSONPostClaimRes> => {
+  try {
+    const response = await fetch(`${baseUsersApiURL}/claims`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        objeto_id: data.objeto_id,
+        descricao: data.descricao,
+        evidencias: data.evidencias ?? []
+      })
+    }).then((res) => res.json());
+    return response;
+  } catch (error) {
+    console.error('API error:', error);
+    return null;
+  }
+};
