@@ -32,15 +32,17 @@ class NotificationSSEService {
    * Conecta ao endpoint SSE de notificações
    */
   connect(token: string): void {
+    if (token.split('.').length !== 3) return console.error('Token JWT inválido para conexão SSE');
+
+    const user_id = JSON.parse(atob(token.split('.')[1])).sub;
+
     if (this.connection.eventSource) {
       this.disconnect();
     }
 
-    const sseUrl = new URL('/notifys/sse', PUBLIC_API_BASE_URL);
-    
     // Adiciona o token como query parameter ou header
-    const eventSource = new EventSource(`${sseUrl.toString()}?token=${encodeURIComponent(token)}`);
-    
+    const eventSource = new EventSource(`${PUBLIC_API_BASE_URL}/notifys/sse/${user_id}`);
+
     this.connection.eventSource = eventSource;
     this.connection.isConnected = true;
     this.connection.reconnectAttempts = 0;
@@ -84,7 +86,7 @@ class NotificationSSEService {
       this.connection.eventSource = null;
     }
     this.connection.isConnected = false;
-    
+
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
@@ -96,7 +98,7 @@ class NotificationSSEService {
    */
   addListener(callback: (notification: Notification) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Retorna função para remover o listener
     return () => {
       const index = this.listeners.indexOf(callback);
@@ -110,7 +112,7 @@ class NotificationSSEService {
    * Notifica todos os listeners sobre uma nova notificação
    */
   private notifyListeners(notification: Notification): void {
-    this.listeners.forEach(callback => {
+    this.listeners.forEach((callback) => {
       try {
         callback(notification);
       } catch (error) {
