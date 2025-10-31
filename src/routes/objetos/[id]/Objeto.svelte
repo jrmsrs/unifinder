@@ -4,6 +4,7 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Badge, Heading, P } from 'flowbite-svelte';
+  import { InfoCircleOutline } from 'flowbite-svelte-icons';
   import { AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
 
   let { objeto }: { objeto: Objeto } = $props();
@@ -20,19 +21,22 @@
   <ObjetoTable>
     <Row key="Postado:" value={new Date(objeto.data_registro).toLocaleDateString()} icon={Calendar} />
     <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.user_id.slice(0, 8)} icon={AtSign} />
-    <Row
-      key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:"
-      value={dictLocalidades[objeto.local_ocorrencia]}
-      icon={MapPin}
-    />
+    <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local_ocorrencia]} icon={MapPin} />
     {#if objeto.tipo === 'achado'}
       <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />
     {/if}
     <Row
       key="Status:"
-      value={objeto.status.toLowerCase() === 'finalizado' ? 'Finalizado' : 'Ativo'}
-      icon={objeto.status.toLowerCase() === 'finalizado' ? CheckCircle : Play}
+      value={objeto.status.toLowerCase() !== 'aberto'
+        ? objeto.status.toLowerCase() === 'em_reivindicacao'
+          ? 'Reivindicado'
+          : 'Finalizado'
+        : 'Ativo'}
+      icon={objeto.status.toLowerCase() !== 'aberto'
+        ? objeto.status.toLowerCase() === 'em_reivindicacao'
+          ? CheckCircle
+          : InfoCircleOutline
+        : Play}
     />
   </ObjetoTable>
 </div>
-

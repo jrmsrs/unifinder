@@ -3,6 +3,7 @@ import { PUBLIC_API_BASE_URL } from '$env/static/public';
 const baseObjetosApiURL = new URL('/objetos', PUBLIC_API_BASE_URL);
 const baseComentariosApiURL = new URL('/comentarios', PUBLIC_API_BASE_URL);
 const baseUsersApiURL = new URL('/users', PUBLIC_API_BASE_URL);
+const baseClaimsApiURL = new URL('/claims', PUBLIC_API_BASE_URL);
 const baseGetOptions: RequestInit = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
 
 type JSONPostObjetoReq = {
@@ -284,7 +285,7 @@ type JSONPostClaimRes = {
 
 export const postClaim = async (data: JSONPostClaimReq, token: string): Promise<JSONPostClaimRes> => {
   try {
-    const response = await fetch(`${baseUsersApiURL}/claims`, {
+    const response = await fetch(baseClaimsApiURL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
