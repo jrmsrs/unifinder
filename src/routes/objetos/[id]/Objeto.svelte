@@ -20,7 +20,7 @@
   <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
   <ObjetoTable>
     <Row key="Postado:" value={new Date(objeto.data_registro).toLocaleDateString()} icon={Calendar} />
-    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.user_id.slice(0, 8)} icon={AtSign} />
+    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.user.username} icon={AtSign} />
     <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local_ocorrencia]} icon={MapPin} />
     {#if objeto.tipo === 'achado'}
       <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />

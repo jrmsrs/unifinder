@@ -20,6 +20,9 @@ declare global {
     id: string;
     data_registro: string;
     user_id: string;
+    user: {
+      username: string;
+    };
     url_imagem: string;
     nome: string;
     descricao: string;

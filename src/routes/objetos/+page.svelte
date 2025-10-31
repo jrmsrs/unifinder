@@ -36,8 +36,8 @@
               <Heading tag="h5" class="line-clamp-1">{obj.nome}</Heading>
               <P class="line-clamp-1">{obj.descricao}</P>
               <div class="absolute top-8 left-1/2 flex -translate-x-1/2 [&>*]:mx-0.5">
-                <Badge color={obj.tipo === 'achado' ? 'green' : 'red'}>
-                  {obj.tipo}
+                <Badge color={obj.tipo.toLowerCase() === 'achado' ? 'green' : 'red'}>
+                  {obj.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
                 </Badge>
                 {#if obj.status.toLowerCase() === 'em_reivindicacao'}
                   <Badge color="yellow">Reivindicado</Badge>
@@ -56,7 +56,7 @@
                 </P>
                 <P class="col-span-2">
                   <AtSign class="mb-1 inline-block h-4 w-4" />
-                  obj.usuario.username
+                  {obj.user.username}
                 </P>
                 <P class="text-end">
                   {new Date(obj.data_registro).toLocaleDateString('pt-BR', {
