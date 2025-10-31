@@ -12,9 +12,6 @@
   let { data } = $props();
   let newObjeto = $state(data.newObjeto);
   let objetoTipo: ObjetoTipo | undefined = $state(data.form?.tipo ?? data.query?.tipo ?? undefined);
-  console.log(data.form)
-  console.log(data.query)
-  
 </script>
 
 <div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
@@ -38,9 +35,14 @@
               <ImageLoader src={obj.url_imagem} alt={obj.nome} class="h-64" />
               <Heading tag="h5" class="line-clamp-1">{obj.nome}</Heading>
               <P class="line-clamp-1">{obj.descricao}</P>
-              <Badge color={obj.tipo === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
-                {obj.tipo}
-              </Badge>
+              <div class="absolute top-8 left-1/2 flex -translate-x-1/2 [&>*]:mx-0.5">
+                <Badge color={obj.tipo === 'achado' ? 'green' : 'red'}>
+                  {obj.tipo}
+                </Badge>
+                {#if obj.status.toLowerCase() === 'em_reivindicacao'}
+                  <Badge color="yellow">Reivindicado</Badge>
+                {/if}
+              </div>
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
                   <MapPin class="mb-1 inline-block h-4 w-4" />
@@ -87,7 +89,7 @@
     class="ml-2"
     onclick={() => {
       newObjeto = true;
-      console.log(newObjeto)
+      console.log(newObjeto);
       objetoTipo = data.query?.tipo ? (data.query?.tipo === 'achado' ? 'perdido' : 'achado') : undefined;
     }}
   >

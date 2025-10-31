@@ -75,6 +75,7 @@
         claimSubmiting = false;
         claimAttachFiles = null;
         (document.getElementById('claimObjetoForm') as HTMLFormElement).reset();
+        objetoClaim = false;
       };
     }}
   >
@@ -106,7 +107,9 @@
             multiple
           />
           <FileUp class="mr-2 h-6 w-6 text-gray-400" />
-          <span class="text-sm text-gray-600 dark:text-gray-400">carregue arquivos. i.e. uma foto do objeto, um recibo, etc.</span>
+          <span class="text-center text-sm text-gray-600 dark:text-gray-400">
+            carregue arquivos.<br />i.e. uma foto do objeto, um recibo, etc.
+          </span>
         </div>
 
         <div class="mt-2 flex flex-col">

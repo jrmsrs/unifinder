@@ -34,9 +34,14 @@
             <ImageLoader src={obj.url_imagem} alt={obj.nome} class="h-48 max-w-full min-w-48" />
             <Heading tag="h5" class="text-xl font-bold tracking-tight">{obj.nome}</Heading>
             <div class="flex">
-              <Badge color={obj.tipo.toLowerCase() === 'achado' ? 'green' : 'red'} class="absolute top-8 left-1/2 -translate-x-1/2">
-                {obj.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
-              </Badge>
+              <div class="absolute top-8 left-1/2 flex -translate-x-1/2 [&>*]:mx-0.5">
+                <Badge color={obj.tipo.toLowerCase() === 'achado' ? 'green' : 'red'}>
+                  {obj.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
+                </Badge>
+                {#if obj.status.toLowerCase() === 'em_reivindicacao'}
+                  <Badge color="yellow">Reivindicado</Badge>
+                {/if}
+              </div>
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
                   <MapPin class="mb-1 inline-block h-4 w-4" />

@@ -92,12 +92,12 @@ type JSONGetObjetosLatestRes = {
 
 export const getObjetosLatest = async (user?: { id: string; email: string }): Promise<JSONGetObjetosLatestRes> => {
   const requests = [
-    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'achado', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions),
-    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'perdido', status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
+    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'achado', status: 'aberto', page: '1', size: '5' })}`, baseGetOptions),
+    fetch(`${baseObjetosApiURL}?${new URLSearchParams({ tipo: 'perdido', status: 'aberto', page: '1', size: '5' })}`, baseGetOptions)
   ];
   if (user)
     requests.push(
-      fetch(`${baseUsersApiURL}/${user.id}/objetos?${new URLSearchParams({ status: 'ABERTO', page: '1', size: '5' })}`, baseGetOptions)
+      fetch(`${baseUsersApiURL}/${user.id}/objetos?${new URLSearchParams({ status: 'aberto', page: '1', size: '5' })}`, baseGetOptions)
     );
   try {
     const responses = await Promise.all(requests);
