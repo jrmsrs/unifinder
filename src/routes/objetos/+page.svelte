@@ -42,6 +42,9 @@
                 {#if obj.status.toLowerCase() === 'em_reivindicacao'}
                   <Badge color="yellow">Reivindicado</Badge>
                 {/if}
+                {#if obj.status.toLowerCase() === 'finalizado'}
+                  <Badge color="gray">Finalizado</Badge>
+                {/if}
               </div>
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
