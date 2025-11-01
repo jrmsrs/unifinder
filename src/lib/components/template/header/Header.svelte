@@ -17,7 +17,6 @@
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
-  import NotificationBell from '$lib/components/NotificationBell.svelte';
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
 
 
@@ -69,10 +68,6 @@
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
-        <!-- Sino de notificação apenas para usuários logados -->
-        <div class="flex items-center">
-          <NotificationBell />
-        </div>
         <NavItem href="/notifys" icon={BellSolid}>Notificações</NavItem>
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
