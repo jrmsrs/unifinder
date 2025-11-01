@@ -27,23 +27,43 @@ class NotificationSSEService {
 
   private listeners: ((notification: Notification) => void)[] = [];
   private reconnectTimeout: NodeJS.Timeout | null = null;
+  private currentUserId: string | null = null;
 
   /**
    * Conecta ao endpoint SSE de notificações
    */
   connect(token: string): void {
-    if (token.split('.').length !== 3) return console.error('Token JWT inválido para conexão SSE');
+    // Valida o token
+    if (!token || token.split('.').length !== 3) {
+      console.error('Token JWT inválido para conexão SSE');
+      return;
+    }
 
-    const user_id = JSON.parse(atob(token.split('.')[1])).sub;
+    // Extrai o user_id do token
+    let user_id: string;
+    try {
+      user_id = JSON.parse(atob(token.split('.')[1])).sub;
+    } catch (error) {
+      console.error('Erro ao decodificar token:', error);
+      return;
+    }
 
+    // Se já está conectado para o mesmo usuário e a conexão está aberta, não faz nada
+    if (this.connection.eventSource && this.currentUserId === user_id && this.connection.eventSource.readyState === EventSource.OPEN) {
+      console.log('SSE já conectado para este usuário');
+      return;
+    }
+
+    // Se está conectado para outro usuário ou desconectado, desconecta primeiro
     if (this.connection.eventSource) {
       this.disconnect();
     }
 
-    // Adiciona o token como query parameter ou header
+    // Conecta ao endpoint SSE
     const eventSource = new EventSource(`${PUBLIC_API_BASE_URL}/notifys/sse/${user_id}`);
-
+    
     this.connection.eventSource = eventSource;
+    this.currentUserId = user_id;
     this.connection.isConnected = true;
     this.connection.reconnectAttempts = 0;
 
@@ -86,6 +106,7 @@ class NotificationSSEService {
       this.connection.eventSource = null;
     }
     this.connection.isConnected = false;
+    this.currentUserId = null;
 
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
