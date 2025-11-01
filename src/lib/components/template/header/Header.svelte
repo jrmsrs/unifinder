@@ -5,6 +5,7 @@
     ArrowLeftToBracketOutline,
     ArrowRightToBracketOutline,
     BellSolid,
+    CheckOutline,
     CubeSolid,
     CubesStackedSolid,
     HomeSolid,
@@ -12,7 +13,6 @@
     QuestionCircleOutline,
     UserSolid
   } from 'flowbite-svelte-icons';
-  import HandHelpingIcon from 'lucide-svelte/icons/hand-helping';
   import { bounceInOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
@@ -62,12 +62,13 @@
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
       <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>
-      <NavItem href="/objetos?tipo=achado" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
+      <NavItem href="/objetos?tipo=achado" icon={CubeSolid}>Achados</NavItem>
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
       <NavItem sep />
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
+        <NavItem href="/claims" icon={CheckOutline}>Reivindicações</NavItem>
         <NavItem href="/notifys" icon={BellSolid}>Notificações</NavItem>
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>

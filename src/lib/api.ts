@@ -300,3 +300,50 @@ export const postClaim = async (data: JSONPostClaimReq, token: string): Promise<
     return null;
   }
 };
+
+// Extend JSONPostClaimRes type
+type Claim = JSONPostClaimRes & { objeto?: Objeto };
+
+type JSONGetClaimsRes = {
+  items: Claim[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+};
+
+export const getClaims = async (params?: { page?: number; size?: number; status?: ClaimStatus }): Promise<JSONGetClaimsRes> => {
+  const dataTransformed = new URLSearchParams();
+  if (params?.page) dataTransformed.append('page', params.page.toString());
+  if (params?.size) dataTransformed.append('size', params.size.toString());
+  if (params?.status) dataTransformed.append('status', params.status);
+  
+  try {
+    const response = await fetch(`${baseClaimsApiURL}?${dataTransformed.toString()}`, baseGetOptions).then((res) => res.json());
+    return response;
+  } catch (error: any) {
+    console.error('API error:', error?.message);
+    return {
+      items: [],
+      total: 0,
+      page: 1,
+      size: 100,
+      pages: 0
+    };
+  }
+};
+
+export const updateClaimStatus = async (claimId: string, status: ClaimStatus, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseClaimsApiURL}/${claimId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status })
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
+
