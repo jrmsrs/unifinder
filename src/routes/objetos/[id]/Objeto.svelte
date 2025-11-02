@@ -4,8 +4,7 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictCategorias, dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Badge, Heading, P } from 'flowbite-svelte';
-  import { InfoCircleOutline } from 'flowbite-svelte-icons';
-  import { AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
+  import { AlertTriangle, AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
 
   let { objeto }: { objeto: Objeto } = $props();
 </script>
@@ -13,7 +12,9 @@
 <div class="flex flex-col">
   <ImageLoader src={objeto.url_imagem} alt={objeto.nome} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
   <div class="grid grid-cols-2 overflow-hidden rounded-b-lg [&>*]:mt-0 [&>*]:h-8 [&>*]:rounded-none">
-    <Badge color={objeto.tipo === 'achado' ? 'green' : 'red'}>{objeto.tipo}</Badge>
+    <Badge color={objeto.tipo.toLowerCase() === 'achado' ? 'green' : 'red'} class="mt-2">
+      {objeto.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
+    </Badge>
     <Badge color="gray" class="mt-2">{dictCategorias[objeto.categoria]}</Badge>
   </div>
   <Heading tag="h2" class="mt-2 text-2xl font-bold">{objeto.nome}</Heading>
@@ -34,8 +35,8 @@
         : 'Ativo'}
       icon={objeto.status.toLowerCase() !== 'aberto'
         ? objeto.status.toLowerCase() === 'em_reivindicacao'
-          ? CheckCircle
-          : InfoCircleOutline
+          ? AlertTriangle
+          : CheckCircle
         : Play}
     />
   </ObjetoTable>

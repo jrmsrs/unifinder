@@ -46,7 +46,7 @@
   </div>
   <div class="g-f col-span-5 flex flex-col gap-4 md:col-span-2 [&>div]:rounded-lg [&>div]:bg-gray-50 [&>div]:p-4 [&>div]:dark:bg-gray-900">
     <div id="acoes">
-      <Heading tag="h3" class="text-xl font-bold">Ações (WIP)</Heading>
+      <Heading tag="h3" class="text-xl font-bold">Ações</Heading>
       <div class="my-1 grid grid-cols-5 gap-1 [&>form>button]:w-full!">
         {#await data.streamed.objeto}
           <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
