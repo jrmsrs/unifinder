@@ -14,7 +14,7 @@ declare global {
     | 'outro';
   type ObjetoTipo = 'achado' | 'perdido';
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
-  type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado';
+  type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
 
   type Objeto = {
     id: string;

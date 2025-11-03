@@ -312,14 +312,34 @@ type JSONGetClaimsRes = {
   pages: number;
 };
 
-export const getClaims = async (params?: { page?: number; size?: number; status?: ClaimStatus }): Promise<JSONGetClaimsRes> => {
+export const getPendingClaims = async (params?: { page?: number; size?: number; token?: string }): Promise<JSONGetClaimsRes> => {
   const dataTransformed = new URLSearchParams();
   if (params?.page) dataTransformed.append('page', params.page.toString());
   if (params?.size) dataTransformed.append('size', params.size.toString());
-  if (params?.status) dataTransformed.append('status', params.status);
   
   try {
-    const response = await fetch(`${baseClaimsApiURL}?${dataTransformed.toString()}`, baseGetOptions).then((res) => res.json());
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (params?.token) {
+      headers['Authorization'] = `Bearer ${params.token}`;
+    }
+    
+    const res = await fetch(`${baseClaimsApiURL}/pending?${dataTransformed.toString()}`, {
+      method: 'GET',
+      headers
+    });
+    
+    if (!res.ok) {
+      console.error('API error:', res.status, res.statusText);
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        size: 100,
+        pages: 0
+      };
+    }
+    
+    const response = await res.json();
     return response;
   } catch (error: any) {
     console.error('API error:', error?.message);
@@ -333,12 +353,65 @@ export const getClaims = async (params?: { page?: number; size?: number; status?
   }
 };
 
-export const updateClaimStatus = async (claimId: string, status: ClaimStatus, token: string): Promise<boolean> => {
+export const getMyClaims = async (params?: { page?: number; size?: number; token?: string }): Promise<JSONGetClaimsRes> => {
+  const dataTransformed = new URLSearchParams();
+  if (params?.page) dataTransformed.append('page', params.page.toString());
+  if (params?.size) dataTransformed.append('size', params.size.toString());
+  
   try {
-    const response = await fetch(`${baseClaimsApiURL}/${claimId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ status })
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (params?.token) {
+      headers['Authorization'] = `Bearer ${params.token}`;
+    }
+    
+    const res = await fetch(`${baseClaimsApiURL}/me?${dataTransformed.toString()}`, {
+      method: 'GET',
+      headers
+    });
+    
+    if (!res.ok) {
+      console.error('API error:', res.status, res.statusText);
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        size: 100,
+        pages: 0
+      };
+    }
+    
+    const response = await res.json();
+    return response;
+  } catch (error: any) {
+    console.error('API error:', error?.message);
+    return {
+      items: [],
+      total: 0,
+      page: 1,
+      size: 100,
+      pages: 0
+    };
+  }
+};
+
+export const approveClaim = async (claimId: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseClaimsApiURL}/${claimId}/aprovar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
+
+export const rejectClaim = async (claimId: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseClaimsApiURL}/${claimId}/rejeitar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
     return response.ok;
   } catch (error) {

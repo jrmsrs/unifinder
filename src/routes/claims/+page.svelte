@@ -13,12 +13,12 @@
   } from 'lucide-svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
-  import { scale } from 'svelte/transition';
 
   let { data, form } = $props();
   
   let selectedClaim = $state<Claim | null>(null);
   let showModal = $state(false);
+  let isClaimForApproval = $state(false);
 
   type Claim = {
     id: string;
@@ -32,34 +32,37 @@
     objeto?: Objeto;
   };
 
-  // Separa claims em "minhas" e "para aprovar"
+  // Carrega claims de ambas as fontes
   const claimsData = $derived(async () => {
-    const claims = await data.streamed.claims;
-    const userId = data.user?.id;
-    
-    const myClaims = claims.items.filter(claim => claim.user_id === userId);
-    const toApproveClaims = claims.items.filter(claim => claim.tutor_id === userId);
+    const [claimsForApproval, myClaims] = await Promise.all([
+      data.streamed.claimsForApproval,
+      data.streamed.myClaims
+    ]);
     
     return {
-      my: {
-        items: myClaims,
-        total: myClaims.length
-      },
-      toApprove: {
-        items: toApproveClaims,
-        total: toApproveClaims.length
-      }
+      my: myClaims,
+      toApprove: claimsForApproval
     };
   });
 
-  function openModal(claim: Claim) {
+  function openModal(claim: Claim, forApproval: boolean = false) {
+    console.log('🚀 openModal called BEFORE', { 
+      forApproval, 
+      status: claim.status
+    });
     selectedClaim = claim;
+    isClaimForApproval = forApproval;
     showModal = true;
+    console.log('🚀 openModal called AFTER', { 
+      isClaimForApproval,
+      status: selectedClaim?.status
+    });
   }
 
   function closeModal() {
     showModal = false;
     selectedClaim = null;
+    isClaimForApproval = false;
   }
 
   function formatDate(dateString: string): string {
@@ -74,7 +77,8 @@
   }
 
   function getStatusBadgeColor(status: ClaimStatus): "green" | "red" | "yellow" | "gray" {
-    switch (status) {
+    const normalized = status.toLowerCase() as ClaimStatus;
+    switch (normalized) {
       case 'aprovado':
         return 'green';
       case 'rejeitado':
@@ -87,7 +91,8 @@
   }
 
   function getStatusText(status: ClaimStatus): string {
-    switch (status) {
+    const normalized = status.toLowerCase() as ClaimStatus;
+    switch (normalized) {
       case 'aprovado':
         return 'Aprovado';
       case 'rejeitado':
@@ -179,7 +184,7 @@
                       <Button
                         size="xs"
                         color="blue"
-                        onclick={() => openModal(claim)}
+                        onclick={() => openModal(claim, true)}
                       >
                         <Eye class="h-3 w-3" />
                         Ver
@@ -327,7 +332,7 @@
                     <Button
                       size="sm"
                       color="blue"
-                      onclick={() => openModal(claim)}
+                      onclick={() => openModal(claim, true)}
                       class="w-full"
                     >
                       <Eye class="h-4 w-4 mr-1" />
@@ -409,7 +414,7 @@
 
 <!-- Modal de detalhes -->
 {#if selectedClaim && showModal}
-  <Modal bind:open={showModal} transition={scale}>
+  <Modal bind:open={showModal}>
     {#snippet header()}
       <Heading tag="h5" class="text-center">
         Detalhes da Reivindicação
@@ -480,7 +485,8 @@
       </div>
 
       <div class="flex justify-between gap-2 mt-4">
-        {#if selectedClaim.tutor_id === data.user?.id && selectedClaim.status === 'pendente'}
+        <!-- Debug: isClaimForApproval={isClaimForApproval}, status={selectedClaim?.status} -->
+        {#if isClaimForApproval && (selectedClaim.status === 'pendente' || selectedClaim.status === 'PENDENTE')}
           <form method="POST" action="?/rejectClaim" use:enhance={() => {
             closeModal();
             return () => {};

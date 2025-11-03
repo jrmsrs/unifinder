@@ -1,6 +1,6 @@
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getClaims, updateClaimStatus } from '$lib/api';
+import { getPendingClaims, getMyClaims, approveClaim, rejectClaim } from '$lib/api';
 
 export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) => {
   const { session, user } = await safeGetSession();
@@ -10,13 +10,13 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) 
     throw redirect(303, '/auth');
   }
   
-  const status = url.searchParams.get('status') as ClaimStatus | null;
   const page = parseInt(url.searchParams.get('page') || '1');
   const size = parseInt(url.searchParams.get('size') || '20');
   
   return {
     streamed: {
-      claims: getClaims({ page, size, status: status || undefined })
+      claimsForApproval: getPendingClaims({ page, size, token: session.access_token }),
+      myClaims: getMyClaims({ page, size, token: session.access_token })
     },
     session,
     user
@@ -37,7 +37,7 @@ export const actions: Actions = {
       return { success: false, error: 'ID da reivindicação não fornecido' };
     }
     
-    const success = await updateClaimStatus(claimId, 'aprovado', session.access_token);
+    const success = await approveClaim(claimId, session.access_token);
     
     if (!success) {
       return { success: false, error: 'Erro ao aprovar reivindicação' };
@@ -59,7 +59,7 @@ export const actions: Actions = {
       return { success: false, error: 'ID da reivindicação não fornecido' };
     }
     
-    const success = await updateClaimStatus(claimId, 'rejeitado', session.access_token);
+    const success = await rejectClaim(claimId, session.access_token);
     
     if (!success) {
       return { success: false, error: 'Erro ao rejeitar reivindicação' };
