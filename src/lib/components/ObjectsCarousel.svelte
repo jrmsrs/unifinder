@@ -14,12 +14,8 @@
     {id}
     class="
 				no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
-				first:px-[calc(50vw-10rem)]
-				sm:first:px-[calc(640px-50vw-10rem)]
-				md:first:px-[calc(768px-50vw-10rem)]
-				lg:first:px-[calc(1024px-50vw-10rem)]
-				xl:first:px-[calc(1280px-50vw-10rem)]
-				2xl:first:px-[calc(1536px-50vw-10rem)]
+				px-4
+				lg:justify-center lg:px-0
 				[&>*]:min-h-64 [&>*]:max-w-64 [&>*]:min-w-64
 			"
   >

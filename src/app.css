@@ -75,29 +75,27 @@
 }
 
 html ::-webkit-scrollbar {
-  width: 16px;
+  width: 8px;
 }
 
 html ::-webkit-scrollbar-track {
-  background: var(--color-gray-200);
+  background: transparent;
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: var(--color-gray-800);
+  background: transparent;
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  border-color: var(--color-gray-800);
+  background: var(--color-gray-600);
+  border-radius: 4px;
 }
 
 html ::-webkit-scrollbar-thumb {
-  background: var(--color-primary-500);
-  border: solid var(--color-gray-200);
-  border-left: 10px;
-  border-bottom: 10px;
-  border-top: 10px;
+  background: var(--color-gray-400);
+  border-radius: 4px;
 }
 
 html ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gray-500);
+  background: var(--color-primary-500);
 }

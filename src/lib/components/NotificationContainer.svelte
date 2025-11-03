@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { notifications, notificationActions } from '$lib/stores/notifications';
   import { notificationSSEService } from '$lib/api/sse';
   import NotificationToast from './NotificationToast.svelte';
@@ -11,26 +11,38 @@
 
   let { session }: Props = $props();
 
-  let removeListener: (() => void) | null = null;
+  let removeListener: (() => void) | null = $state(null);
+  let isListenerAdded = $state(false);
 
-  onMount(() => {
-    if (session?.access_token && session?.user?.id) {
+  // Conecta ao SSE quando o componente é montado ou a sessão muda
+  $effect(() => {
+    if (session?.access_token) {
       // Conecta ao SSE apenas se o usuário estiver autenticado
       notificationSSEService.connect(session.access_token);
 
-      // Adiciona listener para novas notificações
-      removeListener = notificationSSEService.addListener((notification: Notification) => {
-        notificationActions.addNotification(notification);
-      });
+      // Adiciona listener para novas notificações apenas uma vez
+      if (!isListenerAdded) {
+        removeListener = notificationSSEService.addListener((notification: Notification) => {
+          notificationActions.addNotification(notification);
+        });
+        isListenerAdded = true;
+      }
+    } else {
+      // Desconecta se não há sessão
+      notificationSSEService.disconnect();
+      if (removeListener) {
+        removeListener();
+        removeListener = null;
+        isListenerAdded = false;
+      }
     }
   });
 
   onDestroy(() => {
-    // Remove listener e desconecta
+    // Limpa listeners quando o componente é destruído
     if (removeListener) {
       removeListener();
     }
-    notificationSSEService.disconnect();
   });
 
   function handleCloseNotification(notificationId: string) {

@@ -5,6 +5,7 @@
     ArrowLeftToBracketOutline,
     ArrowRightToBracketOutline,
     BellSolid,
+    CheckOutline,
     CubeSolid,
     CubesStackedSolid,
     HomeSolid,
@@ -12,12 +13,10 @@
     QuestionCircleOutline,
     UserSolid
   } from 'flowbite-svelte-icons';
-  import HandHelpingIcon from 'lucide-svelte/icons/hand-helping';
   import { bounceInOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
-  import NotificationBell from '$lib/components/NotificationBell.svelte';
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
 
 
@@ -63,16 +62,13 @@
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
       <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>
-      <NavItem href="/objetos?tipo=achado" icon={[HandHelpingIcon, CubeSolid]}>Achados</NavItem>
+      <NavItem href="/objetos?tipo=achado" icon={CubeSolid}>Achados</NavItem>
       <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
       <NavItem sep />
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
-        <!-- Sino de notificação apenas para usuários logados -->
-        <div class="flex items-center">
-          <NotificationBell />
-        </div>
+        <NavItem href="/claims" icon={CheckOutline}>Reivindicações</NavItem>
         <NavItem href="/notifys" icon={BellSolid}>Notificações</NavItem>
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>

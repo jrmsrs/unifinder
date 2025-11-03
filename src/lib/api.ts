@@ -143,6 +143,24 @@ export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByI
   }
 };
 
+export const getObjetosByIds = async (ids: string[]): Promise<Objeto[]> => {
+  if (!ids || ids.length === 0) return [];
+  try {
+    const requests = ids.map((id) => fetch(`${baseObjetosApiURL}/${id}`, baseGetOptions));
+    const responses = await Promise.all(requests);
+    const objetos = await Promise.all(
+      responses.map(async (res) => {
+        if (res.status === 404) return null;
+        return res.json();
+      })
+    );
+    return objetos.filter((obj): obj is Objeto => obj !== null);
+  } catch (error) {
+    console.error('API error:', error);
+    return [];
+  }
+};
+
 type PathPutObjeto = {
   id: string;
 };
@@ -300,3 +318,123 @@ export const postClaim = async (data: JSONPostClaimReq, token: string): Promise<
     return null;
   }
 };
+
+// Extend JSONPostClaimRes type
+type Claim = JSONPostClaimRes & { objeto?: Objeto };
+
+type JSONGetClaimsRes = {
+  items: Claim[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+};
+
+export const getPendingClaims = async (params?: { page?: number; size?: number; token?: string }): Promise<JSONGetClaimsRes> => {
+  const dataTransformed = new URLSearchParams();
+  if (params?.page) dataTransformed.append('page', params.page.toString());
+  if (params?.size) dataTransformed.append('size', params.size.toString());
+  
+  try {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (params?.token) {
+      headers['Authorization'] = `Bearer ${params.token}`;
+    }
+    
+    const res = await fetch(`${baseClaimsApiURL}/pending?${dataTransformed.toString()}`, {
+      method: 'GET',
+      headers
+    });
+    
+    if (!res.ok) {
+      console.error('API error:', res.status, res.statusText);
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        size: 100,
+        pages: 0
+      };
+    }
+    
+    const response = await res.json();
+    return response;
+  } catch (error: any) {
+    console.error('API error:', error?.message);
+    return {
+      items: [],
+      total: 0,
+      page: 1,
+      size: 100,
+      pages: 0
+    };
+  }
+};
+
+export const getMyClaims = async (params?: { page?: number; size?: number; token?: string }): Promise<JSONGetClaimsRes> => {
+  const dataTransformed = new URLSearchParams();
+  if (params?.page) dataTransformed.append('page', params.page.toString());
+  if (params?.size) dataTransformed.append('size', params.size.toString());
+  
+  try {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (params?.token) {
+      headers['Authorization'] = `Bearer ${params.token}`;
+    }
+    
+    const res = await fetch(`${baseClaimsApiURL}/me?${dataTransformed.toString()}`, {
+      method: 'GET',
+      headers
+    });
+    
+    if (!res.ok) {
+      console.error('API error:', res.status, res.statusText);
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        size: 100,
+        pages: 0
+      };
+    }
+    
+    const response = await res.json();
+    return response;
+  } catch (error: any) {
+    console.error('API error:', error?.message);
+    return {
+      items: [],
+      total: 0,
+      page: 1,
+      size: 100,
+      pages: 0
+    };
+  }
+};
+
+export const approveClaim = async (claimId: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseClaimsApiURL}/${claimId}/aprovar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
+
+export const rejectClaim = async (claimId: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseClaimsApiURL}/${claimId}/rejeitar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('API error:', error);
+    return false;
+  }
+};
+
