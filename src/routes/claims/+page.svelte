@@ -7,7 +7,6 @@
     X,
     FileImage,
     Clock,
-    Eye,
     CheckCircle2,
     AlertCircle
   } from 'lucide-svelte';
@@ -46,17 +45,9 @@
   });
 
   function openModal(claim: Claim, forApproval: boolean = false) {
-    console.log('🚀 openModal called BEFORE', { 
-      forApproval, 
-      status: claim.status
-    });
     selectedClaim = claim;
     isClaimForApproval = forApproval;
     showModal = true;
-    console.log('🚀 openModal called AFTER', { 
-      isClaimForApproval,
-      status: selectedClaim?.status
-    });
   }
 
   function closeModal() {
@@ -154,12 +145,24 @@
         {:else}
           <div class="space-y-3">
             {#each toApprove.items as claim (claim.id)}
-              <Card class="p-4">
+              <Card 
+                class="p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
+                role="button"
+                tabindex={0}
+                onclick={() => openModal(claim, true)}
+                onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && openModal(claim, true)}
+              >
                 <div class="flex items-start gap-3">
                   {#if claim.objeto}
-                    <a href={`/objetos/${claim.objeto.id}`} class="flex-shrink-0">
+                    <div 
+                      class="flex-shrink-0 cursor-pointer" 
+                      role="button"
+                      tabindex="0"
+                      onclick={(e: MouseEvent) => { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); }}
+                      onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); } }}
+                    >
                       <ImageLoader src={claim.objeto.url_imagem} alt={claim.objeto.nome} class="h-20 w-20 rounded-lg object-cover" />
-                    </a>
+                    </div>
                   {/if}
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -176,19 +179,9 @@
                       </Badge>
                     </div>
                     
-                    <div class="flex items-center justify-between gap-2">
-                      <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
-                        <Clock class="h-3 w-3" />
-                        {formatDate(claim.data_registro)}
-                      </div>
-                      <Button
-                        size="xs"
-                        color="blue"
-                        onclick={() => openModal(claim, true)}
-                      >
-                        <Eye class="h-3 w-3" />
-                        Ver
-                      </Button>
+                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
+                      <Clock class="h-3 w-3" />
+                      {formatDate(claim.data_registro)}
                     </div>
                   </div>
                 </div>
@@ -218,12 +211,24 @@
         {:else}
           <div class="space-y-3">
             {#each my.items as claim (claim.id)}
-              <Card class="p-4">
+              <Card 
+                class="p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
+                role="button"
+                tabindex={0}
+                onclick={() => openModal(claim, false)}
+                onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && openModal(claim, false)}
+              >
                 <div class="flex items-start gap-3">
                   {#if claim.objeto}
-                    <a href={`/objetos/${claim.objeto.id}`} class="flex-shrink-0">
+                    <div 
+                      class="flex-shrink-0 cursor-pointer" 
+                      role="button"
+                      tabindex="0"
+                      onclick={(e: MouseEvent) => { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); }}
+                      onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); } }}
+                    >
                       <ImageLoader src={claim.objeto.url_imagem} alt={claim.objeto.nome} class="h-20 w-20 rounded-lg object-cover" />
-                    </a>
+                    </div>
                   {/if}
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -240,19 +245,9 @@
                       </Badge>
                     </div>
                     
-                    <div class="flex items-center justify-between gap-2">
-                      <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
-                        <Clock class="h-3 w-3" />
-                        {formatDate(claim.data_registro)}
-                      </div>
-                      <Button
-                        size="xs"
-                        color="blue"
-                        onclick={() => openModal(claim)}
-                      >
-                        <Eye class="h-3 w-3" />
-                        Ver
-                      </Button>
+                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
+                      <Clock class="h-3 w-3" />
+                      {formatDate(claim.data_registro)}
                     </div>
                   </div>
                 </div>
@@ -306,12 +301,24 @@
         {:else}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {#each toApprove.items as claim (claim.id)}
-              <Card class="p-6 hover:shadow-lg transition-shadow">
+              <Card 
+                class="p-6 cursor-pointer hover:shadow-lg transition-shadow active:scale-[0.98]"
+                role="button"
+                tabindex={0}
+                onclick={() => openModal(claim, true)}
+                onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && openModal(claim, true)}
+              >
                 <div class="flex items-start gap-4 mb-4">
                   {#if claim.objeto}
-                    <a href={`/objetos/${claim.objeto.id}`} class="flex-shrink-0">
+                    <div 
+                      class="flex-shrink-0 cursor-pointer" 
+                      role="button"
+                      tabindex={0}
+                      onclick={(e: MouseEvent) => { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); }}
+                      onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); } }}
+                    >
                       <ImageLoader src={claim.objeto.url_imagem} alt={claim.objeto.nome} class="h-32 w-32 rounded-lg object-cover" />
-                    </a>
+                    </div>
                   {/if}
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -325,19 +332,10 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
                       {claim.descricao}
                     </p>
-                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500 mb-3">
+                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
                       <Clock class="h-3 w-3" />
                       {formatDate(claim.data_registro)}
                     </div>
-                    <Button
-                      size="sm"
-                      color="blue"
-                      onclick={() => openModal(claim, true)}
-                      class="w-full"
-                    >
-                      <Eye class="h-4 w-4 mr-1" />
-                      Ver detalhes
-                    </Button>
                   </div>
                 </div>
               </Card>
@@ -367,12 +365,24 @@
         {:else}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {#each my.items as claim (claim.id)}
-              <Card class="p-6 hover:shadow-lg transition-shadow">
+              <Card 
+                class="p-6 cursor-pointer hover:shadow-lg transition-shadow active:scale-[0.98]"
+                role="button"
+                tabindex={0}
+                onclick={() => openModal(claim, false)}
+                onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && openModal(claim, false)}
+              >
                 <div class="flex items-start gap-4 mb-4">
                   {#if claim.objeto}
-                    <a href={`/objetos/${claim.objeto.id}`} class="flex-shrink-0">
+                    <div 
+                      class="flex-shrink-0 cursor-pointer" 
+                      role="button"
+                      tabindex={0}
+                      onclick={(e: MouseEvent) => { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); }}
+                      onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') { e.stopPropagation(); goto(`/objetos/${claim.objeto!.id}`); } }}
+                    >
                       <ImageLoader src={claim.objeto.url_imagem} alt={claim.objeto.nome} class="h-32 w-32 rounded-lg object-cover" />
-                    </a>
+                    </div>
                   {/if}
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -386,19 +396,10 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
                       {claim.descricao}
                     </p>
-                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500 mb-3">
+                    <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
                       <Clock class="h-3 w-3" />
                       {formatDate(claim.data_registro)}
                     </div>
-                    <Button
-                      size="sm"
-                      color="blue"
-                      onclick={() => openModal(claim)}
-                      class="w-full"
-                    >
-                      <Eye class="h-4 w-4 mr-1" />
-                      Ver detalhes
-                    </Button>
                   </div>
                 </div>
               </Card>
@@ -434,7 +435,7 @@
               </div>
               <Button
                 size="xs"
-                color="blue"
+                color="primary"
                 onclick={() => {
                   const claim = selectedClaim;
                   const objeto = claim?.objeto;
@@ -453,7 +454,7 @@
 
         <!-- Descrição -->
         <div>
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Descrição da Reivindicação</h3>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Descrição</h3>
           <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedClaim.descricao}</p>
         </div>
 
@@ -484,35 +485,28 @@
         </div>
       </div>
 
-      <div class="flex justify-between gap-2 mt-4">
-        <!-- Debug: isClaimForApproval={isClaimForApproval}, status={selectedClaim?.status} -->
-        {#if isClaimForApproval && (selectedClaim.status === 'pendente' || selectedClaim.status === 'PENDENTE')}
+      {#if isClaimForApproval && (selectedClaim.status === 'pendente' || selectedClaim.status === 'PENDENTE')}
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
           <form method="POST" action="?/rejectClaim" use:enhance={() => {
             closeModal();
-            return () => {};
           }}>
             <input type="hidden" name="claimId" value={selectedClaim.id} />
-            <Button type="submit" color="red">
+            <Button type="submit" color="light" class="border border-gray-300 dark:border-gray-600">
               <X class="h-4 w-4 mr-2" />
               Rejeitar
             </Button>
           </form>
           <form method="POST" action="?/approveClaim" use:enhance={() => {
             closeModal();
-            return () => {};
           }}>
             <input type="hidden" name="claimId" value={selectedClaim.id} />
-            <Button type="submit" color="green">
+            <Button type="submit" color="primary" class="font-semibold shadow-sm">
               <Check class="h-4 w-4 mr-2" />
               Aprovar
             </Button>
           </form>
-        {:else}
-          <Button onclick={closeModal} color="gray">
-            Fechar
-          </Button>
-        {/if}
-      </div>
+        </div>
+      {/if}
   </Modal>
 {/if}
 

@@ -143,6 +143,24 @@ export const getObjetoById = async (path: PathGetById): Promise<JSONGetObjetoByI
   }
 };
 
+export const getObjetosByIds = async (ids: string[]): Promise<Objeto[]> => {
+  if (!ids || ids.length === 0) return [];
+  try {
+    const requests = ids.map((id) => fetch(`${baseObjetosApiURL}/${id}`, baseGetOptions));
+    const responses = await Promise.all(requests);
+    const objetos = await Promise.all(
+      responses.map(async (res) => {
+        if (res.status === 404) return null;
+        return res.json();
+      })
+    );
+    return objetos.filter((obj): obj is Objeto => obj !== null);
+  } catch (error) {
+    console.error('API error:', error);
+    return [];
+  }
+};
+
 type PathPutObjeto = {
   id: string;
 };

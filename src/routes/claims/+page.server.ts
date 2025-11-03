@@ -1,6 +1,22 @@
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getPendingClaims, getMyClaims, approveClaim, rejectClaim } from '$lib/api';
+import { getPendingClaims, getMyClaims, approveClaim, rejectClaim, getObjetosByIds } from '$lib/api';
+
+async function enrichClaimsWithObjetos(claims: any) {
+  if (!claims.items || claims.items.length === 0) return claims;
+  
+  const objetoIds = claims.items.map((claim: any) => claim.objeto_id).filter(Boolean);
+  const objetos = await getObjetosByIds(objetoIds);
+  
+  const objetosMap = new Map(objetos.map((obj) => [obj.id, obj]));
+  
+  claims.items = claims.items.map((claim: any) => ({
+    ...claim,
+    objeto: objetosMap.get(claim.objeto_id)
+  }));
+  
+  return claims;
+}
 
 export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) => {
   const { session, user } = await safeGetSession();
@@ -13,10 +29,15 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) 
   const page = parseInt(url.searchParams.get('page') || '1');
   const size = parseInt(url.searchParams.get('size') || '20');
   
+  const claimsForApprovalPromise = getPendingClaims({ page, size, token: session.access_token })
+    .then(enrichClaimsWithObjetos);
+  const myClaimsPromise = getMyClaims({ page, size, token: session.access_token })
+    .then(enrichClaimsWithObjetos);
+  
   return {
     streamed: {
-      claimsForApproval: getPendingClaims({ page, size, token: session.access_token }),
-      myClaims: getMyClaims({ page, size, token: session.access_token })
+      claimsForApproval: claimsForApprovalPromise,
+      myClaims: myClaimsPromise
     },
     session,
     user
@@ -24,7 +45,7 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) 
 };
 
 export const actions: Actions = {
-  approveClaim: async ({ request, locals: { safeGetSession } }) => {
+  approveClaim: async ({ request, locals: { safeGetSession }, url }) => {
     const { session } = await safeGetSession();
     if (!session) {
       throw redirect(303, '/auth');
@@ -43,10 +64,10 @@ export const actions: Actions = {
       return { success: false, error: 'Erro ao aprovar reivindicação' };
     }
     
-    return { success: true };
+    throw redirect(303, url.pathname + url.search);
   },
   
-  rejectClaim: async ({ request, locals: { safeGetSession } }) => {
+  rejectClaim: async ({ request, locals: { safeGetSession }, url }) => {
     const { session } = await safeGetSession();
     if (!session) {
       throw redirect(303, '/auth');
@@ -65,6 +86,6 @@ export const actions: Actions = {
       return { success: false, error: 'Erro ao rejeitar reivindicação' };
     }
     
-    return { success: true };
+    throw redirect(303, url.pathname + url.search);
   }
 };
