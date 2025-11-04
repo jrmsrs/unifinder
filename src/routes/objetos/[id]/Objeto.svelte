@@ -30,7 +30,7 @@
       key="Status:"
       value={objeto.status.toLowerCase() !== 'aberto'
         ? objeto.status.toLowerCase() === 'em_reivindicacao'
-          ? 'Reivindicado'
+          ? 'Reivindicação em andamento'
           : 'Finalizado'
         : 'Ativo'}
       icon={objeto.status.toLowerCase() !== 'aberto'

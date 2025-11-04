@@ -65,7 +65,7 @@ export const getObjetos = async (data?: JSONGetObjetosReq): Promise<JSONGetObjet
   if (data?.search) dataTransformed.append('search', data.search);
   if (data?.tipo) dataTransformed.append('tipo', data.tipo);
   if (data?.usuario) dataTransformed.append('usuario', data.usuario);
-  if (data?.localidade) data.localidade.forEach((loc) => dataTransformed.append('localidade', loc));
+  if (data?.localidade) data.localidade.forEach((loc) => dataTransformed.append('local_ocorrencia', loc));
   if (data?.categoria) data.categoria.forEach((cat) => dataTransformed.append('categoria', cat));
   if (data?.page) dataTransformed.append('page', data.page.toString());
   if (data?.size) dataTransformed.append('size', data.size.toString());
@@ -103,13 +103,19 @@ export const getObjetosLatest = async (user?: { id: string; email: string }): Pr
     const responses = await Promise.all(requests);
     const responseAchados = await responses[0].json();
     const responsePerdidos = await responses[1].json();
-    const responseTutelados = user ? await responses[2].json() : undefined;
+    let responseTutelados = user ? await responses[2].json() : undefined;
+    if (user) {
+      responseTutelados = {
+        ...responseTutelados,
+        items: responseTutelados.items.filter((objeto: Objeto) => objeto.status.toLowerCase() !== 'finalizado')
+      };
+    }
     return {
       latestObjetos: {
         achados: responseAchados.items,
         perdidos: responsePerdidos.items
       },
-      tutelados: user ? responseTutelados?.items : undefined
+      tutelados: responseTutelados?.items ?? undefined
     };
   } catch (error) {
     console.error('API error:', error);
