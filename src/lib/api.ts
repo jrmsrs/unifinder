@@ -334,18 +334,18 @@ export const getPendingClaims = async (params?: { page?: number; size?: number; 
   const dataTransformed = new URLSearchParams();
   if (params?.page) dataTransformed.append('page', params.page.toString());
   if (params?.size) dataTransformed.append('size', params.size.toString());
-  
+
   try {
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (params?.token) {
       headers['Authorization'] = `Bearer ${params.token}`;
     }
-    
+
     const res = await fetch(`${baseClaimsApiURL}/pending?${dataTransformed.toString()}`, {
       method: 'GET',
       headers
     });
-    
+
     if (!res.ok) {
       console.error('API error:', res.status, res.statusText);
       return {
@@ -356,7 +356,7 @@ export const getPendingClaims = async (params?: { page?: number; size?: number; 
         pages: 0
       };
     }
-    
+
     const response = await res.json();
     return response;
   } catch (error: any) {
@@ -375,18 +375,18 @@ export const getMyClaims = async (params?: { page?: number; size?: number; token
   const dataTransformed = new URLSearchParams();
   if (params?.page) dataTransformed.append('page', params.page.toString());
   if (params?.size) dataTransformed.append('size', params.size.toString());
-  
+
   try {
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (params?.token) {
       headers['Authorization'] = `Bearer ${params.token}`;
     }
-    
+
     const res = await fetch(`${baseClaimsApiURL}/me?${dataTransformed.toString()}`, {
       method: 'GET',
       headers
     });
-    
+
     if (!res.ok) {
       console.error('API error:', res.status, res.statusText);
       return {
@@ -397,7 +397,7 @@ export const getMyClaims = async (params?: { page?: number; size?: number; token
         pages: 0
       };
     }
-    
+
     const response = await res.json();
     return response;
   } catch (error: any) {
@@ -437,4 +437,3 @@ export const rejectClaim = async (claimId: string, token: string): Promise<boole
     return false;
   }
 };
-

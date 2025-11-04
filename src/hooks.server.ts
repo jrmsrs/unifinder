@@ -65,7 +65,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 
 const protectedRoutes: Array<(route: { pathname: string; searchParams: URLSearchParams }) => boolean> = [
   ({ pathname }) => pathname.startsWith('/private'),
-  ({ pathname, searchParams }) => pathname === '/objetos' && searchParams.has('new'),
+  ({ pathname, searchParams }) => pathname === '/objetos' && searchParams.has('new')
   // ...
 ];
 

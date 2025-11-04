@@ -17,24 +17,14 @@ export const sseConnectionStatus = writable<{
 });
 
 // Store derivado para notificações não lidas
-export const unreadNotifications = derived(
-  notifications,
-  ($notifications) => $notifications.filter(n => !n.read)
-);
+export const unreadNotifications = derived(notifications, ($notifications) => $notifications.filter((n) => !n.read));
 
 // Store derivado para contagem de notificações não lidas
-export const unreadCount = derived(
-  unreadNotifications,
-  ($unreadNotifications) => $unreadNotifications.length
-);
+export const unreadCount = derived(unreadNotifications, ($unreadNotifications) => $unreadNotifications.length);
 
 // Store derivado para as notificações mais recentes (últimas 10)
-export const recentNotifications = derived(
-  notifications,
-  ($notifications) => 
-    [...$notifications]
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 10)
+export const recentNotifications = derived(notifications, ($notifications) =>
+  [...$notifications].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 10)
 );
 
 // Funções para gerenciar notificações
@@ -43,11 +33,11 @@ export const notificationActions = {
    * Adiciona uma nova notificação
    */
   addNotification(notification: Notification): void {
-    notifications.update(current => {
+    notifications.update((current) => {
       // Verifica se a notificação já existe (evita duplicatas)
-      const exists = current.some(n => n.id === notification.id);
+      const exists = current.some((n) => n.id === notification.id);
       if (exists) return current;
-      
+
       return [notification, ...current];
     });
   },
@@ -56,12 +46,8 @@ export const notificationActions = {
    * Marca uma notificação como lida
    */
   markAsRead(notificationId: string): void {
-    notifications.update(current =>
-      current.map(notification =>
-        notification.id === notificationId
-          ? { ...notification, read: true }
-          : notification
-      )
+    notifications.update((current) =>
+      current.map((notification) => (notification.id === notificationId ? { ...notification, read: true } : notification))
     );
   },
 
@@ -69,18 +55,14 @@ export const notificationActions = {
    * Marca todas as notificações como lidas
    */
   markAllAsRead(): void {
-    notifications.update(current =>
-      current.map(notification => ({ ...notification, read: true }))
-    );
+    notifications.update((current) => current.map((notification) => ({ ...notification, read: true })));
   },
 
   /**
    * Remove uma notificação
    */
   removeNotification(notificationId: string): void {
-    notifications.update(current =>
-      current.filter(notification => notification.id !== notificationId)
-    );
+    notifications.update((current) => current.filter((notification) => notification.id !== notificationId));
   },
 
   /**
@@ -97,11 +79,7 @@ export const notificationActions = {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    notifications.update(current =>
-      current.filter(notification =>
-        new Date(notification.timestamp) > thirtyDaysAgo
-      )
-    );
+    notifications.update((current) => current.filter((notification) => new Date(notification.timestamp) > thirtyDaysAgo));
   }
 };
 
@@ -119,7 +97,7 @@ if (browser) {
   }
 
   // Salva notificações no localStorage sempre que mudarem
-  notifications.subscribe(current => {
+  notifications.subscribe((current) => {
     try {
       localStorage.setItem('notifications', JSON.stringify(current));
     } catch (error) {

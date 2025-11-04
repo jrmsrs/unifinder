@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { notifications, notificationActions } from '$lib/stores/notifications';
-  import { notificationSSEService } from '$lib/api/sse';
-  import NotificationToast from './NotificationToast.svelte';
   import type { Notification } from '$lib/api/sse';
+  import { notificationSSEService } from '$lib/api/sse';
+  import { notificationActions, notifications } from '$lib/stores/notifications';
+  import { onDestroy } from 'svelte';
+  import NotificationToast from './NotificationToast.svelte';
 
   interface Props {
     session: any;
@@ -51,11 +51,8 @@
 </script>
 
 <!-- Container fixo - Mobile First -->
-<div class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-50 space-y-2">
+<div class="fixed top-4 right-4 left-4 z-50 space-y-2 sm:right-4 sm:left-auto sm:max-w-sm">
   {#each $notifications.slice(0, 3) as notification (notification.id)}
-    <NotificationToast
-      {notification}
-      onClose={() => handleCloseNotification(notification.id)}
-    />
+    <NotificationToast {notification} onClose={() => handleCloseNotification(notification.id)} />
   {/each}
 </div>

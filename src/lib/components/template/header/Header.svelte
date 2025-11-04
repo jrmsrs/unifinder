@@ -19,7 +19,6 @@
   import NavList from './TheNavList.svelte';
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
 
-
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
     const htmlElement = document.querySelector('html');
@@ -58,7 +57,7 @@
       <img src="/favicon.svg" class="mx-3 h-6 sm:h-9" alt="UniFinder Logo" />
       <span class="inline self-center text-xl font-semibold whitespace-nowrap md:hidden lg:inline dark:text-white"> UniFinder </span>
     </NavBrand>
-    <NotificationHamburger id="the-nav-hamburger" class="m-0 p-0" session={session} />
+    <NotificationHamburger id="the-nav-hamburger" class="m-0 p-0" {session} />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
       <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>

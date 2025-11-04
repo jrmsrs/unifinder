@@ -61,7 +61,7 @@ class NotificationSSEService {
 
     // Conecta ao endpoint SSE
     const eventSource = new EventSource(`${PUBLIC_API_BASE_URL}/notifys/sse/${user_id}`);
-    
+
     this.connection.eventSource = eventSource;
     this.currentUserId = user_id;
     this.connection.isConnected = true;
