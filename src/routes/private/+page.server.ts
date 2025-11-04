@@ -19,13 +19,9 @@ export const load: PageServerLoad = async ({ locals: { session, supabase } }) =>
     profile: profile || {
       id: session.user.id,
       username: session.user.user_metadata?.username || '',
-      nome: session.user.user_metadata?.full_name || '',
-      email: session.user.email || '',
-      whatsapp: '',
-      instagram: '',
-      x_twitter: '',
-      facebook: '',
-      avatar_url: session.user.user_metadata?.avatar_url || ''
+      full_name: session.user.user_metadata?.full_name || '',
+      avatar_url: session.user.user_metadata?.avatar_url || '',
+      contacts: []
     }
   };
 };
@@ -41,6 +37,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const username = formData.get('username') as string;
     const fullName = formData.get('fullName') as string;
+    const contactsJson = formData.get('contacts') as string;
 
     // Validações básicas
     if (!username || username.trim().length < 3) {
@@ -57,8 +54,15 @@ export const actions: Actions = {
 
     // [validação de campos de redes sociais]
 
+    let contacts = [];
     try {
-      // Atualizar ou inserir perfil
+      contacts = contactsJson ? JSON.parse(contactsJson) : [];
+    } catch (error) {
+      return { error: 'Formato de contatos inválido' };
+    }
+
+    try {
+      console.log('Updating profile with:', { username, fullName, contacts });
       const { error: updateError } = await supabase
         .from('user')
         .update({
@@ -69,19 +73,13 @@ export const actions: Actions = {
 
       if (updateError) {
         console.error('Profile update error:', updateError);
-        return {
-          error: 'Erro ao atualizar perfil. Tente novamente.'
-        };
+        return { error: 'Erro ao atualizar perfil. Tente novamente.' };
       }
 
-      return {
-        success: 'Perfil atualizado com sucesso!'
-      };
+      return { success: 'Perfil atualizado com sucesso!' };
     } catch (error) {
       console.error('Unexpected error:', error);
-      return {
-        error: 'Erro inesperado. Tente novamente.'
-      };
+      return { error: 'Erro inesperado. Tente novamente.' };
     }
   },
 
