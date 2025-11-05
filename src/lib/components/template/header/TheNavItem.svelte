@@ -13,6 +13,7 @@
     green = false,
     red = false,
     themeToggle = false,
+    badgeCount = 0,
     class: extraClass = ''
   }: {
     id?: string;
@@ -23,6 +24,7 @@
     green?: boolean;
     red?: boolean;
     themeToggle?: boolean;
+    badgeCount?: number;
     class?: string;
   } = $props();
 </script>
@@ -70,10 +72,22 @@
             {@const IconComponent = ic}
             <IconComponent class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0" />
           {/each}
+          {#if badgeCount > 0}
+            <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              {badgeCount > 99 ? '99+' : badgeCount}
+            </span>
+          {/if}
         </span>
       {:else}
         {@const Icon = icon}
-        <Icon class="me-1 inline h-5 w-5" />
+        <span class="relative me-1 inline-block">
+          <Icon class="inline h-5 w-5" />
+          {#if badgeCount > 0}
+            <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              {badgeCount > 99 ? '99+' : badgeCount}
+            </span>
+          {/if}
+        </span>
       {/if}
     {/if}
     <span>{@render children()}</span>

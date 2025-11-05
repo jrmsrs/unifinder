@@ -18,6 +18,7 @@
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
+  import { unreadCount } from '$lib/stores/notifications';
 
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
@@ -68,7 +69,7 @@
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
         <NavItem href="/claims" icon={CheckOutline}>Reivindicações</NavItem>
-        <NavItem href="/notifys" icon={BellSolid}>Notificações</NavItem>
+        <NavItem href="/notifys" icon={BellSolid} badgeCount={$unreadCount}>Notificações</NavItem>
         <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
         <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
       {/if}

@@ -4,6 +4,7 @@
   import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
   import Header from '$lib/components/template/header/Header.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
+  import NotificationPoller from '$lib/components/NotificationPoller.svelte';
   import { onMount } from 'svelte';
   import Seo from 'sk-seo';
   import '../app.css';
@@ -49,3 +50,8 @@
     {@render children()}
   </MainContainer>
 </AppContent>
+
+<!-- Poller de notificações em background -->
+{#if data.session}
+  <NotificationPoller session={data.session} />
+{/if}
