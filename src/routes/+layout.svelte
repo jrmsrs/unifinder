@@ -4,7 +4,6 @@
   import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
   import Header from '$lib/components/template/header/Header.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
-  import NotificationContainer from '$lib/components/NotificationContainer.svelte';
   import { onMount } from 'svelte';
   import Seo from 'sk-seo';
   import '../app.css';
@@ -50,8 +49,3 @@
     {@render children()}
   </MainContainer>
 </AppContent>
-
-<!-- Container de notificações toast -->
-{#if data.session}
-  <NotificationContainer session={data.session} />
-{/if}

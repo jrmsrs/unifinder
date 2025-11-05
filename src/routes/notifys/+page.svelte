@@ -1,41 +1,93 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Button, Card, Badge, Alert } from 'flowbite-svelte';
-  import { Info, Check, Trash2, Bell, BellOff } from 'lucide-svelte';
+  import { Info, Check, Bell, BellOff } from 'lucide-svelte';
   import { notifications, unreadCount, notificationActions } from '$lib/stores/notifications';
-  import type { Notification } from '$lib/api/sse';
+  import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '$lib/api/notifications';
+  import type { Notification } from '$lib/api/notifications';
+
+  let { data } = $props();
+  let { session, initialNotifications } = $derived(data);
 
   let showOnlyUnread = $state(false);
+  let loading = $state(false);
+
+  // Carrega notificações iniciais do servidor
+  onMount(() => {
+    if (initialNotifications && initialNotifications.length > 0) {
+      notifications.set(initialNotifications);
+    } else if (session?.access_token) {
+      // Busca notificações se não vieram do servidor
+      fetchNotifications();
+    }
+  });
+
+  // Busca notificações do servidor
+  async function fetchNotifications() {
+    if (!session?.access_token) return;
+    loading = true;
+    try {
+      const response = await getNotifications({ token: session.access_token, size: 50 });
+      notifications.set(response.items || []);
+    } catch (error) {
+      console.error('Erro ao buscar notificações:', error);
+    } finally {
+      loading = false;
+    }
+  }
 
   // Usar apenas ícone e cor informativos
   const Icon = Info;
   const color = 'blue';
 
   // Filtra notificações baseado no estado
-  const filteredNotifications = $derived($notifications.filter((notification) => !showOnlyUnread || !notification.read));
-
-  // Ordena por timestamp (mais recentes primeiro)
-  const sortedNotifications = $derived(
-    [...filteredNotifications].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+  const filteredNotifications = $derived(
+    $notifications.filter((notification) => !showOnlyUnread || !notification.delivered)
   );
 
-  function markAsRead(notificationId: string) {
-    notificationActions.markAsRead(notificationId);
-  }
+  // Ordena por created_at (mais recentes primeiro)
+  const sortedNotifications = $derived(
+    [...filteredNotifications].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+  );
 
-  function markAllAsRead() {
-    notificationActions.markAllAsRead();
-  }
-
-  function removeNotification(notificationId: string) {
-    notificationActions.removeNotification(notificationId);
-  }
-
-  function clearAll() {
-    if (confirm('Tem certeza que deseja limpar todas as notificações?')) {
-      notificationActions.clearAll();
+  async function markAsRead(notificationId: string) {
+    if (!session?.access_token) return;
+    
+    // Chama a API primeiro
+    const success = await markNotificationAsRead(notificationId, session.access_token);
+    
+    if (success) {
+      // Atualiza localmente após sucesso
+      notificationActions.markAsRead(notificationId);
+      
+      // Recarrega notificações do servidor para sincronizar
+      await fetchNotifications();
+    } else {
+      console.error('Erro ao marcar notificação como lida');
+      alert('Erro ao marcar notificação como lida. Tente novamente.');
     }
   }
+
+  async function markAllAsRead() {
+    if (!session?.access_token) return;
+    
+    // Chama a API primeiro
+    const success = await markAllNotificationsAsRead(session.access_token);
+    
+    if (success) {
+      // Atualiza localmente após sucesso
+      notificationActions.markAllAsRead();
+      
+      // Recarrega notificações do servidor para sincronizar
+      await fetchNotifications();
+    } else {
+      console.error('Erro ao marcar todas as notificações como lidas');
+      alert('Erro ao marcar todas as notificações como lidas. Tente novamente.');
+    }
+  }
+
 
   function formatTimestamp(timestamp: string): string {
     const date = new Date(timestamp);
@@ -70,7 +122,7 @@
       <div>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white">Notificações</h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          {sortedNotifications.length} notificação{sortedNotifications.length !== 1 ? 'ões' : ''}
+          {sortedNotifications.length} notificaç{sortedNotifications.length !== 1 ? 'ões' : 'ão'}
           {#if $unreadCount > 0}
             • {$unreadCount} não lida{$unreadCount !== 1 ? 's' : ''}
           {/if}
@@ -81,12 +133,6 @@
           <Button color="green" size="xs" onclick={markAllAsRead} class="flex items-center gap-1">
             <Check class="h-3 w-3" />
             <span class="hidden sm:inline">Marcar todas</span>
-          </Button>
-        {/if}
-        {#if $notifications.length > 0}
-          <Button color="red" size="xs" onclick={clearAll} class="flex items-center gap-1">
-            <Trash2 class="h-3 w-3" />
-            <span class="hidden sm:inline">Limpar</span>
           </Button>
         {/if}
       </div>
@@ -133,7 +179,7 @@
       <div class="space-y-3">
         {#each sortedNotifications as notification (notification.id)}
           <div
-            class="rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 dark:border-gray-700 dark:bg-gray-800 {notification.read
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 dark:border-gray-700 dark:bg-gray-800 {notification.delivered
               ? 'opacity-75'
               : ''}"
           >
@@ -147,34 +193,27 @@
               <div class="min-w-0 flex-1">
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1">
-                    <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">
-                      {notification.title}
-                    </h3>
                     <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
                       {notification.message}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-500">
-                      {formatTimestamp(notification.timestamp)}
+                      {formatTimestamp(notification.created_at)}
                     </p>
                   </div>
 
                   <!-- Status e ações -->
                   <div class="flex flex-col items-end gap-2">
-                    {#if !notification.read}
+                    {#if !notification.delivered}
                       <Badge color="red" size="small">Não lida</Badge>
                     {/if}
 
                     <div class="flex gap-1">
-                      {#if !notification.read}
+                      {#if !notification.delivered}
                         <Button size="xs" color="green" onclick={() => markAsRead(notification.id)} class="flex items-center gap-1">
                           <Check class="h-3 w-3" />
                           <span class="hidden sm:inline">Lida</span>
                         </Button>
                       {/if}
-
-                      <Button size="xs" color="red" onclick={() => removeNotification(notification.id)} class="flex items-center gap-1">
-                        <Trash2 class="h-3 w-3" />
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -199,7 +238,7 @@
     <!-- Desktop Stats -->
     <div class="mb-4 flex items-center gap-3">
       <Badge color="blue" size="small">
-        {sortedNotifications.length} notificação{sortedNotifications.length !== 1 ? 'ões' : ''}
+        {sortedNotifications.length} notificaç{sortedNotifications.length !== 1 ? 'ões' : 'ão'}
       </Badge>
       {#if $unreadCount > 0}
         <Badge color="red" size="small">
@@ -231,13 +270,6 @@
           Marcar todas como lidas
         </Button>
       {/if}
-
-      {#if $notifications.length > 0}
-        <Button color="red" size="sm" onclick={clearAll} class="flex items-center gap-2">
-          <Trash2 class="h-4 w-4" />
-          Limpar todas
-        </Button>
-      {/if}
     </div>
 
     <!-- Desktop List -->
@@ -259,7 +291,7 @@
       <div class="space-y-3">
         {#each sortedNotifications as notification (notification.id)}
           <div
-            class="rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 {notification.read
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 {notification.delivered
               ? 'opacity-75'
               : ''}"
           >
@@ -273,34 +305,27 @@
               <div class="min-w-0 flex-1">
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1">
-                    <h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">
-                      {notification.title}
-                    </h3>
                     <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
                       {notification.message}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-500">
-                      {formatTimestamp(notification.timestamp)}
+                      {formatTimestamp(notification.created_at)}
                     </p>
                   </div>
 
                   <!-- Status e ações -->
                   <div class="flex flex-col items-end gap-2">
-                    {#if !notification.read}
+                    {#if !notification.delivered}
                       <Badge color="red" size="small">Não lida</Badge>
                     {/if}
 
                     <div class="flex gap-1">
-                      {#if !notification.read}
+                      {#if !notification.delivered}
                         <Button size="xs" color="green" onclick={() => markAsRead(notification.id)} class="flex items-center gap-1">
                           <Check class="h-3 w-3" />
                           Lida
                         </Button>
                       {/if}
-
-                      <Button size="xs" color="red" onclick={() => removeNotification(notification.id)} class="flex items-center gap-1">
-                        <Trash2 class="h-3 w-3" />
-                      </Button>
                     </div>
                   </div>
                 </div>
