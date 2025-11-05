@@ -30,21 +30,37 @@
 
     if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden')) hamburger.click();
 
+    let themeClickHandler: (() => void) | null = null;
+    let scrollHandler: (() => void) | null = null;
+
     if (theme && htmlElement && themeButton) {
       const setTheme = (colorA: string, colorB: string) => {
         if (htmlElement.classList.contains('dark')) theme.setAttribute('content', colorA);
         else theme.setAttribute('content', colorB);
       };
       setTheme('#171616', '#ffffff');
-      themeButton.addEventListener('click', () => setTheme('#ffffff', '#171616'));
+      themeClickHandler = () => setTheme('#ffffff', '#171616');
+      themeButton.addEventListener('click', themeClickHandler);
     }
 
-    if (scroll)
-      scroll.addEventListener('scroll', function () {
+    if (scroll) {
+      scrollHandler = function () {
         var scrollPosition = scroll.scrollTop || window.pageYOffset;
         var scrollThreshold = 32;
         blueLine = scrollPosition > scrollThreshold;
-      });
+      };
+      scroll.addEventListener('scroll', scrollHandler);
+    }
+
+    // Cleanup: remove event listeners quando o effect é limpo
+    return () => {
+      if (themeButton && themeClickHandler) {
+        themeButton.removeEventListener('click', themeClickHandler);
+      }
+      if (scroll && scrollHandler) {
+        scroll.removeEventListener('scroll', scrollHandler);
+      }
+    };
   });
 
   let blueLine = $state(false);

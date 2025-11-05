@@ -12,32 +12,51 @@
   let { data, children } = $props();
   let { session, supabase } = $derived(data);
 
-  async function detectSWUpdate() {
-    const registration = await navigator.serviceWorker.ready;
-
-    registration.addEventListener('updatefound', () => {
-      const installingWorker = registration.installing;
-      installingWorker?.addEventListener('statechange', () => {
-        if (installingWorker.state === 'installed') {
-          if (confirm('Uma nova versão do UniFinder está disponível. Deseja atualizar?')) {
-            installingWorker.postMessage({ type: 'SKIP_WAITING' });
-            window.location.reload();
-          }
-        }
-      });
-    });
-  }
-
   onMount(() => {
     const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
       if (newSession?.expires_at !== session?.expires_at) {
         invalidate('supabase:auth');
       }
     });
-    if ('serviceWorker' in navigator) {
-      detectSWUpdate();
+
+    let updateFoundHandler: (() => void) | null = null;
+    let stateChangeHandler: (() => void) | null = null;
+
+    async function detectSWUpdate() {
+      if (!('serviceWorker' in navigator)) return;
+
+      const registration = await navigator.serviceWorker.ready;
+
+      updateFoundHandler = () => {
+        const installingWorker = registration.installing;
+        if (installingWorker) {
+          stateChangeHandler = () => {
+            if (installingWorker.state === 'installed') {
+              if (confirm('Uma nova versão do UniFinder está disponível. Deseja atualizar?')) {
+                installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+              }
+            }
+          };
+          installingWorker.addEventListener('statechange', stateChangeHandler);
+        }
+      };
+
+      registration.addEventListener('updatefound', updateFoundHandler);
     }
-    return () => data.subscription.unsubscribe();
+
+    detectSWUpdate();
+
+    // Cleanup: remove todos os listeners e subscriptions
+    return () => {
+      data.subscription.unsubscribe();
+      if (updateFoundHandler && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.removeEventListener('updatefound', updateFoundHandler!);
+        });
+      }
+      // Note: stateChangeHandler é removido automaticamente quando o worker é destruído
+    };
   });
 </script>
 
