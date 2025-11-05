@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import Profile from '$lib/components/profile/Profile.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import { A, Alert, Button, Heading, P } from 'flowbite-svelte';
   import { TrashBinSolid } from 'flowbite-svelte-icons';
@@ -9,6 +10,32 @@
   let comentario = $state(data.form ?? '');
   let comentarioSubmiting = $state(false);
   let comentarioRemoving = $state(false);
+
+  type Contact = {
+    id: string;
+    tipo: string;
+    valor: string;
+  };
+
+  type User = {
+    id: string;
+    nome: string;
+    username: string;
+    contacts: Contact[];
+  };
+
+  let showProfile = $state(false);
+  let selectedUser = $state<User | null>(null);
+
+  const openProfile = (user: User) => {
+    selectedUser = user;
+    showProfile = true;
+  };
+
+  const closeProfile = () => {
+    showProfile = false;
+    selectedUser = null;
+  };
 </script>
 
 <div id="comentarios" class="h-full">
@@ -63,7 +90,25 @@
       {#if comentarios.length > 0}
         {#each comentarios as comentario}
           <div class="mb-4 text-sm">
-            <div class="mb-1 flex items-center gap-2">
+            <button
+              class="
+                mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md p-1 text-left
+                hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]
+              "
+              type="button"
+              onclick={() =>
+                openProfile({
+                  id: comentario.user_id,
+                  nome: comentario.username,
+                  username: comentario.username,
+                  contacts: [
+                    { id: '1', tipo: 'email', valor: 'teste123@email.com' },
+                    { id: '2', tipo: 'whatsapp', valor: '+5511999999999' },
+                    { id: '3', tipo: 'instagram', valor: 'insta_teste' },
+                    { id: '4', tipo: 'facebook', valor: 'fb.teste' }
+                  ]
+                })}
+            >
               <div
                 class="flex h-8 w-8 items-center justify-center rounded-full"
                 style="background-color: hsl({parseInt(comentario.user_id.slice(0, 6), 16)}, 50%, 50%)"
@@ -96,7 +141,7 @@
                   </form>
                 {/if}
               {/await}
-            </div>
+            </button>
             <div class="flex gap-2">
               <p>{comentario.conteudo}</p>
             </div>
@@ -110,3 +155,7 @@
     {/await}
   </div>
 </div>
+
+{#if selectedUser}
+  <Profile user={selectedUser} bind:open={showProfile} onclose={closeProfile} />
+{/if}

@@ -62,7 +62,7 @@ export const actions: Actions = {
     if (error) {
       redirect(303, `/auth?tab=login&error=${encodeURIComponent(error.message)}&form=${stringToBase64URL(JSON.stringify({ email }))}`);
     } else {
-      redirect(303, '/private');
+      redirect(303, '/');
     }
   },
   gauth: async ({ locals: { supabase }, url }) => {

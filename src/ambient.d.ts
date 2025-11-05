@@ -21,7 +21,13 @@ declare global {
     data_registro: string;
     user_id: string;
     user: {
+      nome: string;
       username: string;
+      contacts: {
+        id: string;
+        tipo: string;
+        valor: string;
+      }[];
     };
     url_imagem: string;
     nome: string;

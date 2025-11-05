@@ -82,26 +82,18 @@
                 {/if}
               </Button>
             </form>
-          {:else}
-            <!-- <Button color="primary" class="col-span-5 flex justify-between" onclick={() => (objetoClaim = true)}>
+          {:else if objeto?.status.toLowerCase() === 'aberto'}
+            <Button color="primary" class="col-span-5 flex justify-between" onclick={() => (objetoClaim = true)}>
               <FilePenSolid class="h-5 w-5 shrink-0" />
               Reivindicar
               <div class="h-5 w-5"></div>
-            </Button> -->
-            <!-- if objeto.status === 'aberto' button enabled "Reivindicar", else button disabled "Reivindicado" -->
-            {#if objeto?.status.toLowerCase() === 'aberto'}
-              <Button color="primary" class="col-span-5 flex justify-between" onclick={() => (objetoClaim = true)}>
-                <FilePenSolid class="h-5 w-5 shrink-0" />
-                Reivindicar
-                <div class="h-5 w-5"></div>
-              </Button>
-            {:else}
-              <Button color="gray" class="col-span-5 flex justify-between" disabled>
-                <FilePenSolid class="h-5 w-5 shrink-0" />
-                Reivindicado
-                <div class="h-5 w-5"></div>
-              </Button>
-            {/if}
+            </Button>
+          {:else}
+            <Button color="gray" class="col-span-5 flex justify-between" disabled>
+              <FilePenSolid class="h-5 w-5 shrink-0" />
+              Reivindicado
+              <div class="h-5 w-5"></div>
+            </Button>
           {/if}
         {/await}
       </div>
