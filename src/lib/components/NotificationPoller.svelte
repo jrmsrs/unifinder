@@ -1,8 +1,7 @@
 <script lang="ts">
   import { getNotifications } from '$lib/api/notifications';
-  import { notificationActions, notifications } from '$lib/stores/notifications';
+  import { notifications } from '$lib/stores/notifications';
   import { onDestroy } from 'svelte';
-  import NotificationToast from './NotificationToast.svelte';
 
   interface Props {
     session: any;
@@ -66,15 +65,7 @@
       clearInterval(pollInterval);
     }
   });
-
-  function handleCloseNotification(notificationId: string) {
-    notificationActions.removeNotification(notificationId);
-  }
 </script>
 
-<!-- Container fixo - Mobile First -->
-<div class="fixed top-4 right-4 left-4 z-50 space-y-2 sm:right-4 sm:left-auto sm:max-w-sm">
-  {#each $notifications.slice(0, 3) as notification (notification.id)}
-    <NotificationToast {notification} onClose={() => handleCloseNotification(notification.id)} />
-  {/each}
-</div>
+<!-- Componente invisível - apenas faz polling em background -->
+

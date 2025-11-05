@@ -1,30 +1,21 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Notification } from '$lib/api/sse';
+import type { Notification } from '$lib/api/notifications';
 
 // Store para as notificações
 export const notifications = writable<Notification[]>([]);
 
-// Store para o estado da conexão SSE
-export const sseConnectionStatus = writable<{
-  isConnected: boolean;
-  reconnectAttempts: number;
-  lastError: string | null;
-}>({
-  isConnected: false,
-  reconnectAttempts: 0,
-  lastError: null
-});
-
-// Store derivado para notificações não lidas
-export const unreadNotifications = derived(notifications, ($notifications) => $notifications.filter((n) => !n.read));
+// Store derivado para notificações não lidas (não entregues)
+export const unreadNotifications = derived(notifications, ($notifications) =>
+  $notifications.filter((n) => !n.delivered)
+);
 
 // Store derivado para contagem de notificações não lidas
 export const unreadCount = derived(unreadNotifications, ($unreadNotifications) => $unreadNotifications.length);
 
 // Store derivado para as notificações mais recentes (últimas 10)
 export const recentNotifications = derived(notifications, ($notifications) =>
-  [...$notifications].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 10)
+  [...$notifications].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 10)
 );
 
 // Funções para gerenciar notificações
@@ -47,7 +38,9 @@ export const notificationActions = {
    */
   markAsRead(notificationId: string): void {
     notifications.update((current) =>
-      current.map((notification) => (notification.id === notificationId ? { ...notification, read: true } : notification))
+      current.map((notification) =>
+        notification.id === notificationId ? { ...notification, delivered: true } : notification
+      )
     );
   },
 
@@ -55,7 +48,7 @@ export const notificationActions = {
    * Marca todas as notificações como lidas
    */
   markAllAsRead(): void {
-    notifications.update((current) => current.map((notification) => ({ ...notification, read: true })));
+    notifications.update((current) => current.map((notification) => ({ ...notification, delivered: true })));
   },
 
   /**
@@ -79,7 +72,7 @@ export const notificationActions = {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    notifications.update((current) => current.filter((notification) => new Date(notification.timestamp) > thirtyDaysAgo));
+    notifications.update((current) => current.filter((notification) => new Date(notification.created_at) > thirtyDaysAgo));
   }
 };
 
