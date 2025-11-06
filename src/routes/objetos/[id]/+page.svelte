@@ -63,39 +63,28 @@
           <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
         {:then objeto}
           {#if objeto?.user_id === data.user?.id}
+            <form action="?/editObjeto" class="col-span-2">
+              <Button
+                type="submit"
+                color="yellow"
+                class="flex w-full justify-between"
+                disabled={objeto?.status?.toLowerCase() === 'finalizado'}
+              >
+                <EditSolid />
+                Editar
+                <div class="h-5 w-5"></div>
+              </Button>
+            </form>
             <Button
               color="green"
               class="col-span-3 flex justify-between"
               onclick={() => (objetoFinish = true)}
-              disabled={objeto?.status.toLowerCase() === 'finalizado'}
+              disabled={objeto?.status?.toLowerCase() === 'finalizado'}
             >
               <CheckOutline />
-              {objeto?.status.toLowerCase() === 'finalizado' ? 'Finalizado' : 'Finalizar'}
+              {objeto?.status?.toLowerCase() === 'finalizado' ? 'Finalizado' : 'Finalizar'}
               <div class="h-5 w-5"></div>
             </Button>
-
-            <form action="?/editObjeto">
-              <Button type="submit" color="yellow"><EditSolid /></Button>
-            </form>
-            <form
-              method="post"
-              action="?/deleteObjeto"
-              use:enhance={() => {
-                objetoRemoving = true;
-                return async ({ update }) => {
-                  await update();
-                  objetoRemoving = false;
-                };
-              }}
-            >
-              <Button color="red" type="submit" disabled={objetoRemoving}>
-                {#if objetoRemoving}
-                  <div class="h-5 w-5 animate-spin rounded-full border-2 border-t-2 border-gray-200"></div>
-                {:else}
-                  <TrashBinSolid />
-                {/if}
-              </Button>
-            </form>
           {:else if objeto?.status.toLowerCase() === 'aberto'}
             <Button color="primary" class="col-span-5 flex justify-between" onclick={() => (objetoClaim = true)}>
               <FilePenSolid class="h-5 w-5 shrink-0" />
