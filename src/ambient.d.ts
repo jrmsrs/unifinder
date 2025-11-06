@@ -42,6 +42,7 @@ declare global {
     tipo: ObjetoTipo;
     categoria: ObjetoCategoria;
     status: ObjetoStatus;
+    motivo_finalizacao?: string;
   };
 
   type Comentario = {

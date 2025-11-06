@@ -4,7 +4,7 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictCategorias, dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Badge, Heading, P } from 'flowbite-svelte';
-  import { AlertTriangle, AtSign, Calendar, CheckCircle, MapPin, Play } from 'lucide-svelte';
+  import { AlertTriangle, AtSign, Calendar, CheckCircle, FileText, MapPin, Play } from 'lucide-svelte';
 
   let { objeto }: { objeto: Objeto } = $props();
 </script>
@@ -39,5 +39,8 @@
           : CheckCircle
         : Play}
     />
+    {#if objeto.status?.toLowerCase() === 'finalizado' && objeto.motivo_finalizacao}
+      <Row key="Motivo da finalização:" value={objeto.motivo_finalizacao} icon={FileText} />
+    {/if}
   </ObjetoTable>
 </div>

@@ -1,4 +1,4 @@
-import { deleteComentario, deleteObjeto, getComentariosByObjetoId, getObjetoById, postClaim, postComentario } from '$lib/api';
+import { deleteComentario, deleteObjeto, finishObjeto, getComentariosByObjetoId, getObjetoById, postClaim, postComentario } from '$lib/api';
 import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect, type Actions } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -19,6 +19,7 @@ export const load: PageServerLoad = ({ params, url }) => {
   return {
     form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
     commentError: url.searchParams.get('comment_error') || null,
+    finishError: url.searchParams.get('finish_error') || null,
     streamed: {
       objeto: fetchObjeto(params.id),
       comentarios: fetchComentarios(params.id)
@@ -35,9 +36,54 @@ const claimSchema = z.object({
     .optional()
 });
 
+const finishSchema = z.object({
+  motivo_finalizacao: z
+    .string()
+    .min(10, 'O motivo deve ter pelo menos 10 caracteres.')
+    .max(500, 'O motivo deve ter no máximo 500 caracteres.')
+});
+
 export const actions: Actions = {
   updateObjeto: async () => {},
-  finishObjeto: async () => {},
+  finishObjeto: async ({ request, params, locals: { safeGetSession } }) => {
+    const session = await safeGetSession();
+    if (!session.session) {
+      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+    }
+
+    const formData = await request.formData();
+    const formPayload = {
+      motivo_finalizacao: formData.get('motivo_finalizacao')
+    };
+
+    const validation = finishSchema.safeParse(formPayload);
+
+    if (!validation.success) {
+      console.error('Erro de validação:', validation.error);
+      throw redirect(
+        303,
+        `/objetos/${params.id}?finish_error=${encodeURIComponent(validation.error.message)}&form=${stringToBase64URL(JSON.stringify(formPayload))}`
+      );
+    }
+
+    const result = await finishObjeto(
+      {
+        id: params.id as string,
+        motivo_finalizacao: validation.data.motivo_finalizacao
+      },
+      session.session.access_token
+    );
+
+    if (!result) {
+      throw redirect(
+        303,
+        `/objetos/${params.id}?finish_error=${encodeURIComponent('Erro ao finalizar objeto. Tente novamente.')}&form=${stringToBase64URL(JSON.stringify({ motivo_finalizacao: formPayload.motivo_finalizacao }))}`
+      );
+    }
+
+    // Redirecionar para a lista de objetos após finalização bem-sucedida
+    throw redirect(303, '/objetos?message=Objeto finalizado com sucesso!');
+  },
   claimObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {

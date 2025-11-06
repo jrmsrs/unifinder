@@ -10,6 +10,7 @@
   import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft } from 'lucide-svelte';
   import ObjetoClaimNew from '../ObjetoModalClaim.svelte';
+  import ObjetoModalFinish from '../ObjetoModalFinish.svelte';
   import Objeto from './Objeto.svelte';
   import ObjetoComentarios from './ObjetoComentarios.svelte';
 
@@ -17,6 +18,15 @@
   let { data } = $props();
   let objetoClaim = $state(false);
   let objetoRemoving = $state(false);
+  let objetoFinish = $state(false);
+  let finishError = $state('');
+
+  $effect(() => {
+    if (page.url.searchParams.get('finish_error')) {
+      finishError = page.url.searchParams.get('finish_error') || '';
+      objetoFinish = true;
+    }
+  });
 </script>
 
 <CosmeticObjetosBg />
@@ -53,13 +63,17 @@
           <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
         {:then objeto}
           {#if objeto?.user_id === data.user?.id}
-            <form action="?/finalizarObjeto" class="col-span-3 flex justify-between">
-              <Button type="submit" color="green">
-                <CheckOutline />
-                Finalizar
-                <div class="h-5 w-5"></div>
-              </Button>
-            </form>
+            <Button
+              color="green"
+              class="col-span-3 flex justify-between"
+              onclick={() => (objetoFinish = true)}
+              disabled={objeto?.status.toLowerCase() === 'finalizado'}
+            >
+              <CheckOutline />
+              {objeto?.status.toLowerCase() === 'finalizado' ? 'Finalizado' : 'Finalizar'}
+              <div class="h-5 w-5"></div>
+            </Button>
+
             <form action="?/editObjeto">
               <Button type="submit" color="yellow"><EditSolid /></Button>
             </form>
@@ -103,7 +117,7 @@
 </ModalContainer>
 
 <ObjetoClaimNew bind:objetoClaim error={null} />
-<!-- <ObjetoClaimNew objetoClaim={false} error={data.claimError} /> -->
+<ObjetoModalFinish bind:objetoFinish error={finishError} />
 
 {#await data.streamed.objeto then objeto}
   <DevInfo
@@ -118,7 +132,7 @@
     - (-) exibir ações
       - (x) botões de ações do responsável
       - (x) botões de ações do usuário
-      - ( ) modal finalizar
+      - (x) modal finalizar  <!-- Atualizado -->
       - ( ) modal editar
       - ( ) modal excluir
     - (-) exibir comentários
@@ -129,7 +143,7 @@
     - (x) get objeto
     - ( ) get comentarios
     - ( ) autorização nivel dono do objeto
-    - ( ) autorização nivel dono do comentario
+    - ( ) autorização nivel dono do comentário
     - ( ) ações (put/delete) de objeto
     - ( ) ações (delete) de comentário`}
   />
