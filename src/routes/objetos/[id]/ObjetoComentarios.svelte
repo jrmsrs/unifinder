@@ -77,29 +77,31 @@
       {#if comentarios.length > 0}
         {#each comentarios as comentario}
           <div class="mb-4 text-sm">
-            <button
-              class="
-                mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md p-1 text-left
-                hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]
-              "
-              type="button"
-              onclick={() => openProfile(comentario.user)}
-            >
-              <div
-                class="flex h-8 w-8 items-center justify-center rounded-full"
-                style="background-color: hsl({parseInt(comentario.user_id.slice(0, 6), 16)}, 50%, 50%)"
+            <div class="mb-1 flex w-full items-center gap-2">
+              <button
+                class="
+                  flex flex-1 cursor-pointer items-center gap-2 rounded-md p-1 text-left
+                  hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]
+                "
+                type="button"
+                onclick={() => openProfile(comentario.user)}
               >
-                {String(comentario.username).charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <span class="font-semibold">{comentario.username}</span>
-                <span class="text-xs font-normal">•</span>
-                <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
-              </div>
+                <div
+                  class="flex h-8 w-8 items-center justify-center rounded-full"
+                  style="background-color: hsl({parseInt(comentario.user_id.slice(0, 6), 16)}, 50%, 50%)"
+                >
+                  {String(comentario.username).charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <span class="font-semibold">{comentario.username}</span>
+                  <span class="text-xs font-normal">•</span>
+                  <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
+                </div>
+              </button>
+
               {#await data.streamed.objeto then objeto}
                 {#if data.user?.id === comentario.user_id || data.user?.id === objeto?.user_id}
                   <form
-                    class="ml-auto"
                     method="post"
                     action="?/deleteComentario"
                     use:enhance={() => {
@@ -117,7 +119,7 @@
                   </form>
                 {/if}
               {/await}
-            </button>
+            </div>
             <div class="flex gap-2">
               <p>{comentario.conteudo}</p>
             </div>
