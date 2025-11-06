@@ -1,12 +1,14 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
+  import NotificationModal from '$lib/components/NotificationModal.svelte';
+  import NotificationPoller from '$lib/components/NotificationPoller.svelte';
   import AppContent from '$lib/components/template/AppContent.svelte';
   import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
   import Header from '$lib/components/template/header/Header.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
-  import NotificationPoller from '$lib/components/NotificationPoller.svelte';
-  import { onMount } from 'svelte';
+  import { modals } from '$lib/stores/modal';
   import Seo from 'sk-seo';
+  import { onMount } from 'svelte';
   import '../app.css';
 
   let { data, children } = $props();
@@ -74,3 +76,4 @@
 {#if data.session}
   <NotificationPoller session={data.session} />
 {/if}
+<NotificationModal bind:open={$modals.notifications} session={data.session} />

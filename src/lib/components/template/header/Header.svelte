@@ -1,5 +1,8 @@
 <script lang="ts">
   import { navigating } from '$app/state';
+  import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
+  import { modalActions } from '$lib/stores/modal';
+  import { unreadCount } from '$lib/stores/notifications';
   import { Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
   import {
     ArrowLeftToBracketOutline,
@@ -17,8 +20,6 @@
   import { slide } from 'svelte/transition';
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
-  import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
-  import { unreadCount } from '$lib/stores/notifications';
 
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
@@ -77,17 +78,28 @@
     <NotificationHamburger id="the-nav-hamburger" class="m-0 p-0" {session} />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
-      <NavItem href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>Perdidos</NavItem>
-      <NavItem href="/objetos?tipo=achado" icon={CubeSolid}>Achados</NavItem>
-      <NavItem href="/about" icon={InfoCircleSolid}>Sobre</NavItem>
+      <!-- se dispositivo movel: exibir achados e perdidos, se dispositivo medio exibir apenas objetos, se dispositivo grande exibir achados e perdidos -->
+      <NavItem class="hidden md:flex lg:hidden" href="/objetos" icon={CubesStackedSolid}>Objetos</NavItem>
+      <NavItem class="flex md:hidden lg:flex" href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}
+        >Perdidos</NavItem
+      >
+      <NavItem class="flex md:hidden lg:flex" href="/objetos?tipo=achado" icon={CubeSolid}>Achados</NavItem>
       <NavItem sep />
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
-        <NavItem href="/claims" icon={CheckOutline}>Reivindicações</NavItem>
-        <NavItem href="/notifys" icon={BellSolid} badgeCount={$unreadCount}>Notificações</NavItem>
-        <NavItem href="/private" icon={UserSolid}>Perfil</NavItem>
-        <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>Logout</NavItem>
+        <NavItem href="/claims" icon={CheckOutline}>
+          <span class="md:hidden lg:flex">Reivindicações</span>
+        </NavItem>
+        <NavItem icon={BellSolid} badgeCount={$unreadCount} onclick={modalActions.openNotifications}>
+          <span class="md:hidden">Notificações</span>
+        </NavItem>
+        <NavItem href="/private" icon={UserSolid}>
+          <span class="md:hidden lg:flex">Perfil </span>
+        </NavItem>
+        <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>
+          <span class="md:hidden lg:flex">Logout</span>
+        </NavItem>
       {/if}
       <NavItem sep />
       <NavItem id="theme-toggle" themeToggle />
