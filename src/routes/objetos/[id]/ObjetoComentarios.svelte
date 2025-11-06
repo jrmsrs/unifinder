@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import Profile from '$lib/components/profile/Profile.svelte';
+  import Profile from '$lib/components/Profile.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import { A, Alert, Button, Heading, P } from 'flowbite-svelte';
   import { TrashBinSolid } from 'flowbite-svelte-icons';
@@ -10,19 +10,6 @@
   let comentario = $state(data.form ?? '');
   let comentarioSubmiting = $state(false);
   let comentarioRemoving = $state(false);
-
-  type Contact = {
-    id: string;
-    tipo: string;
-    valor: string;
-  };
-
-  type User = {
-    id: string;
-    nome: string;
-    username: string;
-    contacts: Contact[];
-  };
 
   let showProfile = $state(false);
   let selectedUser = $state<User | null>(null);
@@ -96,18 +83,7 @@
                 hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]
               "
               type="button"
-              onclick={() =>
-                openProfile({
-                  id: comentario.user_id,
-                  nome: comentario.username,
-                  username: comentario.username,
-                  contacts: [
-                    { id: '1', tipo: 'email', valor: 'teste123@email.com' },
-                    { id: '2', tipo: 'whatsapp', valor: '+5511999999999' },
-                    { id: '3', tipo: 'instagram', valor: 'insta_teste' },
-                    { id: '4', tipo: 'facebook', valor: 'fb.teste' }
-                  ]
-                })}
+              onclick={() => openProfile(comentario.user)}
             >
               <div
                 class="flex h-8 w-8 items-center justify-center rounded-full"

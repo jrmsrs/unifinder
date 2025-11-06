@@ -1,12 +1,11 @@
-<!-- src/lib/components/profile/ContactsEditor.svelte -->
 <script lang="ts">
   import { Button, Helper, Input, Select } from 'flowbite-svelte';
   import { Check, Edit3, Plus, X, XCircle } from 'lucide-svelte';
 
   interface Contact {
     id: string;
-    type: string;
-    value: string;
+    tipo: string;
+    valor: string;
     editing?: boolean;
   }
 
@@ -17,14 +16,17 @@
 
   let { contacts = [], onchange }: Props = $props();
 
-  // Estado local dos contatos
+  // Estado local dos contatos com controle de edição
   let localContacts = $state<Contact[]>([]);
 
-  // Controles do formulário de criação
+  // Controle de sincronização para evitar loops reativos
+  let lastContactsSnapshot = $state('');
+  let isUpdatingFromInternal = $state(false);
+
+  // Estados do formulário de novo contato
   let newType = $state('email');
   let newValue = $state('');
 
-  // Tipos de contato disponíveis
   const contactTypes = [
     { value: 'email', name: 'Email' },
     { value: 'whatsapp', name: 'WhatsApp' },
@@ -34,25 +36,36 @@
     { value: 'outro', name: 'Outro' }
   ];
 
-  // Sincronizar com props iniciais
+  // Sincronização bidirecional: props → estado local
   $effect(() => {
-    localContacts = contacts.map((c) => ({ ...c, editing: false }));
+    const currentContactsSnapshot = JSON.stringify(contacts);
+    if (currentContactsSnapshot !== lastContactsSnapshot && !isUpdatingFromInternal) {
+      localContacts = contacts.map((c) => ({ ...c, editing: false }));
+      lastContactsSnapshot = currentContactsSnapshot;
+    }
+    if (isUpdatingFromInternal) {
+      isUpdatingFromInternal = false;
+    }
   });
 
-  // Emitir mudanças para o parent
+  // Emite mudanças para o componente pai
   const emitChange = () => {
     const cleanContacts = localContacts.map(({ editing, ...contact }) => contact);
+
+    isUpdatingFromInternal = true;
+    lastContactsSnapshot = JSON.stringify(cleanContacts);
+
     onchange?.(cleanContacts);
   };
 
-  // Adicionar novo contato
+  // Adiciona novo contato à lista
   const addContact = () => {
     if (!newValue.trim()) return;
 
     const newContact: Contact = {
       id: crypto.randomUUID(),
-      type: newType,
-      value: newValue.trim(),
+      tipo: newType,
+      valor: newValue.trim(),
       editing: false
     };
 
@@ -61,29 +74,31 @@
     emitChange();
   };
 
-  // Iniciar edição
+  // Controles de edição inline
   const startEdit = (id: string) => {
     localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: true } : c));
   };
 
-  // Salvar edição
   const saveEdit = (id: string) => {
     localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: false } : c));
     emitChange();
   };
 
-  // Cancelar edição
   const cancelEdit = (id: string) => {
-    localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: false } : c));
+    const originalContact = contacts.find((c) => c.id === id);
+    if (originalContact) {
+      localContacts = localContacts.map((c) => (c.id === id ? { ...originalContact, editing: false } : c));
+    } else {
+      localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: false } : c));
+    }
   };
 
-  // Remover contato
   const removeContact = (id: string) => {
     localContacts = localContacts.filter((c) => c.id !== id);
     emitChange();
   };
 
-  // Handle Enter/Escape nas edições
+  // Handlers de teclado para navegação rápida
   const handleEditKeydown = (event: KeyboardEvent, id: string) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -94,7 +109,6 @@
     }
   };
 
-  // Handle Enter no formulário de criação
   const handleNewKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -102,14 +116,13 @@
     }
   };
 
-  // Obter label do tipo
   const getTypeLabel = (type: string) => {
     return contactTypes.find((t) => t.value === type)?.name || type;
   };
 </script>
 
 <div class="space-y-4">
-  <!-- Formulário de criação -->
+  <!-- Formulário para adicionar novo contato -->
   <div class="flex items-end gap-2">
     <div class="w-32 flex-shrink-0">
       <Select bind:value={newType} items={contactTypes} class="w-full" />
@@ -130,20 +143,20 @@
     </div>
   </div>
 
-  <!-- Lista de contatos -->
+  <!-- Lista de contatos com edição inline -->
   {#if localContacts.length > 0}
     <div class="space-y-2">
       {#each localContacts as contact (contact.id)}
         <div class="flex items-center gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
           {#if contact.editing}
-            <!-- Modo edição -->
+            <!-- Modo edição: input + controles -->
             <div class="w-20 flex-shrink-0">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {getTypeLabel(contact.type)}
+                {getTypeLabel(contact.tipo)}
               </span>
             </div>
             <div class="flex-grow">
-              <Input bind:value={contact.value} onkeydown={(e) => handleEditKeydown(e, contact.id)} class="w-full" autofocus />
+              <Input bind:value={contact.valor} onkeydown={(e) => handleEditKeydown(e, contact.id)} class="w-full" autofocus />
             </div>
             <div class="flex flex-shrink-0 gap-1">
               <Button color="green" size="xs" onclick={() => saveEdit(contact.id)} aria-label="Salvar">
@@ -154,15 +167,15 @@
               </Button>
             </div>
           {:else}
-            <!-- Modo exibição -->
+            <!-- Modo visualização: texto + ações -->
             <div class="w-20 flex-shrink-0">
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {getTypeLabel(contact.type)}
+                {getTypeLabel(contact.tipo)}
               </span>
             </div>
             <div class="flex-grow">
               <span class="text-gray-900 dark:text-gray-100">
-                {contact.value}
+                {contact.valor}
               </span>
             </div>
             <div class="flex flex-shrink-0 gap-1">
@@ -178,6 +191,7 @@
       {/each}
     </div>
   {:else}
+    <!-- Estado vazio -->
     <div class="py-4 text-center text-gray-500 dark:text-gray-400">
       <p class="text-sm">Nenhum contato adicionado ainda.</p>
       <Helper class="mt-1 text-xs">Use o formulário acima para adicionar contatos.</Helper>

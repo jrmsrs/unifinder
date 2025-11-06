@@ -4,18 +4,6 @@
   import { FacebookSolid, InstagramSolid, WhatsappSolid, XSolid } from 'flowbite-svelte-icons';
   import { Check, Copy, ExternalLink, Mail } from 'lucide-svelte';
 
-  interface Contact {
-    id: string;
-    tipo: string;
-    valor: string;
-  }
-
-  interface User {
-    nome: string;
-    username: string;
-    contacts: Contact[];
-  }
-
   interface Props {
     user: User;
     open?: boolean;
@@ -80,9 +68,9 @@
 
   // Filtrar e processar contatos
   let processedContacts = $derived(
-    user.contacts
-      .filter((contact) => contact.valor && contact.valor.trim() !== '')
-      .map((contact) => {
+    user?.contato
+      ?.filter((contact) => contact.valor && contact.valor.trim() !== '')
+      ?.map((contact) => {
         const config = contactConfig[contact.tipo as ContactType] || contactConfig.outro;
         return {
           ...contact,
@@ -153,7 +141,7 @@
   {/snippet}
 
   <div class="space-y-6">
-    {#if processedContacts.length > 0}
+    {#if processedContacts?.length > 0}
       <div>
         <Heading tag="h4" class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Contatos</Heading>
         <div class="space-y-3 text-gray-900 dark:text-gray-100">

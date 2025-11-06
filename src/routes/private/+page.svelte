@@ -9,40 +9,59 @@
   let { data, form } = $props();
   let { supabase, profile } = $derived(data);
 
+  // Estados de UI
   let isSubmitting = $state(false);
   let showPassword = $state(false);
   let showConfirmPassword = $state(false);
 
-  let formData = $derived({
-    username: profile?.username || '',
-    nome: profile?.nome || '',
-    email: data.user?.email || data.session?.user?.email || '',
-    contacts: JSON.stringify(profile?.contacts || [])
+  // Estados reativos do perfil
+  let contacts = $state<any[]>([]);
+  let profileLoaded = $state(false);
+
+  let formData = $state({
+    username: '',
+    nome: '',
+    email: '',
+    contacts: '[]'
   });
 
-  let contacts = $state([]);
-
+  // Sincronização de dados do perfil (primeira carga + após submit)
   $effect(() => {
     if (profile) {
-      formData.username = profile.username || '';
-      formData.nome = profile.nome || '';
-      formData.email = data.user?.email || data.session?.user?.email || '';
-      formData.contacts = JSON.stringify(profile.contacts || []);
+      const shouldSync = !profileLoaded || form?.success || form?.passwordSuccess;
+
+      if (shouldSync) {
+        formData.username = profile.username || '';
+        formData.nome = profile.nome || '';
+        formData.email = data.user?.email || data.session?.user?.email || '';
+
+        // Atualizar contatos apenas se mudaram no backend
+        const newContacts = profile.contato || [];
+        const contactsChanged = JSON.stringify(contacts) !== JSON.stringify(newContacts);
+
+        if (contactsChanged || !profileLoaded) {
+          contacts = newContacts;
+          formData.contacts = JSON.stringify(contacts);
+        }
+
+        profileLoaded = true;
+      }
     }
   });
 
+  // Handler para mudanças no editor de contatos
   const handleContactsChange = (updatedContacts: any) => {
     contacts = updatedContacts;
     formData.contacts = JSON.stringify(contacts);
   };
 
-  // Dados do formulário de senha
+  // Dados do formulário de alteração de senha
   let passwordData = $state({
     newPassword: '',
     confirmPassword: ''
   });
 
-  // Função de logout
+  // Logout do usuário
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -53,10 +72,9 @@
     }
   };
 
-  // Atualizar dados quando o form retorna
+  // Limpa campos de senha após sucesso
   onMount(() => {
     if (form?.success || form?.passwordSuccess) {
-      // Limpar campos de senha após sucesso
       passwordData.newPassword = '';
       passwordData.confirmPassword = '';
     }
@@ -69,7 +87,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-4xl space-y-6 p-4">
-  <!-- Header da página -->
+  <!-- Header com avatar e botão de logout -->
   <div class="flex items-center justify-between">
     <div class="flex items-center space-x-4">
       <Avatar src={profile?.avatar_url} alt={profile?.username || 'Avatar'} class="h-16 w-16" />
@@ -86,7 +104,7 @@
     </Button>
   </div>
 
-  <!-- Alertas de feedback -->
+  <!-- Alertas de feedback das ações -->
   {#if form?.success}
     <Alert color="green" dismissable class="flex items-center space-x-2">
       <CheckCircle class="h-5 w-5" />
@@ -115,11 +133,12 @@
     </Alert>
   {/if}
 
-  <!-- Tabs de navegação -->
+  <!-- Navegação em tabs: Perfil e Segurança -->
   <Tabs
     tabStyle="pill"
     contentClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 w-full [&>div]:w-full"
   >
+    <!-- Tab: Informações Pessoais -->
     <TabItem open class="flex items-center" title="Informações Pessoais">
       <span class="mb-1.5 flex items-center space-x-2"><User class="h-4 w-4 pe-1" /> Informações Pessoais</span>
       <form
@@ -134,8 +153,8 @@
         }}
         class="space-y-6"
       >
+        <!-- Campos básicos do perfil -->
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <!-- Username -->
           <div>
             <Label for="username" class="mb-2">Nome de Usuário *</Label>
             <Input
@@ -150,7 +169,6 @@
             <Helper class="text-xs">Mínimo 3 caracteres</Helper>
           </div>
 
-          <!-- Full Name -->
           <div>
             <Label for="fullName" class="mb-2">Nome Completo *</Label>
             <Input
@@ -165,24 +183,23 @@
             <Helper class="text-xs">Mínimo 2 caracteres</Helper>
           </div>
 
-          <!-- Email (readonly) -->
+          <!-- Email readonly (gerenciado pelo Supabase Auth) -->
           <div class="md:col-span-2">
             <Label for="email" class="mb-2">Email</Label>
-            <Input id="email" value={formData.email} readonly class="w-full bg-gray-50 dark:bg-gray-800" />
+            <Input id="email" bind:value={formData.email} readonly class="w-full bg-gray-50 dark:bg-gray-800" />
             <Helper class="text-xs">O email não pode ser alterado aqui</Helper>
           </div>
         </div>
 
-        <!-- Seção de Contatos -->
+        <!-- Editor de contatos e redes sociais -->
         <div class="border-t pt-6">
           <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Contatos e Redes Sociais</h3>
           <ContactsEditor {contacts} onchange={handleContactsChange} />
 
-          <!-- Campo oculto para enviar contatos -->
+          <!-- Campo oculto para envio dos contatos como JSON -->
           <input type="hidden" name="contacts" value={JSON.stringify(contacts)} />
         </div>
 
-        <!-- Botão de Salvar -->
         <div class="flex justify-end border-t pt-6">
           <Button type="submit" color="blue" disabled={isSubmitting} class="flex items-center space-x-2">
             {#if isSubmitting}
@@ -196,6 +213,7 @@
       </form>
     </TabItem>
 
+    <!-- Tab: Segurança (alteração de senha) -->
     <TabItem class="flex items-center space-x-2" title="Segurança">
       <span class="mb-1.5 flex items-center space-x-2"><Shield class="h-4 w-4 pe-1" /> Segurança</span>
 
@@ -213,7 +231,7 @@
         class="space-y-6"
       >
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <!-- Nova Senha -->
+          <!-- Campo nova senha com toggle de visibilidade -->
           <div>
             <Label for="newPassword" class="mb-2">Nova Senha *</Label>
             <div class="relative">
@@ -242,7 +260,7 @@
             <Helper class="text-xs">Mínimo 6 caracteres</Helper>
           </div>
 
-          <!-- Confirmar Senha -->
+          <!-- Campo confirmação de senha com toggle de visibilidade -->
           <div>
             <Label for="confirmPassword" class="mb-2">Confirmar Nova Senha *</Label>
             <div class="relative">
@@ -272,7 +290,6 @@
           </div>
         </div>
 
-        <!-- Botão de Alterar Senha -->
         <div class="flex justify-end border-t pt-6">
           <Button type="submit" color="red" disabled={isSubmitting} class="flex items-center space-x-2">
             {#if isSubmitting}
@@ -289,12 +306,11 @@
 </div>
 
 <style>
-  /* Adiciona transições suaves */
+  /* Transições suaves para melhor UX */
   :global(.transition-all) {
     transition: all 0.3s ease;
   }
 
-  /* Melhora o foco nos inputs */
   :global(.focus\:ring-2:focus) {
     transition: all 0.2s ease;
   }

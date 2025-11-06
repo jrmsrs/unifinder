@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
+// Carrega dados do perfil do usuário autenticado
 export const load: PageServerLoad = async ({ locals: { session, supabase } }) => {
   if (!session) {
     redirect(303, '/auth');
   }
 
-  // Buscar dados completos do usuário
   const { data: profile, error } = await supabase.from('user').select('*').eq('id', session.user.id).single();
 
   if (error && error.code !== 'PGRST116') {
@@ -16,17 +16,12 @@ export const load: PageServerLoad = async ({ locals: { session, supabase } }) =>
   return {
     session,
     user: session.user,
-    profile: profile || {
-      id: session.user.id,
-      username: session.user.user_metadata?.username || '',
-      full_name: session.user.user_metadata?.full_name || '',
-      avatar_url: session.user.user_metadata?.avatar_url || '',
-      contacts: []
-    }
+    profile: profile || null
   };
 };
 
 export const actions: Actions = {
+  // Atualiza informações do perfil (nome, username, contatos)
   updateProfile: async ({ request, locals: { session, supabase } }) => {
     if (!session) {
       return {
@@ -39,7 +34,7 @@ export const actions: Actions = {
     const fullName = formData.get('fullName') as string;
     const contactsJson = formData.get('contacts') as string;
 
-    // Validações básicas
+    // Validação de campos obrigatórios
     if (!username || username.trim().length < 3) {
       return {
         error: 'Nome de usuário deve ter pelo menos 3 caracteres'
@@ -52,22 +47,53 @@ export const actions: Actions = {
       };
     }
 
-    // [validação de campos de redes sociais]
-
+    // Processamento e validação dos contatos (JSONB: { id, tipo, valor })
     let contacts = [];
     try {
       contacts = contactsJson ? JSON.parse(contactsJson) : [];
+
+      if (!Array.isArray(contacts)) {
+        return { error: 'Formato de contatos inválido' };
+      }
+
+      // Validação estrutural de cada contato
+      for (const contact of contacts) {
+        if (!contact.id || !contact.tipo || !contact.valor) {
+          return { error: 'Todos os contatos devem ter id, tipo e valor' };
+        }
+
+        if (typeof contact.id !== 'string' || typeof contact.tipo !== 'string' || typeof contact.valor !== 'string') {
+          return { error: 'ID, tipo e valor dos contatos devem ser strings' };
+        }
+
+        // Validação de tipos permitidos
+        const allowedTypes = ['email', 'whatsapp', 'instagram', 'x', 'facebook', 'outro'];
+        if (!allowedTypes.includes(contact.tipo)) {
+          return { error: `Tipo de contato '${contact.tipo}' não é válido` };
+        }
+      }
+
+      // Sanitização: manter apenas campos necessários
+      contacts = contacts.map((contact) => ({
+        id: contact.id,
+        tipo: contact.tipo,
+        valor: contact.valor
+      }));
     } catch (error) {
+      console.error('Error parsing contacts:', error);
       return { error: 'Formato de contatos inválido' };
     }
 
     try {
       console.log('Updating profile with:', { username, fullName, contacts });
+
+      // Atualização no banco: perfil + contatos em JSONB
       const { error: updateError } = await supabase
         .from('user')
         .update({
           username: username.trim(),
-          nome: fullName.trim()
+          nome: fullName.trim(),
+          contato: contacts
         })
         .eq('id', session.user.id);
 
@@ -83,6 +109,7 @@ export const actions: Actions = {
     }
   },
 
+  // Alteração de senha via Supabase Auth
   changePassword: async ({ request, locals: { session, supabase } }) => {
     if (!session) {
       return {
@@ -94,7 +121,7 @@ export const actions: Actions = {
     const newPassword = formData.get('newPassword') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    // Validações
+    // Validação da nova senha
     if (!newPassword || newPassword.length < 6) {
       return {
         passwordError: 'A senha deve ter pelo menos 6 caracteres'

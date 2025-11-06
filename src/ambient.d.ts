@@ -16,19 +16,24 @@ declare global {
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
   type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
 
+  type Contact = {
+    id: string;
+    tipo: string;
+    valor: string;
+  };
+
+  type User = {
+    id: string;
+    username: string;
+    nome: string;
+    contato: Contact[];
+  };
+
   type Objeto = {
     id: string;
     data_registro: string;
     user_id: string;
-    user: {
-      nome: string;
-      username: string;
-      contacts: {
-        id: string;
-        tipo: string;
-        valor: string;
-      }[];
-    };
+    user: User;
     url_imagem: string;
     nome: string;
     descricao: string;
@@ -46,6 +51,7 @@ declare global {
     user_id: string;
     username: string;
     conteudo: string;
+    user: User;
   };
 }
 
