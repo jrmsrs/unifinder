@@ -6,7 +6,7 @@
   import { Badge, Heading, P } from 'flowbite-svelte';
   import { AlertTriangle, AtSign, Calendar, CheckCircle, FileText, MapPin, Play } from 'lucide-svelte';
 
-  let { objeto }: { objeto: Objeto } = $props();
+  let { objeto, onOpenProfile }: { objeto: Objeto; onOpenProfile?: (user: User) => void } = $props();
 </script>
 
 <div class="flex flex-col">
@@ -21,7 +21,22 @@
   <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
   <ObjetoTable>
     <Row key="Postado:" value={new Date(objeto.data_registro).toLocaleDateString()} icon={Calendar} />
-    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" value={objeto.user.username} icon={AtSign} />
+
+    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" icon={AtSign}>
+      {#if onOpenProfile}
+        <button
+          type="button"
+          class="group flex w-full items-center gap-2 rounded-md p-1 text-left transition-colors hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]"
+          onclick={() => onOpenProfile(objeto.user)}
+        >
+          {objeto.user.username}
+          <span class="truncate text-blue-800 group-hover:underline dark:text-blue-200">[contato]</span>
+        </button>
+      {:else}
+        <span>{objeto.user.username}</span>
+      {/if}
+    </Row>
+
     <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local_ocorrencia]} icon={MapPin} />
     {#if objeto.tipo === 'achado'}
       <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />

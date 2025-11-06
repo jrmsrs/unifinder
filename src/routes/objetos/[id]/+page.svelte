@@ -2,12 +2,13 @@
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import Profile from '$lib/components/Profile.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import CosmeticObjetosBg from '$lib/components/routes/ObjetoCosmeticBg.svelte';
   import ModalContainer from '$lib/components/routes/ObjetoModalContainer.svelte';
   import { Button, Heading } from 'flowbite-svelte';
-  import { CheckOutline, EditSolid, FilePenSolid, TrashBinSolid } from 'flowbite-svelte-icons';
+  import { CheckOutline, EditSolid, FilePenSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft } from 'lucide-svelte';
   import ObjetoClaimNew from '../ObjetoModalClaim.svelte';
   import ObjetoModalFinish from '../ObjetoModalFinish.svelte';
@@ -17,9 +18,22 @@
   let ref = page.url.searchParams.get('ref') || '/objetos';
   let { data } = $props();
   let objetoClaim = $state(false);
-  let objetoRemoving = $state(false);
   let objetoFinish = $state(false);
   let finishError = $state('');
+
+  // Variáveis para Profile
+  let showProfile = $state(false);
+  let selectedUser: User | null = $state(null);
+
+  const onOpenProfile = (user: User) => {
+    selectedUser = user;
+    showProfile = true;
+  };
+
+  const closeProfile = () => {
+    showProfile = false;
+    selectedUser = null;
+  };
 
   $effect(() => {
     if (page.url.searchParams.get('finish_error')) {
@@ -48,12 +62,13 @@
       {#if objeto === null}
         <p class="text-red-500">Objeto não encontrado.</p>
       {:else}
-        <Objeto {objeto} />
+        <Objeto {objeto} {onOpenProfile} />
       {/if}
     {:catch error}
       <p class="text-red-500">Erro ao carregar o objeto: {error.message}</p>
     {/await}
   </div>
+
   <div class="g-f col-span-5 flex flex-col gap-4 md:col-span-2 [&>div]:rounded-lg [&>div]:bg-gray-50 [&>div]:p-4 [&>div]:dark:bg-gray-900">
     <div id="acoes">
       <Heading tag="h3" class="text-xl font-bold">Ações</Heading>
@@ -108,6 +123,10 @@
 <ObjetoClaimNew bind:objetoClaim error={null} />
 <ObjetoModalFinish bind:objetoFinish error={finishError} />
 
+{#if selectedUser}
+  <Profile user={selectedUser} bind:open={showProfile} onclose={closeProfile} />
+{/if}
+
 {#await data.streamed.objeto then objeto}
   <DevInfo
     content={`\
@@ -121,9 +140,8 @@
     - (-) exibir ações
       - (x) botões de ações do responsável
       - (x) botões de ações do usuário
-      - (x) modal finalizar  <!-- Atualizado -->
+      - (x) modal finalizar
       - ( ) modal editar
-      - ( ) modal excluir
     - (-) exibir comentários
       - (x) ações do dono
       - (x) mock comentários
