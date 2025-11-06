@@ -1,8 +1,8 @@
 <script lang="ts">
   import { navigating } from '$app/state';
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
-  import { modalActions } from '$lib/stores/modal';
   import { unreadCount } from '$lib/stores/notifications';
+  import type { Session } from '@supabase/supabase-js';
   import { Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
   import {
     ArrowLeftToBracketOutline,
@@ -12,7 +12,6 @@
     CubeSolid,
     CubesStackedSolid,
     HomeSolid,
-    InfoCircleSolid,
     QuestionCircleOutline,
     UserSolid
   } from 'flowbite-svelte-icons';
@@ -66,7 +65,7 @@
 
   let blueLine = $state(false);
 
-  let { session } = $props();
+  let { session, openNotifys = $bindable(false) }: { session: Session | null; openNotifys: boolean } = $props();
 </script>
 
 <header class="sticky top-0 z-35">
@@ -91,7 +90,7 @@
         <NavItem href="/claims" icon={CheckOutline}>
           <span class="md:hidden lg:flex">Reivindicações</span>
         </NavItem>
-        <NavItem icon={BellSolid} badgeCount={$unreadCount} onclick={modalActions.openNotifications}>
+        <NavItem icon={BellSolid} badgeCount={$unreadCount} onclick={() => (openNotifys = true)}>
           <span class="md:hidden">Notificações</span>
         </NavItem>
         <NavItem href="/private" icon={UserSolid}>

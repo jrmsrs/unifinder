@@ -6,10 +6,11 @@
   import FloatingSpin from '$lib/components/template/FloatingSpin.svelte';
   import Header from '$lib/components/template/header/Header.svelte';
   import MainContainer from '$lib/components/template/MainContainer.svelte';
-  import { modals } from '$lib/stores/modal';
   import Seo from 'sk-seo';
   import { onMount } from 'svelte';
   import '../app.css';
+
+  let openNotifys = $state(false);
 
   let { data, children } = $props();
   let { session, supabase } = $derived(data);
@@ -63,17 +64,15 @@
 </script>
 
 <Seo />
-<!-- handle title, seo headers at load() -->
 <FloatingSpin />
 <AppContent>
-  <Header session={data.session} />
+  <Header session={data.session} bind:openNotifys />
   <MainContainer>
     {@render children()}
   </MainContainer>
 </AppContent>
 
-<!-- Poller de notificações em background -->
 {#if data.session}
   <NotificationPoller session={data.session} />
 {/if}
-<NotificationModal bind:open={$modals.notifications} session={data.session} />
+<NotificationModal bind:open={openNotifys} session={data.session} />
