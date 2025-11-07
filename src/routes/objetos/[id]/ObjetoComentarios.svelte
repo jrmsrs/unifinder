@@ -90,10 +90,10 @@
                   class="flex h-8 w-8 items-center justify-center rounded-full"
                   style="background-color: hsl({parseInt(comentario.user_id.slice(0, 6), 16)}, 50%, 50%)"
                 >
-                  {String(comentario.username).charAt(0).toUpperCase()}
+                  {String(comentario.user.username).charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <span class="font-semibold">{comentario.username}</span>
+                  <span class="font-semibold">{comentario.user.username}</span>
                   <span class="text-xs font-normal">•</span>
                   <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
                 </div>
