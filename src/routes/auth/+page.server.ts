@@ -84,14 +84,17 @@ export const actions: Actions = {
 
     if (!username) return;
 
-    const { error } = await supabase.auth.updateUser({
-      data: { username, role: 'user' }
-    });
-
-    if (error) {
+    const userId = await supabase.auth.getUser().then((res) => res.data.user?.id);
+    const [res1, res2] = await Promise.all([
+      supabase.from('user').update({ username: username.trim() }).eq('id', userId),
+      supabase.auth.updateUser({ data: { username, role: 'user' } })
+    ]);
+    if (res1.error || res2.error) {
       redirect(
         303,
-        `/auth?&error=${encodeURIComponent(error.message)}&form=${stringToBase64URL(JSON.stringify({ username }))}&finish=true`
+        `/auth?&error=${encodeURIComponent(res1.error ? res1.error.message : res2.error ? res2.error.message : '')}&form=${stringToBase64URL(
+          JSON.stringify({ username })
+        )}&finish=true`
       );
     } else {
       redirect(303, '/');

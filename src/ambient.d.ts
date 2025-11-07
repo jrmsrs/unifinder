@@ -15,6 +15,7 @@ declare global {
   type ObjetoTipo = 'achado' | 'perdido';
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
   type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
+  type UserRole = 'user' | 'admin' | 'funcionario';
 
   type Contact = {
     id: string;
@@ -27,6 +28,7 @@ declare global {
     username: string;
     nome: string;
     contato: Contact[];
+    role: UserRole;
   };
 
   type Objeto = {

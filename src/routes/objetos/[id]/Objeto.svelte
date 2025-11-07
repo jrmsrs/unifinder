@@ -20,7 +20,13 @@
   <Heading tag="h2" class="mt-2 text-2xl font-bold">{objeto.nome}</Heading>
   <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
   <ObjetoTable>
-    <Row key="Postado:" value={new Date(objeto.data_registro).toLocaleDateString()} icon={Calendar} />
+    <Row
+      key="Postado:"
+      value={`${new Date(objeto.data_registro + 'Z').toLocaleDateString('pt-BR')} às ${new Date(
+        objeto.data_registro + 'Z'
+      ).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`}
+      icon={Calendar}
+    />
 
     <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" icon={AtSign}>
       {#if onOpenProfile}

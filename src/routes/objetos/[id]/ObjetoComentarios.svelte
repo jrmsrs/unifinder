@@ -92,10 +92,26 @@
                 >
                   {String(comentario.user.username).charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <span class="font-semibold">{comentario.user.username}</span>
-                  <span class="text-xs font-normal">•</span>
-                  <span class="text-xs font-normal">{new Date(comentario.publicado_em).toLocaleDateString()}</span>
+                <div class="flex flex-col leading-tight">
+                  {#await data.streamed.objeto then objeto}
+                    <span
+                      class="font-semibold {comentario.user.role.toLowerCase() === 'funcionario' ? 'text-blue-600 dark:text-blue-400' : ''}"
+                    >
+                      {comentario.user.username}
+                      <span class="font-normal text-gray-500 dark:text-gray-400">
+                        {objeto?.user_id === comentario.user_id ? (objeto.tipo.toLowerCase() === 'achado' ? ' (Achou)' : ' (Perdeu)') : ''}
+                      </span>
+                    </span>
+                  {/await}
+                  <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                    {new Date(comentario.publicado_em + 'Z').toLocaleString(undefined, {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
                 </div>
               </button>
 
