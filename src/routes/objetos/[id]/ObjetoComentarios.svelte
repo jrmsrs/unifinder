@@ -11,14 +11,17 @@
   let comentarioSubmiting = $state(false);
   let comentarioRemoving = $state(false);
 
+  // Estado do modal de perfil
   let showProfile = $state(false);
   let selectedUser = $state<User | null>(null);
 
+  /** Abre o modal de perfil do usuário */
   const openProfile = (user: User) => {
     selectedUser = user;
     showProfile = true;
   };
 
+  /** Fecha o modal de perfil do usuário */
   const closeProfile = () => {
     showProfile = false;
     selectedUser = null;
@@ -30,6 +33,8 @@
     Comentários
     {#await data.streamed.comentarios then { comentarios: c }}({c.length}){/await}
   </Heading>
+
+  <!-- Formulário para novo comentário -->
   <div id="novo-comentario" class="mb-2 flex flex-col">
     {#await data.streamed.comentarios then}
       {#if data.user}
@@ -65,9 +70,13 @@
       {/if}
     {/await}
   </div>
+
+  <!-- Erro ao comentar -->
   {#if data.commentError}
     <Alert color="red" class="mb-2" dismissable>{data.commentError}</Alert>
   {/if}
+
+  <!-- Lista de comentários -->
   <div id="lista-comentarios" class="mt-6">
     {#await data.streamed.comentarios}
       {#each { length: 4 }}
@@ -78,6 +87,7 @@
         {#each comentarios as comentario}
           <div class="mb-4 text-sm">
             <div class="mb-1 flex w-full items-center gap-2">
+              <!-- Informações do autor (clicável para ver perfil) -->
               <button
                 class="
                   flex flex-1 cursor-pointer items-center gap-2 rounded-md p-1 text-left
@@ -86,6 +96,7 @@
                 type="button"
                 onclick={() => openProfile(comentario.user)}
               >
+                <!-- Avatar gerado por hash do user_id -->
                 <div
                   class="flex h-8 w-8 items-center justify-center rounded-full"
                   style="background-color: hsl({parseInt(comentario.user_id.slice(0, 6), 16)}, 50%, 50%)"
@@ -98,6 +109,7 @@
                       class="font-semibold {comentario.user.role.toLowerCase() === 'funcionario' ? 'text-blue-600 dark:text-blue-400' : ''}"
                     >
                       {comentario.user.username}
+                      <!-- Badge indicando se é o tutor do objeto -->
                       <span class="font-normal text-gray-500 dark:text-gray-400">
                         {objeto?.user_id === comentario.user_id ? (objeto.tipo.toLowerCase() === 'achado' ? ' (Achou)' : ' (Perdeu)') : ''}
                       </span>
@@ -115,6 +127,7 @@
                 </div>
               </button>
 
+              <!-- Botão de excluir (apenas autor ou tutor do objeto) -->
               {#await data.streamed.objeto then objeto}
                 {#if data.user?.id === comentario.user_id || data.user?.id === objeto?.user_id}
                   <form
@@ -150,6 +163,7 @@
   </div>
 </div>
 
+<!-- Modal de perfil do usuário -->
 {#if selectedUser}
   <Profile user={selectedUser} bind:open={showProfile} onclose={closeProfile} />
 {/if}

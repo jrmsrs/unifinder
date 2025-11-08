@@ -10,6 +10,8 @@
   let objetoTipo: ObjetoTipo | undefined = $state(form?.tipo ?? query?.tipo ?? undefined);
   let objetoTitulo: string = $state(form?.titulo ?? '');
   let objetoDescricao: string = $state(form?.descricao ?? '');
+
+  /** Lista de localidades disponíveis */
   const listaLocalidades: Array<{ value: ObjetoLocalidade; name: string }> = [
     { value: 'biblio', name: dictLocalidades.biblio },
     { value: 'ccetibio', name: dictLocalidades.ccetibio },
@@ -27,6 +29,8 @@
     form?.local_encaminhado && form?.local_encaminhado !== '' ? form?.local_encaminhado : 'em mãos'
   );
   let objetoLocalEncaminhadoAdd: string = $state(form?.local_encaminhado_add ?? '');
+
+  /** Lista de categorias disponíveis */
   const listaCategorias: Array<{ value: ObjetoCategoria; name: string }> = [
     { value: 'academico', name: dictCategorias.academico },
     { value: 'carteira', name: dictCategorias.carteira },
@@ -44,7 +48,8 @@
   let objetoImagePreviewURL: string | undefined = $state(form?.image_url ?? undefined);
   let objetoSubmiting = $state(false);
 
-  function handleFileSelect(e: Event) {
+  /** Valida e carrega imagem selecionada (máximo 15MB) */
+  const handleFileSelect = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const file = target.files?.[0];
 
@@ -59,16 +64,18 @@
       objetoImageFile = file;
       objetoImagePreviewURL = URL.createObjectURL(file);
     }
-  }
+  };
 
-  function handleRemoveImage() {
+  /** Remove imagem selecionada */
+  const handleRemoveImage = () => {
     objetoImageFile = undefined;
     if (objetoImagePreviewURL) {
       URL.revokeObjectURL(objetoImagePreviewURL);
       objetoImagePreviewURL = undefined;
     }
-  }
+  };
 
+  // Reseta estado de submissão quando há erro
   $effect(() => {
     if (error) {
       objetoSubmiting = false;
@@ -98,12 +105,15 @@
     }}
   >
     <div class="flex flex-col-reverse gap-4">
+      <!-- Campo título -->
       <div>
         <Label>
           Título <span class="text-red-400">*</span>
           <Input name="titulo" bind:value={objetoTitulo} placeholder="Digite o título do objeto" />
         </Label>
       </div>
+
+      <!-- Seletor de tipo (achado/perdido) -->
       <div>
         <Label>Tipo de objeto <span class="text-red-400">*</span></Label>
         <div class="grid grid-cols-2 flex-row text-center [&>label]:rounded-none [&>label]:first:rounded-l-lg [&>label]:last:rounded-r-lg">
@@ -136,6 +146,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Campo descrição -->
     <div>
       <Label>
         Descrição <span class="text-red-400">*</span>
@@ -148,6 +160,8 @@
         />
       </Label>
     </div>
+
+    <!-- Upload de imagem -->
     <div>
       <Label>Imagem</Label>
       <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -191,18 +205,24 @@
       </div>
       <input type="text" class="sr-only" placeholder="URL da imagem" name="image_url" bind:value={objetoImagePreviewURL} />
     </div>
+
+    <!-- Localidade onde foi encontrado/perdido -->
     <div>
       <Label>
         Área em que foi {objetoTipo === 'achado' ? 'encontrado' : 'perdido'} (prédio, praça, etc) <span class="text-red-400">*</span>
         <Select items={listaLocalidades} bind:value={objetoLocalidade} placeholder="Selecione a área" name="localidade" />
       </Label>
     </div>
+
+    <!-- Local específico (opcional) -->
     <div>
       <Label>
         Local específico (ex. sala 101 no 1º andar)
         <Input bind:value={objetoLocalEspecifico} placeholder="(Opcional) Digite a localização específica" name="local_especifico" />
       </Label>
     </div>
+
+    <!-- Local de encaminhamento (apenas para achados) -->
     {#if objetoTipo === 'achado'}
       <div>
         <Label>
@@ -230,6 +250,8 @@
         e então preenchê-lo. É possível marcar como "Objeto em mãos" e modificar mais tarde quando realizar o encaminhamento.
       </Helper>
     {/if}
+
+    <!-- Especificar outro local (se selecionado) -->
     {#if objetoTipo === 'achado' && objetoLocalEncaminhado === 'outro'}
       <div>
         <Label>
@@ -242,6 +264,8 @@
         Área correta?) e é seguro e apropriado para armazenar o objeto até que o dono possa recuperá-lo.
       </Helper>
     {/if}
+
+    <!-- Categoria do objeto -->
     <div>
       <Label>
         Categoria <span class="text-red-400">*</span>
@@ -249,6 +273,7 @@
       </Label>
     </div>
 
+    <!-- Mensagem de erro -->
     {#if error}
       <Alert color="red">
         Erro ao registrar o objeto:
@@ -263,6 +288,7 @@
       </Alert>
     {/if}
 
+    <!-- Botões de ação -->
     <div class="flex shrink-0 items-center space-x-3 rounded-b-lg p-4 md:p-5 rtl:space-x-reverse">
       <div class="flex w-full justify-end">
         <Button

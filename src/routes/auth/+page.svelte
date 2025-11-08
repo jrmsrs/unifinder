@@ -22,11 +22,12 @@
 
 <div
   class="
-		flex h-[calc(100vh-11em)] w-full flex-col content-center justify-center
-		[&>*]:mx-auto [&>*]:flex [&>*]:max-w-sm [&>*]:min-w-full [&>*]:flex-col [&>*]:gap-4
-		[&>*]:min-[420px]:min-w-[380px]
+    flex h-[calc(100vh-11em)] w-full flex-col content-center justify-center
+    [&>*]:mx-auto [&>*]:flex [&>*]:max-w-sm [&>*]:min-w-full [&>*]:flex-col [&>*]:gap-4
+    [&>*]:min-[420px]:min-w-[380px]
   "
 >
+  <!-- Finalização de cadastro OAuth (Google) -->
   {#if data.user || (data.finish && data.error !== 'server_error')}
     <Heading tag="h3" class="mb-6 text-center">Finalize seu cadastro</Heading>
     <form method="POST" action="?/gauthFinish">
@@ -61,6 +62,8 @@
         <Button type="submit" class="dark:bg-primary-700 dark:hover:bg-primary-800">Finalizar cadastro</Button>
       </div>
     </form>
+
+    <!-- Redefinição de senha -->
   {:else if data.tab === 'reset'}
     <Heading tag="h3" class="mb-6 text-center">Redefinir senha</Heading>
     <form method="POST" action="?/reset">
@@ -86,8 +89,12 @@
     <div class="flex flex-col items-center justify-center gap-2">
       <P><A href="/auth?tab=login" class="text-sm text-gray-500 hover:underline">Voltar ao login</A></P>
     </div>
+
+    <!-- Cadastro (signup) -->
   {:else if data.tab === 'signup'}
     <Heading tag="h3" class="mb-6 text-center">Cadastrar</Heading>
+
+    <!-- Cadastro via Google OAuth -->
     <form method="POST" action="?/gauth">
       <P class="text-center text-lg">Cadastre-se com sua conta Google</P>
       <div class="flex flex-col items-center justify-center gap-2">
@@ -111,7 +118,10 @@
         </div>
       </div>
     </form>
+
     <Hr class="my-10 text-gray-500">ou</Hr>
+
+    <!-- Cadastro manual (email/senha) -->
     <form method="POST" action="?/signup">
       {#if data.error}
         <Alert color="red" dismissable>{data.error}</Alert>
@@ -173,8 +183,12 @@
       <P>Já tem uma conta?</P>
       <P><A href="/auth?tab=login" class="text-sm text-gray-500 hover:underline">Entrar</A></P>
     </div>
+
+    <!-- Login -->
   {:else}
     <Heading tag="h3" class="mb-6 text-center">Realizar login</Heading>
+
+    <!-- Login via Google OAuth -->
     <form method="POST" action="?/gauth">
       <P class="text-center text-lg">Entre com sua conta Google</P>
       <div class="flex flex-col items-center justify-center gap-2">
@@ -198,7 +212,10 @@
         </div>
       </div>
     </form>
+
     <Hr class="my-10 text-gray-500">ou</Hr>
+
+    <!-- Login manual (email/senha) -->
     <form method="POST" action="?/login">
       {#if data.error}
         <Alert color="red" dismissable>{data.error}</Alert>

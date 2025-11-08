@@ -3,7 +3,7 @@
   import NotificationHamburger from '$lib/components/NotificationHamburger.svelte';
   import { unreadCount } from '$lib/stores/notifications';
   import type { Session } from '@supabase/supabase-js';
-  import { Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
+  import { Navbar, NavBrand } from 'flowbite-svelte';
   import {
     ArrowLeftToBracketOutline,
     ArrowRightToBracketOutline,
@@ -20,19 +20,30 @@
   import NavItem from './TheNavItem.svelte';
   import NavList from './TheNavList.svelte';
 
+  let { session, openNotifys = $bindable(false) }: { session: Session | null; openNotifys: boolean } = $props();
+  let blueLine = $state(false);
+
+  // Fecha menu mobile ao navegar
+  $effect(() => {
+    const hamburger = document.getElementById('the-nav-hamburger');
+    const navlist = document.getElementById('the-nav-list');
+
+    if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden')) {
+      hamburger.click();
+    }
+  });
+
+  // Gerencia tema e scroll
   $effect(() => {
     const theme = document.querySelector('meta[name="theme-color"]');
     const htmlElement = document.querySelector('html');
     const themeButton = document.getElementById('theme-toggle');
-    const hamburger = document.getElementById('the-nav-hamburger');
-    const navlist = document.getElementById('the-nav-list');
     const scroll = document.getElementById('scroll');
-
-    if (!navigating.complete && hamburger && navlist && !navlist.classList.contains('hidden')) hamburger.click();
 
     let themeClickHandler: (() => void) | null = null;
     let scrollHandler: (() => void) | null = null;
 
+    // Atualiza cor do tema ao alternar dark/light mode
     if (theme && htmlElement && themeButton) {
       const setTheme = (colorA: string, colorB: string) => {
         if (htmlElement.classList.contains('dark')) theme.setAttribute('content', colorA);
@@ -43,6 +54,7 @@
       themeButton.addEventListener('click', themeClickHandler);
     }
 
+    // Mostra linha azul ao rolar página
     if (scroll) {
       scrollHandler = function () {
         var scrollPosition = scroll.scrollTop || window.pageYOffset;
@@ -52,7 +64,7 @@
       scroll.addEventListener('scroll', scrollHandler);
     }
 
-    // Cleanup: remove event listeners quando o effect é limpo
+    // Cleanup: remove event listeners
     return () => {
       if (themeButton && themeClickHandler) {
         themeButton.removeEventListener('click', themeClickHandler);
@@ -62,10 +74,6 @@
       }
     };
   });
-
-  let blueLine = $state(false);
-
-  let { session, openNotifys = $bindable(false) }: { session: Session | null; openNotifys: boolean } = $props();
 </script>
 
 <header class="sticky top-0 z-35">
@@ -77,13 +85,16 @@
     <NotificationHamburger id="the-nav-hamburger" class="m-0 p-0" {session} />
     <NavList id="the-nav-list">
       <NavItem href="/" icon={HomeSolid}>Início</NavItem>
-      <!-- se dispositivo movel: exibir achados e perdidos, se dispositivo medio exibir apenas objetos, se dispositivo grande exibir achados e perdidos -->
+
+      <!-- Links de navegação responsivos (mobile/tablet/desktop) -->
       <NavItem class="hidden md:flex lg:hidden" href="/objetos" icon={CubesStackedSolid}>Objetos</NavItem>
-      <NavItem class="flex md:hidden lg:flex" href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}
-        >Perdidos</NavItem
-      >
+      <NavItem class="flex md:hidden lg:flex" href="/objetos?tipo=perdido" icon={[CubesStackedSolid, QuestionCircleOutline]}>
+        Perdidos
+      </NavItem>
       <NavItem class="flex md:hidden lg:flex" href="/objetos?tipo=achado" icon={CubeSolid}>Achados</NavItem>
       <NavItem sep />
+
+      <!-- Menu autenticado vs não autenticado -->
       {#if !session}
         <NavItem href="/auth" icon={ArrowRightToBracketOutline} green>Login</NavItem>
       {:else}
@@ -100,9 +111,12 @@
           <span class="md:hidden lg:flex">Logout</span>
         </NavItem>
       {/if}
+
       <NavItem sep />
       <NavItem id="theme-toggle" themeToggle />
     </NavList>
+
+    <!-- Linha azul animada ao rolar -->
     <div class="mt-2 flex h-0.5 w-full flex-col content-center items-center md:mt-0">
       {#if blueLine}
         <div

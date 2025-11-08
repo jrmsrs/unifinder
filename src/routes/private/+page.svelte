@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
-  import { Alert, Avatar, Button, Card, Helper, Input, Label, Spinner, TabItem, Tabs } from 'flowbite-svelte';
+  import { Alert, Avatar, Button, Helper, Input, Label, Spinner, TabItem, Tabs } from 'flowbite-svelte';
   import { CheckCircle, Eye, EyeOff, LogOut, Save, Shield, TriangleAlertIcon, User } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import ContactsEditor from './ContactsEditor.svelte';
@@ -18,12 +18,36 @@
   let contacts = $state<any[]>([]);
   let profileLoaded = $state(false);
 
+  /** Dados do formulário de edição do perfil */
   let formData = $state({
     username: '',
     nome: '',
     email: '',
     contacts: '[]'
   });
+
+  /** Dados do formulário de alteração de senha */
+  let passwordData = $state({
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  /** Handler para mudanças no editor de contatos */
+  const handleContactsChange = (updatedContacts: any) => {
+    contacts = updatedContacts;
+    formData.contacts = JSON.stringify(contacts);
+  };
+
+  /** Logout do usuário */
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error(error);
+      goto('/error');
+    } else {
+      goto('/auth');
+    }
+  };
 
   // Sincronização de dados do perfil (primeira carga + após submit)
   $effect(() => {
@@ -48,29 +72,6 @@
       }
     }
   });
-
-  // Handler para mudanças no editor de contatos
-  const handleContactsChange = (updatedContacts: any) => {
-    contacts = updatedContacts;
-    formData.contacts = JSON.stringify(contacts);
-  };
-
-  // Dados do formulário de alteração de senha
-  let passwordData = $state({
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  // Logout do usuário
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error(error);
-      goto('/error');
-    } else {
-      goto('/auth');
-    }
-  };
 
   // Limpa campos de senha após sucesso
   onMount(() => {

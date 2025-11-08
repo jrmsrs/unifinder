@@ -4,13 +4,14 @@ import { redirect, type Actions } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 
+/** Busca um objeto pelo ID */
 const fetchObjeto = async (id: string) => {
   const objeto = await getObjetoById({ id });
   return objeto;
 };
 
+/** Busca comentários associados ao objeto */
 const fetchComentarios = async (id: string) => {
-  await new Promise<void>((resolve) => setTimeout(resolve, 2000));
   const comentarios = await getComentariosByObjetoId({ id });
   return comentarios;
 };
@@ -27,6 +28,7 @@ export const load: PageServerLoad = ({ params, url }) => {
   };
 };
 
+/** Schema de validação para reivindicação */
 const claimSchema = z.object({
   descricao: z.string(),
   evidencias: z
@@ -36,6 +38,7 @@ const claimSchema = z.object({
     .optional()
 });
 
+/** Schema de validação para finalização de objeto */
 const finishSchema = z.object({
   motivo_finalizacao: z
     .string()
@@ -45,6 +48,8 @@ const finishSchema = z.object({
 
 export const actions: Actions = {
   updateObjeto: async () => {},
+
+  /** Finaliza objeto (tutor encerra o ciclo do objeto) */
   finishObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
@@ -81,19 +86,22 @@ export const actions: Actions = {
       );
     }
 
-    // Redirecionar para a lista de objetos após finalização bem-sucedida
     throw redirect(303, '/objetos?message=Objeto finalizado com sucesso!');
   },
+
+  /** Cria reivindicação de objeto */
   claimObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
       throw redirect(303, '/login?redirect=/objetos/' + params.id);
     }
+
     const formData = await request.formData();
     const formPayload = {
       descricao: formData.get('descricao'),
       evidencias: Array.from(formData.getAll('evidencias')).filter((item) => item instanceof File)
     };
+
     const validation = claimSchema.safeParse(formPayload);
 
     if (!validation.success) {
@@ -113,6 +121,7 @@ export const actions: Actions = {
       },
       session.session.access_token
     );
+
     if (!result) {
       throw redirect(
         303,
@@ -122,34 +131,46 @@ export const actions: Actions = {
       );
     }
   },
+
+  /** Exclui objeto (apenas tutor) */
   deleteObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
       throw redirect(303, '/login?redirect=/objetos/' + params.id);
     }
+
     const success = await deleteObjeto({ id: params.id as string }, session.session.access_token);
+
     if (!success) {
       throw redirect(303, `/objetos/${params.id}?error=${encodeURIComponent('Erro ao excluir objeto. Tente novamente.')}`);
     }
+
     throw redirect(303, `/objetos`);
   },
+
+  /** Cria comentário no objeto */
   createComentario: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
       throw redirect(303, '/login?redirect=/objetos/' + params.id);
     }
+
     const formData = await request.formData();
     const conteudo = formData.get('conteudo');
+
     const schema = z.object({
       conteudo: z.string().min(1, 'O comentário não pode ser vazio.').max(1000, 'O comentário deve ter no máximo 1000 caracteres.')
     });
+
     const parsed = schema.safeParse({ conteudo });
+
     if (!parsed.success) {
       throw redirect(
         303,
         `/objetos/${params.id}?comment_error=${encodeURIComponent(parsed.error.message)}&form=${stringToBase64URL(JSON.stringify({ conteudo }))}`
       );
     }
+
     const comentario = await postComentario(
       {
         conteudo: parsed.data.conteudo,
@@ -158,28 +179,37 @@ export const actions: Actions = {
       },
       session.session.access_token
     );
+
     if (!comentario) {
       throw redirect(
         303,
         `/objetos/${params.id}?comment_error=${encodeURIComponent('Erro ao publicar comentário. Tente novamente.')}&form=${stringToBase64URL(JSON.stringify({ conteudo }))}`
       );
     }
+
     throw redirect(303, `/objetos/${params.id}`);
   },
+
+  /** Exclui comentário (apenas autor) */
   deleteComentario: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
       throw redirect(303, '/login?redirect=/objetos/' + params.id);
     }
+
     const formData = await request.formData();
     const id = formData.get('id');
+
     if (!id) {
       throw redirect(303, `/objetos/${params.id}?comment_error=${encodeURIComponent('ID do comentário não encontrado.')}`);
     }
+
     const success = await deleteComentario({ id: id as string }, session.session.access_token);
+
     if (!success) {
       throw redirect(303, `/objetos/${params.id}?comment_error=${encodeURIComponent('Erro ao excluir comentário. Tente novamente.')}`);
     }
+
     throw redirect(303, `/objetos/${params.id}`);
   }
 };

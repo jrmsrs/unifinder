@@ -1,7 +1,10 @@
 import { dictLocalidades } from '$lib/utils/dicionaries';
 
 declare global {
+  /** Tipo de localidade do objeto */
   type ObjetoLocalidade = keyof typeof dictLocalidades;
+
+  /** Tipo de categoria do objeto */
   type ObjetoCategoria =
     | 'documento'
     | 'carteira'
@@ -12,17 +15,27 @@ declare global {
     | 'vestuario'
     | 'chaveiro'
     | 'outro';
+
+  /** Tipo de objeto perdido/achado */
   type ObjetoTipo = 'achado' | 'perdido';
+
+  /** Tipo de status do objeto */
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
+
+  /** Tipo de status da reivindicação */
   type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
+
+  /** Tipo de papel do usuário */
   type UserRole = 'user' | 'admin' | 'funcionario';
 
+  /** Tipo de contato do usuário */
   type Contact = {
     id: string;
     tipo: string;
     valor: string;
   };
 
+  /** Tipo de usuário */
   type User = {
     id: string;
     username: string;
@@ -31,6 +44,7 @@ declare global {
     role: UserRole;
   };
 
+  /** Tipo de objeto perdido/achado */
   type Objeto = {
     id: string;
     data_registro: string;
@@ -47,6 +61,7 @@ declare global {
     motivo_finalizacao?: string;
   };
 
+  /** Tipo de comentário em objeto */
   type Comentario = {
     id: string;
     publicado_em: string;

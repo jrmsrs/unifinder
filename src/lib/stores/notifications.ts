@@ -1,24 +1,22 @@
-import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Notification } from '$lib/api/notifications';
+import { derived, writable } from 'svelte/store';
 
-// Store para as notificações
+/** Store para as notificações */
 export const notifications = writable<Notification[]>([]);
 
-// Store derivado para notificações não lidas (não entregues)
-export const unreadNotifications = derived(notifications, ($notifications) =>
-  $notifications.filter((n) => !n.delivered)
-);
+/** Store derivado para notificações não lidas (não entregues) */
+export const unreadNotifications = derived(notifications, ($notifications) => $notifications.filter((n) => !n.delivered));
 
-// Store derivado para contagem de notificações não lidas
+/** Store derivado para contagem de notificações não lidas */
 export const unreadCount = derived(unreadNotifications, ($unreadNotifications) => $unreadNotifications.length);
 
-// Store derivado para as notificações mais recentes (últimas 10)
+/** Store derivado para as notificações mais recentes (últimas 10) */
 export const recentNotifications = derived(notifications, ($notifications) =>
   [...$notifications].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 10)
 );
 
-// Funções para gerenciar notificações
+/** Funções para gerenciar notificações */
 export const notificationActions = {
   /**
    * Adiciona uma nova notificação
@@ -38,9 +36,7 @@ export const notificationActions = {
    */
   markAsRead(notificationId: string): void {
     notifications.update((current) =>
-      current.map((notification) =>
-        notification.id === notificationId ? { ...notification, delivered: true } : notification
-      )
+      current.map((notification) => (notification.id === notificationId ? { ...notification, delivered: true } : notification))
     );
   },
 
@@ -78,7 +74,6 @@ export const notificationActions = {
 
 // Persistência no localStorage (apenas no browser)
 if (browser) {
-  // Carrega notificações do localStorage na inicialização
   const savedNotifications = localStorage.getItem('notifications');
   if (savedNotifications) {
     try {
@@ -89,7 +84,6 @@ if (browser) {
     }
   }
 
-  // Salva notificações no localStorage sempre que mudarem
   notifications.subscribe((current) => {
     try {
       localStorage.setItem('notifications', JSON.stringify(current));

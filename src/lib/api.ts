@@ -444,7 +444,6 @@ export const rejectClaim = async (claimId: string, token: string): Promise<boole
   }
 };
 
-// no meu repositório jrmsrs/unifinder, quero integrar e criar a funcionalidade do dono do objeto finalizar ele, ele invocará PUT na endpoint /objetos/{objeto_id}/finalizar onde haverá um body { "motivo_finalizacao": "string" }, que será obtido -- assim como é feito para criar uma claim/reivindicação -- através de um Modal. não realize essas alterações diretamente no repositório, mas exponha elas aqui
 export const finishObjeto = async (data: { id: string; motivo_finalizacao: string }, accessToken: string): Promise<boolean> => {
   try {
     const response = await fetch(`${baseObjetosApiURL}/${data.id}/finalizar`, {

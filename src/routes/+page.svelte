@@ -8,6 +8,7 @@
 
   let { data } = $props();
 
+  // Redireciona para finalização de cadastro se usuário não tem username
   onMount(() => {
     if (data.user && data.user.email && !data.user.user_metadata.username) {
       goto('/auth?finish=true');
@@ -16,6 +17,7 @@
 </script>
 
 <div class="m-auto flex flex-col items-center justify-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
+  <!-- Barra de pesquisa principal -->
   <P>Perdeu ou achou algum pertence na UNIRIO? Procure pelo objeto entre os Achados ou o registro do dono entre os Perdidos:</P>
   <FilteredSearch></FilteredSearch>
   <Hr class="my-0!">não encontrou?</Hr>
@@ -23,6 +25,8 @@
     Registrar Objeto Perdido/Achado
   </Button>
   <Hr />
+
+  <!-- Seção de objetos em acompanhamento (apenas usuários logados) -->
   {#if data.user}
     <Heading tag="h4">Objetos em acompanhamento</Heading>
     {#await data.streamed.objetos}
@@ -38,6 +42,8 @@
     {/await}
     <Hr />
   {/if}
+
+  <!-- Seção de últimos objetos achados -->
   <Heading tag="h4">Últimos objetos achados</Heading>
   {#await data.streamed.objetos}
     <ObjectsCarousel id="found-objects-carousel" objects={null} />
@@ -51,6 +57,8 @@
     <Alert color="red" dismissable>Erro: {error.message}</Alert>
   {/await}
   <Hr />
+
+  <!-- Seção de últimos objetos perdidos -->
   <Heading tag="h4">Últimos objetos perdidos</Heading>
   {#await data.streamed.objetos}
     <ObjectsCarousel id="found-objects-carousel" objects={null} />
@@ -77,11 +85,11 @@
   - (x) layout cards objetos em acompanhamento
   - (x) layout cards ultimos achados/perdidos
   - (x) mocks cards
-  - (-) integração
+  - (x) integração
 # todo (autenticação):
   - (x) login padrão
   - (x) sign up padrão
   - (x) recuperação de senha padrão
   - (x) usuario tem username (etapa adicional)
-  - (-) integração`}
+  - (x) integração`}
 />

@@ -10,20 +10,23 @@
 </script>
 
 <div class="relative w-full">
+  <!-- Carrossel de objetos -->
   <div
     {id}
     class="
-				no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
-				px-4
-				lg:justify-center lg:px-0
-				[&>*]:min-h-64 [&>*]:max-w-64 [&>*]:min-w-64
-			"
+      no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
+      px-4
+      lg:justify-center lg:px-0
+      [&>*]:min-h-64 [&>*]:max-w-64 [&>*]:min-w-64
+    "
   >
     {#if objects === null}
-      {#each Array.from({ length: 3 }) as _, i}
+      <!-- Loading state -->
+      {#each Array.from({ length: 3 }) as _}
         <Skeleton card={48} />
       {/each}
     {:else}
+      <!-- Cards de objetos -->
       {#each objects as obj}
         <a href={`/objetos/${obj.id}?ref=%2f`}>
           <Card class="relative col-span-1 flex h-full gap-2 p-6">
@@ -32,6 +35,7 @@
               {obj.nome}
             </Heading>
             <div class="flex">
+              <!-- Badges de status -->
               <div class="absolute top-8 left-1/2 flex -translate-x-1/2 [&>*]:mx-0.5">
                 <Badge color={obj.tipo.toLowerCase() === 'achado' ? 'green' : 'red'}>
                   {obj.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
@@ -40,6 +44,8 @@
                   <Badge color="yellow">Reivindicado</Badge>
                 {/if}
               </div>
+
+              <!-- Informações do objeto -->
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
                   <MapPin class="mb-1 inline-block h-4 w-4" />
@@ -64,14 +70,18 @@
           </Card>
         </a>
       {/each}
+
+      <!-- Link "Ver todos" -->
       <a
         href={tutela ? `/objetos?tutela=true` : `/objetos?tipo=${objects[0].tipo.toLowerCase()}`}
-        class=" flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
+        class="flex flex-row items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
       >
         Ver todos
       </a>
     {/if}
   </div>
+
+  <!-- Botões de navegação do carrossel -->
   <div class="absolute top-1/2 left-0 -ml-7 -translate-y-1/2 bg-transparent">
     <ObjectsCarouselScroll carouselId={id} />
   </div>

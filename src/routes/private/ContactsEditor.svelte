@@ -48,7 +48,7 @@
     }
   });
 
-  // Emite mudanças para o componente pai
+  /** Emite mudanças para o callback onchange */
   const emitChange = () => {
     const cleanContacts = localContacts.map(({ editing, ...contact }) => contact);
 
@@ -58,7 +58,7 @@
     onchange?.(cleanContacts);
   };
 
-  // Adiciona novo contato à lista
+  /** Adiciona novo contato à lista */
   const addContact = () => {
     if (!newValue.trim()) return;
 
@@ -74,16 +74,18 @@
     emitChange();
   };
 
-  // Controles de edição inline
+  /** Inicia edição de um contato */
   const startEdit = (id: string) => {
     localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: true } : c));
   };
 
+  /** Salva edição de um contato */
   const saveEdit = (id: string) => {
     localContacts = localContacts.map((c) => (c.id === id ? { ...c, editing: false } : c));
     emitChange();
   };
 
+  /** Cancela edição de um contato */
   const cancelEdit = (id: string) => {
     const originalContact = contacts.find((c) => c.id === id);
     if (originalContact) {
@@ -93,12 +95,13 @@
     }
   };
 
+  /** Remove um contato da lista */
   const removeContact = (id: string) => {
     localContacts = localContacts.filter((c) => c.id !== id);
     emitChange();
   };
 
-  // Handlers de teclado para navegação rápida
+  /** Manipula eventos de teclado na edição */
   const handleEditKeydown = (event: KeyboardEvent, id: string) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -108,7 +111,7 @@
       cancelEdit(id);
     }
   };
-
+  /** Manipula eventos de teclado no novo contato */
   const handleNewKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -116,6 +119,7 @@
     }
   };
 
+  /** Obtém o rótulo legível para um tipo de contato */
   const getTypeLabel = (type: string) => {
     return contactTypes.find((t) => t.value === type)?.name || type;
   };

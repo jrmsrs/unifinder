@@ -3,18 +3,19 @@ import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
+// Carrega dados para a página de autenticação
 export function load({ locals: { safeGetSession }, url }) {
   return {
     finish: url.searchParams.get('finish') === 'true',
     tab: url.searchParams.get('tab') || 'login',
     error: url.searchParams.get('error') || null,
     form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
-    // user: supabase.auth.getUser(),
     session: safeGetSession()
   };
 }
 
 export const actions: Actions = {
+  /** Cadastro de novo usuário */
   signup: async ({ request, locals: { supabase } }) => {
     let validationErrors = [];
     const formData = await request.formData();
@@ -22,6 +23,8 @@ export const actions: Actions = {
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const passwordConfirm = formData.get('passwordConfirm') as string;
+
+    // Validações de campos obrigatórios
     if (!email || !username || !password || !passwordConfirm) {
       validationErrors.push('Todos os campos são obrigatórios');
     }
@@ -37,12 +40,16 @@ export const actions: Actions = {
     if (password.length < 6) {
       validationErrors.push('A senha deve ter pelo menos 6 caracteres');
     }
+
+    // Redireciona com erros de validação
     if (validationErrors.length > 0) {
       redirect(
         303,
         `/auth?tab=signup&error=${encodeURIComponent(validationErrors.join('; '))}&form=${stringToBase64URL(JSON.stringify({ email, username }))}`
       );
     }
+
+    // Cria usuário via Supabase Auth
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { username, role: 'user' } } });
     if (error) {
       redirect(
@@ -53,6 +60,8 @@ export const actions: Actions = {
       redirect(303, '/');
     }
   },
+
+  /** Login de usuário existente */
   login: async ({ request, locals: { supabase } }) => {
     const formData = await request.formData();
     const email = formData.get('email') as string;
@@ -65,6 +74,8 @@ export const actions: Actions = {
       redirect(303, '/');
     }
   },
+
+  /** Autenticação via Google OAuth */
   gauth: async ({ locals: { supabase }, url }) => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -78,6 +89,8 @@ export const actions: Actions = {
       redirect(303, data.url);
     }
   },
+
+  /** Finaliza cadastro via Google OAuth (adiciona username) */
   gauthFinish: async ({ request, locals: { supabase } }) => {
     const formData = await request.formData();
     const username = formData.get('username') as string;
@@ -85,10 +98,13 @@ export const actions: Actions = {
     if (!username) return;
 
     const userId = await supabase.auth.getUser().then((res) => res.data.user?.id);
+
+    // Atualiza username na tabela user e nos metadados do auth
     const [res1, res2] = await Promise.all([
       supabase.from('user').update({ username: username.trim() }).eq('id', userId),
       supabase.auth.updateUser({ data: { username, role: 'user' } })
     ]);
+
     if (res1.error || res2.error) {
       redirect(
         303,

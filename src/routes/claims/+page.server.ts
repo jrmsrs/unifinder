@@ -2,6 +2,7 @@ import { approveClaim, getMyClaims, getObjetosByIds, getPendingClaims, rejectCla
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
+/* Enriquece claims com dados completos dos objetos associados */
 async function enrichClaimsWithObjetos(claims: any) {
   if (!claims.items || claims.items.length === 0) return claims;
 
@@ -21,7 +22,6 @@ async function enrichClaimsWithObjetos(claims: any) {
 export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) => {
   const { session, user } = await safeGetSession();
 
-  // Redireciona para login se não estiver autenticado
   if (!session) {
     throw redirect(303, '/auth');
   }
@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) 
   const page = parseInt(url.searchParams.get('page') || '1');
   const size = parseInt(url.searchParams.get('size') || '20');
 
+  // Busca paralela: claims pendentes (tutor) e claims próprias (usuário)
   const claimsForApprovalPromise = getPendingClaims({ page, size, token: session.access_token }).then(enrichClaimsWithObjetos);
   const myClaimsPromise = getMyClaims({ page, size, token: session.access_token }).then(enrichClaimsWithObjetos);
 
@@ -43,6 +44,7 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession }, url }) 
 };
 
 export const actions: Actions = {
+  /** Aprova reivindicação (tutor do objeto) */
   approveClaim: async ({ request, locals: { safeGetSession }, url }) => {
     const { session } = await safeGetSession();
     if (!session) {
@@ -65,6 +67,7 @@ export const actions: Actions = {
     throw redirect(303, url.pathname + url.search);
   },
 
+  /** Rejeita reivindicação (tutor do objeto) */
   rejectClaim: async ({ request, locals: { safeGetSession }, url }) => {
     const { session } = await safeGetSession();
     if (!session) {

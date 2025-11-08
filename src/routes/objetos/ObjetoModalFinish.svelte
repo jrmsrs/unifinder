@@ -8,6 +8,7 @@
   let motivoFinalizacao: string = $state('');
   let finishSubmiting = $state(false);
 
+  // Reseta estado de submissão quando há erro
   $effect(() => {
     if (error) {
       finishSubmiting = false;
@@ -39,6 +40,7 @@
       };
     }}
   >
+    <!-- Campo de motivo da finalização -->
     <div>
       <Label>
         Motivo da finalização <span class="text-red-400">*</span>
@@ -55,6 +57,7 @@
       </Helper>
     </div>
 
+    <!-- Mensagem de erro -->
     {#if error}
       <Alert color="red">
         Erro ao finalizar objeto:
@@ -66,6 +69,7 @@
       </Alert>
     {/if}
 
+    <!-- Botões de ação -->
     <div class="flex shrink-0 items-center space-x-3 rounded-b-lg p-4 md:p-5 rtl:space-x-reverse">
       <div class="flex w-full justify-end gap-2">
         <Button color="alternative" onclick={() => (objetoFinish = false)}>Cancelar</Button>

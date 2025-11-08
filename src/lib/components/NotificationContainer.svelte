@@ -11,18 +11,16 @@
   let { session }: Props = $props();
 
   let pollInterval: NodeJS.Timeout | null = $state(null);
-  const POLL_INTERVAL_MS = 30000; // 30 segundos
+  const POLL_INTERVAL_MS = 30000;
 
-  // Busca notificações do servidor
-  async function fetchNotifications() {
+  /** Busca e sincroniza notificações do servidor */
+  const fetchNotifications = async () => {
     if (!session?.access_token) return;
 
     try {
       const response = await getNotifications({ token: session.access_token, size: 50 });
       const serverNotifications = response.items || [];
 
-      // Sincroniza com o servidor: sobrescreve notificações locais com dados do servidor
-      // Mantém o estado de entregas do servidor
       notifications.update((current) => {
         const serverMap = new Map(serverNotifications.map((n) => [n.id, n]));
         const currentMap = new Map(current.map((n) => [n.id, n]));
@@ -33,7 +31,7 @@
         // Adiciona novas notificações do servidor
         const newNotifications = serverNotifications.filter((n) => !currentMap.has(n.id));
 
-        // Retorna as notificações ordenadas por data (mais recentes primeiro)
+        // Ordena por data (mais recentes primeiro) e limita a 50
         return [...updated, ...newNotifications]
           .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           .slice(0, 50);
@@ -41,18 +39,14 @@
     } catch (error) {
       console.error('Erro ao buscar notificações:', error);
     }
-  }
+  };
 
-  // Inicia polling quando há sessão
+  // Inicia/para polling baseado na sessão
   $effect(() => {
     if (session?.access_token) {
-      // Busca imediatamente
       fetchNotifications();
-
-      // Inicia polling periódico
       pollInterval = setInterval(fetchNotifications, POLL_INTERVAL_MS);
     } else {
-      // Para o polling se não houver sessão
       if (pollInterval) {
         clearInterval(pollInterval);
         pollInterval = null;
@@ -60,8 +54,8 @@
     }
   });
 
+  // Cleanup ao desmontar
   onDestroy(() => {
-    // Limpa o intervalo quando o componente é destruído
     if (pollInterval) {
       clearInterval(pollInterval);
     }
@@ -72,7 +66,7 @@
   }
 </script>
 
-<!-- Container fixo - Mobile First -->
+<!-- Container de toasts (máximo 3 visíveis, mobile-first) -->
 <div class="fixed top-4 right-4 left-4 z-50 space-y-2 sm:right-4 sm:left-auto sm:max-w-sm">
   {#each $notifications.slice(0, 3) as notification (notification.id)}
     <NotificationToast {notification} onClose={() => handleCloseNotification(notification.id)} />

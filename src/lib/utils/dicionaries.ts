@@ -1,3 +1,4 @@
+/** Dicionário para localidades */
 export const dictLocalidades = {
   biblio: 'Biblioteca',
   ru: 'Restaurante (Bandejão)',
@@ -10,11 +11,13 @@ export const dictLocalidades = {
   outro: 'Outro'
 };
 
+/** Dicionário para tipos de objeto */
 export const dictTipos = {
   achado: 'Achados',
   perdido: 'Perdidos'
 };
 
+/** Dicionário para categorias de objeto */
 export const dictCategorias = {
   documento: 'Documentos',
   carteira: 'Carteiras',

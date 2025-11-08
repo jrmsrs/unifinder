@@ -10,7 +10,7 @@ const ASSETS = [...build, ...files];
 
 console.log('Service worker is running. Version:', version);
 
-// install service worker
+/** Instala service worker */
 self.addEventListener('install', (event) => {
   async function addFilesToCache() {
     const cache = await caches.open(CACHE);
@@ -20,7 +20,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(addFilesToCache());
 });
 
-// activate service worker
+/** Ativa service worker */
 self.addEventListener('activate', (event) => {
   async function clearOldCaches() {
     for (const key of await caches.keys()) {
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(clearOldCaches());
 });
 
-// listen to fetch events
+/** Intercepta requisições */
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return;
@@ -41,19 +41,17 @@ self.addEventListener('fetch', (event) => {
 
   async function respond() {
     const url = new URL(event.request.url);
-    // console.log('Fetching:', url.pathname);
     const cache = await caches.open(CACHE);
 
-    // serve build files from cache
+    /** Tenta servir do cache */
     if (ASSETS.includes(url.pathname)) {
       const cachedResponse = await cache.match(event.request);
       if (cachedResponse) {
-        // console.log('Serving from cache:', url.pathname);
         return cachedResponse;
       }
     }
 
-    // try to fetch from network
+    /** Busca da rede e atualiza cache */
     try {
       const response = await fetch(event.request);
       const isNotExtension = url.protocol === 'http:';

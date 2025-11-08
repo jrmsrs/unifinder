@@ -16,6 +16,7 @@
   let { session, supabase } = $derived(data);
 
   onMount(() => {
+    // Monitora mudanças no estado de autenticação
     const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
       if (newSession?.expires_at !== session?.expires_at) {
         invalidate('supabase:auth');
@@ -25,6 +26,7 @@
     let updateFoundHandler: (() => void) | null = null;
     let stateChangeHandler: (() => void) | null = null;
 
+    /** Detecta atualizações do Service Worker */
     async function detectSWUpdate() {
       if (!('serviceWorker' in navigator)) return;
 
@@ -50,7 +52,7 @@
 
     detectSWUpdate();
 
-    // Cleanup: remove todos os listeners e subscriptions
+    // Cleanup: remove listeners e subscriptions ao desmontar
     return () => {
       data.subscription.unsubscribe();
       if (updateFoundHandler && 'serviceWorker' in navigator) {
@@ -58,7 +60,6 @@
           registration.removeEventListener('updatefound', updateFoundHandler!);
         });
       }
-      // Note: stateChangeHandler é removido automaticamente quando o worker é destruído
     };
   });
 </script>
@@ -72,7 +73,10 @@
   </MainContainer>
 </AppContent>
 
+<!-- Polling de notificações (apenas para usuários autenticados) -->
 {#if data.session}
   <NotificationPoller session={data.session} />
 {/if}
+
+<!-- Modal de notificações -->
 <NotificationModal bind:open={openNotifys} session={data.session} />

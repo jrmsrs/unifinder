@@ -10,16 +10,24 @@
 </script>
 
 <div class="flex flex-col">
+  <!-- Imagem do objeto -->
   <ImageLoader src={objeto.url_imagem} alt={objeto.nome} class="h-72 rounded-t-lg sm:h-96 lg:h-[32rem]" />
+
+  <!-- Badges de tipo e categoria -->
   <div class="grid grid-cols-2 overflow-hidden rounded-b-lg [&>*]:mt-0 [&>*]:h-8 [&>*]:rounded-none">
     <Badge color={objeto.tipo.toLowerCase() === 'achado' ? 'green' : 'red'} class="mt-2">
       {objeto.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
     </Badge>
     <Badge color="gray" class="mt-2">{dictCategorias[objeto.categoria]}</Badge>
   </div>
+
+  <!-- Título e descrição -->
   <Heading tag="h2" class="mt-2 text-2xl font-bold">{objeto.nome}</Heading>
   <P class="text-gray-700 dark:text-gray-400">{objeto.descricao}</P>
+
+  <!-- Tabela de informações detalhadas -->
   <ObjetoTable>
+    <!-- Data de registro -->
     <Row
       key="Postado:"
       value={`${new Date(objeto.data_registro + 'Z').toLocaleDateString('pt-BR')} às ${new Date(
@@ -28,6 +36,7 @@
       icon={Calendar}
     />
 
+    <!-- Tutor/dono do objeto (clicável para ver perfil) -->
     <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" icon={AtSign}>
       {#if onOpenProfile}
         <button
@@ -43,10 +52,15 @@
       {/if}
     </Row>
 
+    <!-- Localidade onde foi encontrado/perdido -->
     <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local_ocorrencia]} icon={MapPin} />
+
+    <!-- Local de armazenamento (apenas para achados) -->
     {#if objeto.tipo === 'achado'}
       <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />
     {/if}
+
+    <!-- Status do objeto -->
     <Row
       key="Status:"
       value={objeto.status.toLowerCase() !== 'aberto'
@@ -60,6 +74,8 @@
           : CheckCircle
         : Play}
     />
+
+    <!-- Motivo da finalização (se finalizado) -->
     {#if objeto.status?.toLowerCase() === 'finalizado' && objeto.motivo_finalizacao}
       <Row key="Motivo da finalização:" value={objeto.motivo_finalizacao} icon={FileText} />
     {/if}

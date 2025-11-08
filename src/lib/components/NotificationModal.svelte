@@ -2,15 +2,22 @@
   import { getNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '$lib/api/notifications';
   import { notificationActions, notifications, unreadCount } from '$lib/stores/notifications';
   import { Badge, Button, Modal } from 'flowbite-svelte';
-  import { Bell, BellOff, Check, Info, X } from 'lucide-svelte';
+  import { Bell, BellOff, Check, Info } from 'lucide-svelte';
 
   let { open = $bindable(), session = $bindable() } = $props();
 
   let showOnlyUnread = $state(false);
   let loading = $state(false);
 
-  // Busca notificações do servidor
-  async function fetchNotifications() {
+  // Filtra e ordena notificações
+  const filteredNotifications = $derived($notifications.filter((notification) => !showOnlyUnread || !notification.delivered));
+
+  const sortedNotifications = $derived(
+    [...filteredNotifications].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  );
+
+  /** Busca notificações do servidor */
+  const fetchNotifications = async () => {
     if (!session?.access_token) return;
     loading = true;
     try {
@@ -21,56 +28,40 @@
     } finally {
       loading = false;
     }
-  }
+  };
 
-  // Usar apenas ícone e cor informativos
-  const Icon = Info;
-
-  // Filtra notificações baseado no estado
-  const filteredNotifications = $derived($notifications.filter((notification) => !showOnlyUnread || !notification.delivered));
-
-  // Ordena por created_at (mais recentes primeiro)
-  const sortedNotifications = $derived(
-    [...filteredNotifications].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-  );
-
-  async function markAsRead(notificationId: string) {
+  /** Marca notificação individual como lida */
+  const markAsRead = async (notificationId: string) => {
     if (!session?.access_token) return;
 
-    // Chama a API primeiro
     const success = await markNotificationAsRead(notificationId, session.access_token);
 
     if (success) {
-      // Atualiza localmente após sucesso
       notificationActions.markAsRead(notificationId);
-
-      // Recarrega notificações do servidor para sincronizar
       await fetchNotifications();
     } else {
       console.error('Erro ao marcar notificação como lida');
       alert('Erro ao marcar notificação como lida. Tente novamente.');
     }
-  }
+  };
 
-  async function markAllAsRead() {
+  /** Marca todas as notificações como lidas */
+  const markAllAsRead = async () => {
     if (!session?.access_token) return;
 
-    // Chama a API primeiro
     const success = await markAllNotificationsAsRead(session.access_token);
 
     if (success) {
-      // Atualiza localmente após sucesso
       notificationActions.markAllAsRead();
-
-      // Recarrega notificações do servidor para sincronizar
       await fetchNotifications();
     } else {
       console.error('Erro ao marcar todas as notificações como lidas');
       alert('Erro ao marcar todas as notificações como lidas. Tente novamente.');
     }
-  }
+  };
 
-  function formatTimestamp(timestamp: string): string {
+  /** Formata timestamp para exibição relativa */
+  const formatTimestamp = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
@@ -82,15 +73,14 @@
       const hours = Math.floor(diffInHours);
       return `há ${hours} hora${hours !== 1 ? 's' : ''}`;
     } else if (diffInHours < 168) {
-      // 7 dias
       const days = Math.floor(diffInHours / 24);
       return `há ${days} dia${days !== 1 ? 's' : ''}`;
     } else {
       return date.toLocaleDateString('pt-BR');
     }
-  }
+  };
 
-  // Carrega notificações quando o modal abre
+  // Carrega notificações ao abrir modal
   $effect(() => {
     if (open && session?.access_token) {
       fetchNotifications();
@@ -99,7 +89,6 @@
 </script>
 
 <Modal bind:open size="xl" class="w-full max-w-4xl" dismissable={true} outsideclose={true}>
-  <!-- <div slot="header" class="flex items-center justify-between"> -->
   {#snippet header()}
     <div class="flex items-center justify-between gap-4">
       <div>
@@ -123,7 +112,7 @@
   {/snippet}
 
   <div class="space-y-4">
-    <!-- Filtros -->
+    <!-- Filtro de visualização -->
     <div class="flex gap-2">
       <Button
         color={showOnlyUnread ? 'blue' : 'light'}
@@ -151,6 +140,7 @@
           </div>
         </div>
       {:else if sortedNotifications.length === 0}
+        <!-- Estado vazio -->
         <div class="py-12 text-center">
           <div class="flex flex-col items-center gap-4">
             <Bell class="h-16 w-16 text-gray-400" />
@@ -165,6 +155,7 @@
           </div>
         </div>
       {:else}
+        <!-- Lista de notificações -->
         <div class="space-y-3">
           {#each sortedNotifications as notification (notification.id)}
             <div
@@ -173,12 +164,12 @@
                 : ''}"
             >
               <div class="flex items-start gap-3">
-                <!-- Ícone -->
+                <!-- Ícone da notificação -->
                 <div class="mt-1 flex-shrink-0">
-                  <Icon class="h-5 w-5 text-blue-500" />
+                  <Info class="h-5 w-5 text-blue-500" />
                 </div>
 
-                <!-- Conteúdo -->
+                <!-- Conteúdo da notificação -->
                 <div class="min-w-0 flex-1">
                   <div class="flex items-start justify-between gap-2">
                     <div class="flex-1">

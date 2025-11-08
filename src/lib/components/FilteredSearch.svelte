@@ -5,8 +5,9 @@
   import { CloseOutline, FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
   import { scale } from 'svelte/transition';
 
-  let { divClass, query }: { divClass?: string; query?: any } = $props();
+  let { query = undefined } = $props();
 
+  // Mapeia dicionários para opções de seleção
   let locations: { value: ObjetoLocalidade; name: string }[] = Object.entries(dictLocalidades).map(([value, name]) => ({
     value: value as ObjetoLocalidade,
     name
@@ -22,6 +23,7 @@
     label
   }));
 
+  // Estado dos filtros
   let modal = $state(false);
   let search = $state(query?.search ?? '');
   let localidade = $state<string[]>(query?.localidade ?? []);
@@ -30,7 +32,8 @@
   let inativo = $state(query?.inativo ?? false);
   let tutela = $state(query?.usuario ? true : false);
 
-  function removeEmptyFields(obj: Record<string, any>): Record<string, any> {
+  /** Remove campos vazios do objeto de filtros */
+  const removeEmptyFields = (obj: Record<string, any>): Record<string, any> => {
     return Object.fromEntries(
       Object.entries(obj)
         .filter(([_, v]) => {
@@ -44,10 +47,11 @@
           return true;
         })
     );
-  }
+  };
 </script>
 
 <div role="search" aria-label="Busca avançada" class="w-full max-w-full">
+  <!-- Botão de busca principal -->
   <button
     type="button"
     class="flex h-12 w-full items-center text-white [&>span]:h-full"
@@ -55,6 +59,7 @@
       modal = true;
     }}
   >
+    <!-- Ícone de filtro -->
     <span
       class="
         content-center rounded-s-lg border border-e-0
@@ -65,6 +70,7 @@
       <FilterOutline class="my-0.5 h-6 w-6" />
     </span>
 
+    <!-- Campo de busca (visual) -->
     <span
       class="
         flex w-full min-w-0 cursor-text items-center gap-2 border border-solid
@@ -82,6 +88,7 @@
       </span>
     </span>
 
+    <!-- Ícone de busca -->
     <span
       class="
         content-center rounded-e-lg
@@ -93,6 +100,7 @@
     </span>
   </button>
 
+  <!-- Modal de busca avançada -->
   <Modal
     class="w-11/12 shadow-2xl shadow-black backdrop:bg-transparent backdrop:backdrop-blur-sm"
     form
@@ -126,7 +134,9 @@
     {#snippet header()}
       <Heading tag="h5" class="text-center">Pesquisa filtrada</Heading>
     {/snippet}
+
     <div class="flex flex-col gap-4">
+      <!-- Campo de busca textual -->
       <div>
         <Label for="search">Pesquisa por termo, descrição, andar, sala, etc</Label>
         <Input
@@ -139,6 +149,8 @@
             dark:not-[:placeholder-shown]:outline-primary-600!"
         />
       </div>
+
+      <!-- Filtro de tipo (achado/perdido) -->
       <div>
         <Label>Tipo de objeto</Label>
         <div class="grid grid-cols-2 flex-row text-center [&>label]:rounded-none [&>label]:first:rounded-l-lg [&>label]:last:rounded-r-lg">
@@ -158,6 +170,8 @@
           {/each}
         </div>
       </div>
+
+      <!-- Filtro de localidade -->
       <div>
         <Label for="localidade">Prédio/Localidade</Label>
         <MultiSelect
@@ -170,6 +184,8 @@
         />
         <Helper>Selecione uma ou mais localidades</Helper>
       </div>
+
+      <!-- Filtro de categoria -->
       <div>
         <Label>Categoria(s)</Label>
         <div class="my-1 flex flex-wrap justify-center gap-x-2 gap-y-2 text-center">
@@ -197,6 +213,8 @@
         </div>
         <Helper>Selecione uma ou mais categorias</Helper>
       </div>
+
+      <!-- Toggle para incluir objetos inativos -->
       <div class="flex items-center justify-between">
         <Label for="inativo">
           Incluir objetos inativos
@@ -204,6 +222,8 @@
         </Label>
         <Toggle id="inativo" color="primary" class="px-1" bind:checked={inativo} />
       </div>
+
+      <!-- Toggle para filtrar objetos em acompanhamento -->
       <div class="flex items-center justify-between">
         <Label for="tutela">
           Apenas objetos acompanhados
@@ -212,6 +232,7 @@
         <Toggle id="tutela" color="primary" class="px-1" bind:checked={tutela} />
       </div>
     </div>
+
     {#snippet footer()}
       <div class="flex w-full justify-end">
         <Button type="submit" value="submit">Pesquisar</Button>

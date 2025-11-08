@@ -10,7 +10,8 @@
   let claimAttachFiles: FileList | null = $state(null);
   let claimSubmiting = $state(false);
 
-  function handleFileSelect(e: Event) {
+  /** Valida arquivos selecionados (máximo 5 arquivos, 5MB cada) */
+  const handleFileSelect = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const files = target.files;
 
@@ -31,9 +32,10 @@
       }
       claimAttachFiles = files;
     }
-  }
+  };
 
-  function handleRemoveFile(i: number) {
+  /** Remove arquivo da lista de anexos */
+  const handleRemoveFile = (i: number) => {
     if (!claimAttachFiles) return;
 
     const dataTransfer = new DataTransfer();
@@ -44,8 +46,9 @@
     }
     claimAttachFiles = dataTransfer.files;
     (document.getElementById('fileInput') as HTMLInputElement).files = claimAttachFiles;
-  }
+  };
 
+  // Reseta estado de submissão quando há erro
   $effect(() => {
     if (error) {
       claimSubmiting = false;
@@ -79,6 +82,7 @@
       };
     }}
   >
+    <!-- Campo de descrição da reivindicação -->
     <div>
       <Label>
         Descreva por que você acredita que o objeto é seu <span class="text-red-400">*</span>
@@ -91,10 +95,13 @@
         />
       </Label>
     </div>
+
+    <!-- Upload de evidências (opcional) -->
     <div>
       <Label for="fileInput">Anexe documentos comprobatórios (opcional)</Label>
 
       <div class="flex flex-col">
+        <!-- Área de drag-and-drop -->
         <div
           class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
@@ -112,6 +119,7 @@
           </span>
         </div>
 
+        <!-- Lista de arquivos anexados -->
         <div class="mt-2 flex flex-col">
           {#each claimAttachFiles as file, i}
             <div class="mb-1 flex items-center justify-between rounded bg-gray-100 p-2 dark:bg-gray-600">
@@ -132,6 +140,7 @@
       </div>
     </div>
 
+    <!-- Mensagem de erro -->
     {#if error}
       <Alert color="red">
         Erro ao enviar reivindicação:
@@ -143,6 +152,7 @@
       </Alert>
     {/if}
 
+    <!-- Botões de ação -->
     <div class="flex shrink-0 items-center space-x-3 rounded-b-lg p-4 md:p-5 rtl:space-x-reverse">
       <div class="flex w-full justify-end">
         <Button type="submit" value="submit" disabled={claimSubmiting || claimDescricao?.trim().length === 0}>Cadastrar</Button>

@@ -30,31 +30,31 @@
     onclick?: (() => void) | undefined;
   } = $props();
 
+  // Executa onclick e fecha menu mobile
   function handleClick(event: Event) {
     if (onclick) {
       event.preventDefault();
 
-      // Fecha o menu hambúrguer se estiver aberto
       const navList = document.getElementById('the-nav-list');
       if (navList && !navList.classList.contains('hidden')) {
         navList.classList.add('hidden');
       }
 
-      // Executa a função de clique personalizada
       onclick();
     }
   }
 </script>
 
+<!-- Toggle de tema claro/escuro -->
 {#if themeToggle}
   <li class="not-md:w-full">
     <DarkMode
       {id}
       class="
-				flex w-full content-center rounded-sm hover:bg-gray-300 
-				md:rounded-full dark:hover:bg-gray-700 [&>*]:mx-auto
-				[&>*]:w-full md:[&>*]:w-min
-			"
+        flex w-full content-center rounded-sm hover:bg-gray-300 
+        md:rounded-full dark:hover:bg-gray-700 [&>*]:mx-auto
+        [&>*]:w-full md:[&>*]:w-min
+      "
     >
       {#snippet lightIcon()}
         <div class="flex content-between justify-between px-1">
@@ -72,70 +72,28 @@
       {/snippet}
     </DarkMode>
   </li>
-{:else if !sep}
-  {#if onclick}
-    <!-- Item com onclick personalizado -->
-    <li class="not-md:w-full">
-      <button
-        type="button"
-        onclick={handleClick}
-        class="
-          flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-gray-900 hover:bg-gray-100
-          dark:text-white dark:hover:bg-gray-700
-          {green ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!' : ''}
-          {red ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!' : ''}
-          {extraClass}
-        "
-      >
-        {#if icon}
-          {#if Array.isArray(icon)}
-            <span class="relative me-2 inline-flex h-5 w-5 shrink-0 items-center justify-center">
-              {#each icon as ic, i}
-                {@const IconComponent = ic}
-                <IconComponent class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0" />
-              {/each}
-              {#if badgeCount > 0}
-                <span
-                  class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
-                >
-                  {badgeCount > 99 ? '99+' : badgeCount}
-                </span>
-              {/if}
-            </span>
-          {:else}
-            {@const Icon = icon}
-            <span class="relative me-2 inline-flex h-5 w-5 shrink-0 items-center justify-center">
-              <Icon class="h-5 w-5" />
-              {#if badgeCount > 0}
-                <span
-                  class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
-                >
-                  {badgeCount > 99 ? '99+' : badgeCount}
-                </span>
-              {/if}
-            </span>
-          {/if}
-        {/if}
 
-        <!-- texto central no mobile com fallback de espaço do lado direito -->
-        <span class="flex-1 text-center md:text-left">{@render children()}</span>
+  <!-- Separador visual -->
+{:else if sep}
+  <li>
+    <TheNavSep />
+  </li>
 
-        <!-- espaçador invisível no mobile pra simetria com o ícone à esquerda -->
-        <span class="h-5 w-5 opacity-0 md:hidden"></span>
-      </button>
-    </li>
-  {:else}
-    <!-- Item com href normal -->
-    <NavLi
-      {href}
+  <!-- Item de navegação com onclick customizado -->
+{:else if onclick}
+  <li class="not-md:w-full">
+    <button
+      type="button"
+      onclick={handleClick}
       class="
-        flex w-full items-center justify-between
-        not-md:w-full
+        flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-gray-900 hover:bg-gray-100
+        dark:text-white dark:hover:bg-gray-700
         {green ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!' : ''}
         {red ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!' : ''}
         {extraClass}
       "
     >
+      <!-- Ícone(s) com badge de contagem opcional -->
       {#if icon}
         {#if Array.isArray(icon)}
           <span class="relative me-2 inline-flex h-5 w-5 shrink-0 items-center justify-center">
@@ -166,15 +124,61 @@
         {/if}
       {/if}
 
-      <!-- texto central no mobile com fallback de espaço do lado direito -->
+      <!-- Texto centralizado (mobile) / alinhado à esquerda (desktop) -->
       <span class="flex-1 text-center md:text-left">{@render children()}</span>
 
-      <!-- espaçador invisível no mobile pra simetria com o ícone à esquerda -->
+      <!-- Espaçador invisível para simetria no mobile -->
       <span class="h-5 w-5 opacity-0 md:hidden"></span>
-    </NavLi>
-  {/if}
-{:else}
-  <li>
-    <TheNavSep />
+    </button>
   </li>
+
+  <!-- Item de navegação padrão com href -->
+{:else}
+  <NavLi
+    {href}
+    class="
+      flex w-full items-center justify-between
+      not-md:w-full
+      {green ? 'hover:bg-green-500! hover:text-white! dark:hover:bg-green-500! dark:hover:text-white!' : ''}
+      {red ? 'hover:bg-secondary-500! hover:text-white! dark:hover:bg-secondary-500! dark:hover:text-white!' : ''}
+      {extraClass}
+    "
+  >
+    <!-- Ícone(s) com badge de contagem opcional -->
+    {#if icon}
+      {#if Array.isArray(icon)}
+        <span class="relative me-2 inline-flex h-5 w-5 shrink-0 items-center justify-center">
+          {#each icon as ic, i}
+            {@const IconComponent = ic}
+            <IconComponent class="absolute {i === 0 ? 'top-1 h-5 w-6' : '-top-1 m-auto h-4 w-4'} right-0" />
+          {/each}
+          {#if badgeCount > 0}
+            <span
+              class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+            >
+              {badgeCount > 99 ? '99+' : badgeCount}
+            </span>
+          {/if}
+        </span>
+      {:else}
+        {@const Icon = icon}
+        <span class="relative me-2 inline-flex h-5 w-5 shrink-0 items-center justify-center">
+          <Icon class="h-5 w-5" />
+          {#if badgeCount > 0}
+            <span
+              class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+            >
+              {badgeCount > 99 ? '99+' : badgeCount}
+            </span>
+          {/if}
+        </span>
+      {/if}
+    {/if}
+
+    <!-- Texto centralizado (mobile) / alinhado à esquerda (desktop) -->
+    <span class="flex-1 text-center md:text-left">{@render children()}</span>
+
+    <!-- Espaçador invisível para simetria no mobile -->
+    <span class="h-5 w-5 opacity-0 md:hidden"></span>
+  </NavLi>
 {/if}

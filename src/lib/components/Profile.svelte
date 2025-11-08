@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button, Heading, Modal, P } from 'flowbite-svelte';
+  import { Button, Heading, Modal, P } from 'flowbite-svelte';
   import { FacebookSolid, InstagramSolid, WhatsappSolid, XSolid } from 'flowbite-svelte-icons';
   import { Check, Copy, ExternalLink, Mail } from 'lucide-svelte';
 
@@ -11,12 +11,11 @@
 
   let { user, open = $bindable(false), onclose }: Props = $props();
 
-  // Estado dos botões de cópia para feedback visual
   let copiedStates = $state<Record<string, boolean>>({});
 
   type ContactType = 'email' | 'whatsapp' | 'instagram' | 'x' | 'facebook' | 'outro';
 
-  // Configuração dos tipos de contato: ícones, labels e URLs
+  /** Configuração de cada tipo de contato (ícone, label, URL) */
   const contactConfig: Record<
     ContactType,
     {
@@ -64,7 +63,7 @@
     }
   };
 
-  // Processa contatos do usuário com configurações de exibição
+  /** Processa contatos do usuário com configs de exibição */
   let processedContacts = $derived(
     user?.contato
       ?.filter((contact) => contact.valor && contact.valor.trim() !== '')
@@ -79,19 +78,18 @@
       })
   );
 
-  // Copia texto para clipboard com feedback visual
+  /** Copia para clipboard com feedback visual */
   const copyToClipboard = async (text: string, contactId: string) => {
     try {
       await navigator.clipboard.writeText(text);
       copiedStates[contactId] = true;
 
-      // Reset visual após 2 segundos
       setTimeout(() => {
         copiedStates[contactId] = false;
       }, 2000);
     } catch (error) {
       console.error('Erro ao copiar:', error);
-      // Fallback para navegadores sem Clipboard API
+      // Fallback para navegadores antigos
       const textArea = document.createElement('textarea');
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -106,13 +104,14 @@
     }
   };
 
-  // Abre link em nova aba com segurança
+  /** Abre link em nova aba */
   const openLink = (url: string) => {
     if (url !== '#') {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
+  /** Fecha o modal */
   const closeModal = () => {
     onclose?.();
   };
@@ -120,7 +119,7 @@
 
 <Modal bind:open onclose={closeModal} size="md" class="w-full">
   {#snippet header()}
-    <!-- Header com avatar e informações básicas -->
+    <!-- Avatar e informações do usuário -->
     <div class="flex items-center space-x-3">
       <div class="flex-shrink-0">
         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
@@ -142,12 +141,14 @@
     {#if processedContacts?.length > 0}
       <div>
         <Heading tag="h4" class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Contatos</Heading>
-        <!-- Lista de contatos com ações (copiar/abrir) -->
+
+        <!-- Lista de contatos -->
         <div class="space-y-3 text-gray-900 dark:text-gray-100">
           {#each processedContacts as contact (contact.id)}
             <div
               class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
             >
+              <!-- Informações do contato -->
               <div class="flex min-w-0 flex-grow items-center space-x-3 px-1">
                 <contact.config.icon class="h-4 w-4" />
                 <span class="max-w-[200px] truncate" title={contact.displayValue}>
@@ -155,8 +156,8 @@
                 </span>
               </div>
 
+              <!-- Ações (abrir link + copiar) -->
               <div class="flex flex-shrink-0 items-center space-x-2">
-                <!-- Link externo (se aplicável) -->
                 {#if contact.url !== '#'}
                   <Button
                     size="xs"
@@ -170,7 +171,7 @@
                   </Button>
                 {/if}
 
-                <!-- Botão copiar com estado visual -->
+                <!-- Botão copiar com feedback -->
                 <Button
                   size="xs"
                   color={copiedStates[contact.id] ? 'green' : 'gray'}
@@ -206,7 +207,6 @@
 </Modal>
 
 <style>
-  /* Truncate responsivo para contatos longos */
   :global(.truncate) {
     overflow: hidden;
     text-overflow: ellipsis;

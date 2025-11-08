@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals: { session, supabase } }) =>
 };
 
 export const actions: Actions = {
-  // Atualiza informações do perfil (nome, username, contatos)
+  /** Atualiza informações do perfil (nome, username, contatos) */
   updateProfile: async ({ request, locals: { session, supabase } }) => {
     if (!session) {
       return {
@@ -109,7 +109,7 @@ export const actions: Actions = {
     }
   },
 
-  // Alteração de senha via Supabase Auth
+  /** Alteração de senha via Supabase Auth */
   changePassword: async ({ request, locals: { session, supabase } }) => {
     if (!session) {
       return {

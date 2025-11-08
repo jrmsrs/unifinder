@@ -1,5 +1,6 @@
 import type { PageLoad } from './$types';
 
+/** Busca o perfil do usuário autenticado */
 const fetchUserProfile = async () => {
   return {
     name: 'John Doe',

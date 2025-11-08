@@ -5,17 +5,15 @@ import { sequence } from '@sveltejs/kit/hooks';
 
 const supabase: Handle = async ({ event, resolve }) => {
   /**
-   * Creates a Supabase client specific to this server request.
-   *
-   * The Supabase client gets the Auth token from the request cookies.
+   * Cria um cliente Supabase específico para esta requisição de servidor.
+   * O cliente Supabase obtém o token de autenticação dos cookies da requisição.
    */
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
       /**
-       * SvelteKit's cookies API requires `path` to be explicitly set in
-       * the cookie options. Setting `path` to `/` replicates previous/
-       * standard behavior.
+       * A API de cookies do SvelteKit requer que `path` seja definido explicitamente nas
+       * opções do cookie. Definir `path` como `/` replica o comportamento anterior/padrão.
        */
       setAll: (cookiesToSet) => {
         cookiesToSet.forEach(({ name, value, options }) => {
@@ -26,9 +24,11 @@ const supabase: Handle = async ({ event, resolve }) => {
   });
 
   /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
+   * Função auxiliar para obter a sessão autenticada com validação de JWT.
+   *
+   * Diferente de `supabase.auth.getSession()`, que retorna a sessão _sem_
+   * validar o JWT, esta função também chama `getUser()` para validar o
+   * JWT antes de retornar a sessão.
    */
   event.locals.safeGetSession = async () => {
     const {
@@ -43,7 +43,7 @@ const supabase: Handle = async ({ event, resolve }) => {
       error
     } = await event.locals.supabase.auth.getUser();
     if (error) {
-      // JWT validation has failed
+      // Validação de JWT falhou
       return { session: null, user: null };
     }
     // @ts-expect-error: user property may not be optional in type definition
@@ -55,8 +55,8 @@ const supabase: Handle = async ({ event, resolve }) => {
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
       /**
-       * Supabase libraries use the `content-range` and `x-supabase-api-version`
-       * headers, so we need to tell SvelteKit to pass it through.
+       * Bibliotecas Supabase usam os cabeçalhos `content-range` e `x-supabase-api-version`,
+       * então precisamos informar ao SvelteKit para passá-los.
        */
       return name === 'content-range' || name === 'x-supabase-api-version';
     }
@@ -66,9 +66,9 @@ const supabase: Handle = async ({ event, resolve }) => {
 const protectedRoutes: Array<(route: { pathname: string; searchParams: URLSearchParams }) => boolean> = [
   ({ pathname }) => pathname.startsWith('/private'),
   ({ pathname, searchParams }) => pathname === '/objetos' && searchParams.has('new')
-  // ...
 ];
 
+/** Guarda de autenticação para rotas protegidas */
 export const authGuard: Handle = async ({ event, resolve }) => {
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;

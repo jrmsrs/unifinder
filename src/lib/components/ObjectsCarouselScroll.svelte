@@ -9,9 +9,10 @@
   id={right ? 'scroll-right' : 'scroll-left'}
   aria-hidden="true"
   tabindex={-1}
-  class="h-64 w-20 rounded-none bg-transparent! focus-within:ring-0 {right
-    ? 'ps-12 pe-0'
-    : 'ps-0 pe-12'} text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+  class="
+    h-64 w-20 rounded-none bg-transparent! focus-within:ring-0 
+    {right ? 'ps-12 pe-0' : 'ps-0 pe-12'} text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800
+  "
   onclick={() => {
     const container = document.getElementById(carouselId);
     if (container) {

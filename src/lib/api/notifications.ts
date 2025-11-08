@@ -1,6 +1,8 @@
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
 
-// Interface baseada no formato da API
+/**
+ * Interface baseada no formato da API
+ */
 export interface Notification {
   id: string;
   message: string;
@@ -9,7 +11,9 @@ export interface Notification {
   delivered: boolean;
 }
 
-// Interface para a resposta da API de listagem
+/**
+ * Interface para a resposta da API de listagem
+ */
 export interface NotificationsResponse {
   items: Notification[];
   total: number;
@@ -23,9 +27,7 @@ const baseNotificationsApiURL = new URL('/notifys', PUBLIC_API_BASE_URL);
 /**
  * Busca notificações do usuário
  */
-export const getNotifications = async (
-  params?: { page?: number; size?: number; token?: string }
-): Promise<NotificationsResponse> => {
+export const getNotifications = async (params?: { page?: number; size?: number; token?: string }): Promise<NotificationsResponse> => {
   const dataTransformed = new URLSearchParams();
   if (params?.page) dataTransformed.append('page', params.page.toString());
   if (params?.size) dataTransformed.append('size', params.size.toString());
@@ -69,13 +71,10 @@ export const getNotifications = async (
 /**
  * Marca uma notificação como lida
  */
-export const markNotificationAsRead = async (
-  notificationId: string,
-  token: string
-): Promise<boolean> => {
+export const markNotificationAsRead = async (notificationId: string, token: string): Promise<boolean> => {
   try {
     const url = `${baseNotificationsApiURL}/${notificationId}/mark-as-read`;
-    
+
     const res = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -104,7 +103,7 @@ export const markNotificationAsRead = async (
 export const markAllNotificationsAsRead = async (token: string): Promise<boolean> => {
   try {
     const url = `${baseNotificationsApiURL}/mark-all-as-read`;
-    
+
     const res = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -126,4 +125,3 @@ export const markAllNotificationsAsRead = async (token: string): Promise<boolean
     return false;
   }
 };
-

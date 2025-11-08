@@ -15,7 +15,9 @@
 </script>
 
 <div class="m-auto flex flex-col items-center p-4 [&>*]:my-4 [&>*>hr]:max-w-64 [&>hr]:w-full [&>hr]:max-w-64">
+  <!-- Grid de objetos -->
   <div class="mb-4 grid w-full max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <!-- Cabeçalho com filtros -->
     <div class="g col-span-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <Heading class="col-span-1 lg:col-span-2 xl:col-span-3" tag="h4">
         Lista de Objetos
@@ -23,7 +25,9 @@
       </Heading>
       <FilteredSearch query={data.query}></FilteredSearch>
     </div>
+
     {#await data.streamed.objetos}
+      <!-- Skeleton loader responsivo -->
       {#each Array.from({ length: 4 }) as _, i}
         <Skeleton card={64} paragraphSize={2} class={i === 2 ? 'hidden lg:flex' : i === 3 ? 'hidden xl:flex' : ''} />
       {/each}
@@ -35,6 +39,8 @@
               <ImageLoader src={obj.url_imagem} alt={obj.nome} class="h-64" />
               <Heading tag="h5" class="line-clamp-1">{obj.nome}</Heading>
               <P class="line-clamp-1">{obj.descricao}</P>
+
+              <!-- Badges de status (tipo, reivindicação, finalizado) -->
               <div class="absolute top-8 left-1/2 flex -translate-x-1/2 [&>*]:mx-0.5">
                 <Badge color={obj.tipo.toLowerCase() === 'achado' ? 'green' : 'red'}>
                   {obj.tipo.toLowerCase() === 'achado' ? 'Achado' : 'Perdido'}
@@ -46,6 +52,8 @@
                   <Badge color="gray">Finalizado</Badge>
                 {/if}
               </div>
+
+              <!-- Informações do objeto (localidade, tutor, data) -->
               <div class="grid grid-cols-3 gap-1 break-all [&>*]:line-clamp-1 [&>*]:text-sm">
                 <P class="col-span-2">
                   <MapPin class="mb-1 inline-block h-4 w-4" />
@@ -80,6 +88,7 @@
 
 <Hr />
 
+<!-- Call-to-action para criar novo objeto -->
 <div class="m-auto mb-8 flex max-w-3xl flex-col items-center gap-4 p-4">
   <P class="text-center text-lg">
     {data.query?.tipo
@@ -100,6 +109,7 @@
   </Button>
 </div>
 
+<!-- Modal de criação de objeto -->
 <ObjetoModalNew bind:new={newObjeto} form={data.form} query={data.query} error={data.error} />
 
 <DevInfo

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
-  import { Button, Card, Badge, Alert, Heading, P, Modal, Hr } from 'flowbite-svelte';
-  import { Check, X, FileImage, Clock, CheckCircle2, AlertCircle } from 'lucide-svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
+  import { Alert, Badge, Button, Card, Heading, Hr, Modal, P } from 'flowbite-svelte';
+  import { AlertCircle, Check, CheckCircle2, Clock, FileImage, X } from 'lucide-svelte';
 
   let { data, form } = $props();
 
@@ -24,7 +24,7 @@
     objeto?: Objeto;
   };
 
-  // Carrega claims de ambas as fontes
+  /** Busca paralela de claims (pendentes para aprovar + minhas reivindicações) */
   const claimsData = $derived(async () => {
     const [claimsForApproval, myClaims] = await Promise.all([data.streamed.claimsForApproval, data.streamed.myClaims]);
 
@@ -34,18 +34,21 @@
     };
   });
 
+  /** Abre o modal para visualizar ou aprovar uma reivindicação */
   function openModal(claim: Claim, forApproval: boolean = false) {
     selectedClaim = claim;
     isClaimForApproval = forApproval;
     showModal = true;
   }
 
+  /** Fecha o modal de detalhes da reivindicação */
   function closeModal() {
     showModal = false;
     selectedClaim = null;
     isClaimForApproval = false;
   }
 
+  /** Formata a data para exibição */
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', {
@@ -57,6 +60,7 @@
     });
   }
 
+  /** Retorna a cor do badge com base no status da reivindicação */
   function getStatusBadgeColor(status: ClaimStatus): 'green' | 'red' | 'yellow' | 'gray' {
     const normalized = status.toLowerCase() as ClaimStatus;
     switch (normalized) {
@@ -71,6 +75,7 @@
     }
   }
 
+  /** Retorna o texto do status da reivindicação */
   function getStatusText(status: ClaimStatus): string {
     const normalized = status.toLowerCase() as ClaimStatus;
     switch (normalized) {
@@ -84,20 +89,15 @@
         return status;
     }
   }
-
-  // Componente para renderizar claim card (mobile)
-  function ClaimCardMobile(claim: Claim, canApprove: boolean = false) {
-    return { claim, canApprove };
-  }
 </script>
 
 <svelte:head>
   <title>Reivindicações - UniFinder</title>
 </svelte:head>
 
-<!-- Mobile First Layout -->
+<!-- Layout Mobile -->
 <div class="min-h-screen bg-gray-50 lg:hidden dark:bg-gray-900">
-  <!-- Header Mobile -->
+  <!-- Header fixo -->
   <div class="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
     <div class="flex items-center justify-between">
       <div>
@@ -106,7 +106,6 @@
     </div>
   </div>
 
-  <!-- Conteúdo -->
   <div class="space-y-6 px-4 py-4">
     {#await claimsData()}
       <div class="space-y-3">
@@ -115,7 +114,7 @@
         {/each}
       </div>
     {:then { my, toApprove }}
-      <!-- Seção: Para Aprovar -->
+      <!-- Claims pendentes de aprovação (tutor) -->
       <div>
         <div class="mb-3 flex items-center gap-2">
           <AlertCircle class="h-5 w-5 text-orange-500" />
@@ -187,7 +186,7 @@
 
       <Hr />
 
-      <!-- Seção: Minhas Reivindicações -->
+      <!-- Minhas reivindicações (usuário) -->
       <div>
         <div class="mb-3 flex items-center gap-2">
           <CheckCircle2 class="h-5 w-5 text-blue-500" />
@@ -262,10 +261,9 @@
   </div>
 </div>
 
-<!-- Desktop Layout (hidden on mobile) -->
+<!-- Layout Desktop -->
 <div class="hidden lg:block">
   <div class="container mx-auto max-w-6xl px-4 py-6">
-    <!-- Desktop Header -->
     <div class="mb-6">
       <h1 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Reivindicações</h1>
       <p class="text-sm text-gray-600 dark:text-gray-400">Gerencie suas reivindicações e as reivindicações que você precisa aprovar</p>
@@ -278,7 +276,7 @@
         {/each}
       </div>
     {:then { my, toApprove }}
-      <!-- Seção: Para Aprovar -->
+      <!-- Claims pendentes de aprovação -->
       <div class="mb-8">
         <div class="mb-4 flex items-center gap-2">
           <AlertCircle class="h-6 w-6 text-orange-500" />
@@ -348,7 +346,7 @@
 
       <Hr />
 
-      <!-- Seção: Minhas Reivindicações -->
+      <!-- Minhas reivindicações -->
       <div>
         <div class="mb-4 flex items-center gap-2">
           <CheckCircle2 class="h-6 w-6 text-blue-500" />
@@ -421,7 +419,7 @@
   </div>
 </div>
 
-<!-- Modal de detalhes -->
+<!-- Modal de detalhes da claim -->
 {#if selectedClaim && showModal}
   <Modal bind:open={showModal}>
     {#snippet header()}
@@ -429,7 +427,7 @@
     {/snippet}
 
     <div class="space-y-4">
-      <!-- Objeto -->
+      <!-- Informações do objeto -->
       {#if selectedClaim.objeto}
         <div>
           <h3 class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Objeto Reivindicado</h3>
@@ -458,13 +456,12 @@
         </div>
       {/if}
 
-      <!-- Descrição -->
       <div>
         <h3 class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Descrição</h3>
         <p class="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">{selectedClaim.descricao}</p>
       </div>
 
-      <!-- Evidências -->
+      <!-- Evidências anexadas -->
       {#if selectedClaim.evidencias && selectedClaim.evidencias.length > 0}
         <div>
           <h3 class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Evidências</h3>
@@ -476,13 +473,11 @@
         </div>
       {/if}
 
-      <!-- Data -->
       <div>
         <h3 class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Data da Ocorrência</h3>
         <p class="text-sm text-gray-700 dark:text-gray-300">{formatDate(selectedClaim.data_registro)}</p>
       </div>
 
-      <!-- Status -->
       <div>
         <h3 class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Status</h3>
         <Badge color={getStatusBadgeColor(selectedClaim.status)}>
@@ -491,6 +486,7 @@
       </div>
     </div>
 
+    <!-- Ações de aprovação/rejeição (apenas para tutores e claims pendentes) -->
     {#if isClaimForApproval && (selectedClaim.status === 'pendente' || selectedClaim.status === 'PENDENTE')}
       <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
         <form
@@ -524,6 +520,7 @@
   </Modal>
 {/if}
 
+<!-- Alertas de feedback -->
 {#if form?.error}
   <Alert color="red" dismissable class="fixed top-20 right-4 z-50">
     {form.error}

@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 
+/** Tipos permitidos para filtros de objetos */
 type query = {
   search?: string;
   tipo?: ObjetoTipo;
@@ -14,6 +15,7 @@ type query = {
   inativo?: true;
 };
 
+// Valores permitidos para filtros
 const allTipos: ObjetoTipo[] = ['achado', 'perdido'];
 
 const allLocals: ObjetoLocalidade[] = ['biblio', 'ru', 'ccetibio', 'cla', 'cch', 'ib', 'ccjp', 'intercampi', 'outro'];
@@ -30,11 +32,13 @@ const allCategorias: ObjetoCategoria[] = [
   'outro'
 ];
 
+/** Busca objetos com filtros opcionais */
 const fetchFilteredObjetos = async (query?: query) => {
   const objetos = await getObjetos({ ...query });
   return objetos;
 };
 
+/** Constrói query de objetos a partir dos parâmetros da URL */
 const buildObjetoQuery = (url: URL, email?: string): query => {
   const tipoUnf = url.searchParams.getAll('tipo').length > 0 ? url.searchParams.getAll('tipo') : undefined;
   const localidadeUnf = url.searchParams.getAll('localidade').length > 0 ? url.searchParams.getAll('localidade') : undefined;
@@ -62,6 +66,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   };
 };
 
+/** Esquema de validação para criação de objeto */
 const objetoSchema = z
   .object({
     tipo: z.enum(['achado', 'perdido'], { error: 'Selecione um tipo' }),
@@ -79,6 +84,7 @@ const objetoSchema = z
     image_url: z.string().optional()
   })
   .superRefine((data, ctx) => {
+    // Validação condicional: objetos achados devem ter local de encaminhamento
     if (data.tipo === 'achado') {
       if (!data.local_encaminhado || data.local_encaminhado === '') {
         ctx.addIssue({ code: 'custom', path: ['local_encaminhado'], message: 'Informe para onde o objeto foi encaminhado.' });
@@ -90,6 +96,7 @@ const objetoSchema = z
   });
 
 export const actions: Actions = {
+  /** Cria novo objeto */
   createObjeto: async ({ request, locals: { supabase, safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session) throw redirect(303, '/auth');
@@ -98,6 +105,7 @@ export const actions: Actions = {
     const formPayload = Object.fromEntries(formData);
     const validation = objetoSchema.safeParse(formPayload);
 
+    // Valida dados do formulário
     if (!validation.success) {
       console.error('Erro de validação:', validation.error);
       const { imagem_arquivo, ...rest } = formPayload;
@@ -112,9 +120,11 @@ export const actions: Actions = {
     const { imagem_arquivo, ...otherData } = validation.data;
     let imageUrl: string | null = null;
 
+    // Processa e faz upload da imagem (se fornecida)
     if (imagem_arquivo && imagem_arquivo.size > 0) {
       try {
         const imageBuffer = Buffer.from(await imagem_arquivo.arrayBuffer());
+        // Redimensiona e comprime imagem
         const processedImageBuffer = await sharp(imageBuffer).resize(800).jpeg({ quality: 70 }).toBuffer();
         const fileName = `${crypto.randomUUID()}.jpg`;
         const filePath = `${session.user?.id}/${fileName}`;
@@ -138,6 +148,7 @@ export const actions: Actions = {
       }
     }
 
+    // Define local de armazenamento (apenas para objetos achados)
     const localArmazenamento =
       otherData.tipo === 'achado'
         ? otherData.local_encaminhado === 'outro'
@@ -145,6 +156,7 @@ export const actions: Actions = {
           : otherData.local_encaminhado
         : null;
 
+    // Cria objeto via API
     const createdObjeto = await postObjeto(
       {
         tipo: otherData.tipo,
