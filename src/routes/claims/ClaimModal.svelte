@@ -17,6 +17,15 @@
     isClaimForApproval: boolean;
     onClose: () => void;
   } = $props();
+
+  /** Navega para a página do objeto associado à reivindicação */
+  const navigateToObjeto = () => {
+    if (claim?.objeto?.id) {
+      const objetoId = claim.objeto.id;
+      onClose();
+      goto(`/objetos/${objetoId}`);
+    }
+  };
 </script>
 
 {#if claim}
@@ -36,16 +45,7 @@
               <p class="font-medium text-gray-900 dark:text-white">{claim.objeto.nome}</p>
               <p class="text-sm text-gray-600 dark:text-gray-400">{claim.objeto.descricao}</p>
             </div>
-            <Button
-              size="xs"
-              color="primary"
-              onclick={() => {
-                onClose();
-                goto(`/objetos/${claim.objeto!.id}`);
-              }}
-            >
-              Ver objeto
-            </Button>
+            <Button size="xs" color="primary" onclick={navigateToObjeto}>Ver objeto</Button>
           </div>
         </div>
       {/if}
