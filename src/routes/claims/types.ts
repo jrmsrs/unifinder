@@ -1,4 +1,4 @@
-export type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
+export type ClaimStatus = 'pendente' | 'aprovado' | 'aprovada' | 'rejeitado' | 'concluida' | 'PENDENTE' | 'APROVADO' | 'APROVADA' | 'REJEITADO' | 'CONCLUIDA';
 
 export type Claim = {
   id: string;
@@ -25,15 +25,18 @@ export function formatDate(dateString: string): string {
 }
 
 /** Retorna a cor do badge com base no status da reivindicação */
-export function getStatusBadgeColor(status: ClaimStatus): 'green' | 'red' | 'yellow' | 'gray' {
-  const normalized = status.toLowerCase() as ClaimStatus;
+export function getStatusBadgeColor(status: ClaimStatus): 'green' | 'red' | 'yellow' | 'gray' | 'blue' {
+  const normalized = status.toLowerCase();
   switch (normalized) {
     case 'aprovado':
+    case 'aprovada':
       return 'green';
     case 'rejeitado':
       return 'red';
     case 'pendente':
       return 'yellow';
+    case 'concluida':
+      return 'blue';
     default:
       return 'gray';
   }
@@ -41,15 +44,30 @@ export function getStatusBadgeColor(status: ClaimStatus): 'green' | 'red' | 'yel
 
 /** Retorna o texto do status da reivindicação */
 export function getStatusText(status: ClaimStatus): string {
-  const normalized = status.toLowerCase() as ClaimStatus;
+  const normalized = status.toLowerCase();
   switch (normalized) {
     case 'aprovado':
-      return 'Aprovado';
+    case 'aprovada':
+      return 'Aprovada';
     case 'rejeitado':
       return 'Rejeitado';
     case 'pendente':
       return 'Pendente';
+    case 'concluida':
+      return 'Concluída';
     default:
       return status;
   }
+}
+
+/** Verifica se o status é aprovado/aprovada */
+export function isStatusAprovada(status: ClaimStatus): boolean {
+  const normalized = status.toLowerCase();
+  return normalized === 'aprovado' || normalized === 'aprovada';
+}
+
+/** Verifica se o status é concluída */
+export function isStatusConcluida(status: ClaimStatus): boolean {
+  const normalized = status.toLowerCase();
+  return normalized === 'concluida';
 }
