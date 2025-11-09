@@ -3,8 +3,8 @@
   import { goto } from '$app/navigation';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import { Badge, Button, Heading, Modal } from 'flowbite-svelte';
-  import { Check, X } from 'lucide-svelte';
-  import { formatDate, getStatusBadgeColor, getStatusText, type Claim } from './types';
+  import { Check, CheckCircle2, X } from 'lucide-svelte';
+  import { formatDate, getStatusBadgeColor, getStatusText, isStatusAprovada, isStatusConcluida, type Claim } from './types';
 
   let {
     claim,
@@ -109,6 +109,33 @@
             Aprovar
           </Button>
         </form>
+      </div>
+    {/if}
+
+    <!-- Ação de finalizar (apenas para usuário que abriu a reivindicação e claims aprovadas, não concluídas) -->
+    {#if !isClaimForApproval && isStatusAprovada(claim.status) && !isStatusConcluida(claim.status)}
+      <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+        <form
+          method="POST"
+          action="?/finalizeClaim"
+          use:enhance
+        >
+          <input type="hidden" name="claimId" value={claim.id} />
+          <Button type="submit" color="green" class="font-semibold shadow-sm">
+            <CheckCircle2 class="mr-2 h-4 w-4" />
+            Finalizar
+          </Button>
+        </form>
+      </div>
+    {/if}
+
+    <!-- Indicador de reivindicação concluída -->
+    {#if !isClaimForApproval && isStatusConcluida(claim.status)}
+      <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <CheckCircle2 class="h-5 w-5 text-blue-500" />
+          <span>Reivindicação finalizada com sucesso</span>
+        </div>
       </div>
     {/if}
   </Modal>

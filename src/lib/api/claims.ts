@@ -88,3 +88,23 @@ export const rejectClaim = async (claimId: string, token: string): Promise<boole
     return false;
   }
 };
+
+export const finalizeClaim = async (claimId: string, token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${baseURL}/${claimId}/finalizar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error finalizing claim:', response.status, response.statusText, errorText);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('API error finalizing claim:', error);
+    return false;
+  }
+};

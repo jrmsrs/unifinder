@@ -23,7 +23,7 @@ declare global {
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
 
   /** Tipo de status da reivindicação */
-  type ClaimStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'PENDENTE' | 'APROVADO' | 'REJEITADO';
+  type ClaimStatus = 'pendente' | 'aprovado' | 'aprovada' | 'rejeitado' | 'concluida' | 'PENDENTE' | 'APROVADO' | 'APROVADA' | 'REJEITADO' | 'CONCLUIDA';
 
   /** Tipo de papel do usuário */
   type UserRole = 'user' | 'admin' | 'funcionario';
