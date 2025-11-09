@@ -4,7 +4,7 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictCategorias, dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Badge, Heading, P } from 'flowbite-svelte';
-  import { AlertTriangle, AtSign, Calendar, CheckCircle, FileText, MapPin, Play } from 'lucide-svelte';
+  import { AlertTriangle, AtSign, Calendar, CheckCircle, FileText, Hourglass, Info, MapPin, Play } from 'lucide-svelte';
 
   let { objeto, onOpenProfile }: { objeto: Objeto; onOpenProfile?: (user: User) => void } = $props();
 </script>
@@ -63,16 +63,24 @@
     <!-- Status do objeto -->
     <Row
       key="Status:"
-      value={objeto.status.toLowerCase() !== 'aberto'
-        ? objeto.status.toLowerCase() === 'em_reivindicacao'
+      value={objeto.status.toLowerCase() === 'aberto'
+        ? 'Ativo'
+        : objeto.status.toLowerCase() === 'em_reivindicacao'
           ? 'Reivindicação em andamento'
-          : 'Finalizado'
-        : 'Ativo'}
-      icon={objeto.status.toLowerCase() !== 'aberto'
-        ? objeto.status.toLowerCase() === 'em_reivindicacao'
+          : objeto.status.toLowerCase() === 'aguardando_retirada'
+            ? 'Aguardando Retirada'
+            : objeto.status.toLowerCase() === 'finalizado'
+              ? 'Finalizado'
+              : 'Desconhecido'}
+      icon={objeto.status.toLowerCase() === 'aberto'
+        ? Play
+        : objeto.status.toLowerCase() === 'em_reivindicacao'
           ? AlertTriangle
-          : CheckCircle
-        : Play}
+          : objeto.status.toLowerCase() === 'aguardando_retirada'
+            ? Hourglass
+            : objeto.status.toLowerCase() === 'finalizado'
+              ? CheckCircle
+              : Info}
     />
 
     <!-- Motivo da finalização (se finalizado) -->
