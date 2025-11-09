@@ -1,4 +1,5 @@
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import type { Claim } from '../../routes/claims/types';
 
 const baseURL = new URL('/claims', PUBLIC_API_BASE_URL);
 
@@ -44,7 +45,15 @@ export const getPendingClaims = async (params?: { page?: number; size?: number; 
   }
 };
 
-export const getMyClaims = async (params?: { page?: number; size?: number; token?: string }) => {
+export type JSONGetMyClaimsRes = {
+  items: Claim[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+};
+
+export const getMyClaims = async (params?: { page?: number; size?: number; token?: string }): Promise<JSONGetMyClaimsRes> => {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.size) queryParams.append('size', params.size.toString());
@@ -63,11 +72,12 @@ export const getMyClaims = async (params?: { page?: number; size?: number; token
   }
 };
 
-export const approveClaim = async (claimId: string, token: string): Promise<boolean> => {
+export const approveClaim = async (claimId: string, token: string, motivo: string): Promise<boolean> => {
   try {
     const response = await fetch(`${baseURL}/${claimId}/aprovar`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ motivo })
     });
     return response.ok;
   } catch (error) {
@@ -76,11 +86,12 @@ export const approveClaim = async (claimId: string, token: string): Promise<bool
   }
 };
 
-export const rejectClaim = async (claimId: string, token: string): Promise<boolean> => {
+export const rejectClaim = async (claimId: string, token: string, motivo: string): Promise<boolean> => {
   try {
     const response = await fetch(`${baseURL}/${claimId}/rejeitar`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ motivo })
     });
     return response.ok;
   } catch (error) {

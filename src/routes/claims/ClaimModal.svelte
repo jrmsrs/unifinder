@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
-  import { Badge, Button, Heading, Modal } from 'flowbite-svelte';
+  import { Badge, Button, Heading, Label, Modal, Textarea } from 'flowbite-svelte';
   import { Check, CheckCircle2, X } from 'lucide-svelte';
   import { formatDate, getStatusBadgeColor, getStatusText, isStatusAprovada, isStatusConcluida, type Claim } from './types';
 
@@ -19,6 +19,7 @@
   } = $props();
 
   let actionSubmiting = $state(false);
+  let motivo = $state('');
 
   /** Navega para a página do objeto associado à reivindicação */
   const navigateToObjeto = () => {
@@ -84,43 +85,62 @@
 
     <!-- Ações de aprovação/rejeição (apenas para tutores e claims pendentes) -->
     {#if isClaimForApproval && (claim.status === 'pendente' || claim.status === 'PENDENTE')}
-      <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-        <form
-          method="POST"
-          action="?/rejectClaim"
-          use:enhance={() => {
-            actionSubmiting = true;
-            return async ({ update }) => {
-              await update();
-              actionSubmiting = false;
-              onClose();
-            };
-          }}
-        >
-          <input type="hidden" name="claimId" value={claim.id} />
-          <Button type="submit" color="light" disabled={actionSubmiting}>
-            <X class="mr-2 h-4 w-4" />
-            Rejeitar
-          </Button>
-        </form>
-        <form
-          method="POST"
-          action="?/approveClaim"
-          use:enhance={() => {
-            actionSubmiting = true;
-            return async ({ update }) => {
-              await update();
-              actionSubmiting = false;
-              onClose();
-            };
-          }}
-        >
-          <input type="hidden" name="claimId" value={claim.id} />
-          <Button type="submit" color="primary" disabled={actionSubmiting}>
-            <Check class="mr-2 h-4 w-4" />
-            Aprovar
-          </Button>
-        </form>
+      <div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
+        <div class="mb-4">
+          <Label for="motivo" class="mb-2 block font-semibold">Réplica (Obrigatório)</Label>
+          <Textarea
+            id="motivo"
+            rows={4}
+            bind:value={motivo}
+            placeholder={'"Parece legítimo", "Falta evidência", "Me chama no privado (21) 99999-9999", etc.'}
+            class="focus:ring-opacity-50 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          />
+          <p class="mb-2 text-xs text-gray-600 dark:text-gray-400">
+            Digite o motivo da aprovação ou rejeição. O espaço pode ser utilizado para dar feedback ou solicitar infos que não serão
+            públicas na plataforma.
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <form
+            method="POST"
+            action="?/rejectClaim"
+            use:enhance={() => {
+              actionSubmiting = true;
+              return async ({ update }) => {
+                await update();
+                actionSubmiting = false;
+                onClose();
+              };
+            }}
+          >
+            <input type="hidden" name="claimId" value={claim.id} />
+            <input type="hidden" name="motivo" value={motivo} />
+            <Button type="submit" color="red" disabled={actionSubmiting || motivo.trim() === ''}>
+              <X class="mr-2 h-4 w-4" />
+              Rejeitar
+            </Button>
+          </form>
+          <form
+            method="POST"
+            action="?/approveClaim"
+            use:enhance={() => {
+              actionSubmiting = true;
+              return async ({ update }) => {
+                await update();
+                actionSubmiting = false;
+                onClose();
+              };
+            }}
+          >
+            <input type="hidden" name="claimId" value={claim.id} />
+            <input type="hidden" name="motivo" value={motivo} />
+            <Button type="submit" color="green" disabled={actionSubmiting || motivo.trim() === ''}>
+              <Check class="mr-2 h-4 w-4" />
+              Aprovar
+            </Button>
+          </form>
+        </div>
       </div>
     {/if}
 

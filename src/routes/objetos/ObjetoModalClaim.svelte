@@ -67,7 +67,7 @@
   {/snippet}
   <form
     id="claimObjetoForm"
-    class="flex flex-col gap-4"
+    class="flex flex-col"
     method="POST"
     action="?/claimObjeto"
     enctype="multipart/form-data"
@@ -83,14 +83,14 @@
     }}
   >
     <!-- Campo de descrição da reivindicação -->
-    <div>
+    <div class="mb-4">
       <Label>
-        Descreva por que você acredita que o objeto é seu <span class="text-red-400">*</span>
+        Por que você acredita que o objeto é seu? <span class="text-red-400">*</span>
         <Textarea
           bind:value={claimDescricao}
           name="descricao"
-          placeholder="Descreva informações sobre o objeto, como você o perdeu, onde e quando, etc."
-          class="w-full dark:border-gray-600! dark:bg-gray-700!"
+          placeholder={'"Tem meu nome na capa", "É parecido com o que eu perdi", "Tenho fotos dele", "Me chama no privado (21) 99999-9999", etc.'}
+          class="mt-1 w-full dark:border-gray-600! dark:bg-gray-700!"
           rows={4}
         />
       </Label>
@@ -103,7 +103,7 @@
       <div class="flex flex-col">
         <!-- Área de drag-and-drop -->
         <div
-          class="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          class="relative mt-1 flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
           <input
             type="file"
@@ -140,6 +140,11 @@
       </div>
     </div>
 
+    <p class="mt-2 mb-4 text-xs text-gray-600 dark:text-gray-400">
+      A pessoa que cadastrou o objeto irá avaliar sua reivindicação com base nas informações fornecidas e fornecerá um retorno. Este espaço
+      pode ser utilizado para dar feedback ou solicitar infos que não serão públicas na plataforma.
+    </p>
+
     <!-- Mensagem de erro -->
     {#if error}
       <Alert color="red">
@@ -153,7 +158,7 @@
     {/if}
 
     <!-- Botões de ação -->
-    <div class="flex shrink-0 items-center space-x-3 rounded-b-lg p-4 md:p-5 rtl:space-x-reverse">
+    <div class="flex shrink-0 items-center space-x-3 rounded-b-lg rtl:space-x-reverse">
       <div class="flex w-full justify-end">
         <Button type="submit" value="submit" disabled={claimSubmiting || claimDescricao?.trim().length === 0}>Cadastrar</Button>
         <button

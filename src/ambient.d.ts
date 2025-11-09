@@ -23,7 +23,17 @@ declare global {
   type ObjetoStatus = 'aberto' | 'finalizado' | 'em_reivindicacao';
 
   /** Tipo de status da reivindicação */
-  type ClaimStatus = 'pendente' | 'aprovado' | 'aprovada' | 'rejeitado' | 'concluida' | 'PENDENTE' | 'APROVADO' | 'APROVADA' | 'REJEITADO' | 'CONCLUIDA';
+  type ClaimStatus =
+    | 'pendente'
+    | 'aprovado'
+    | 'aprovada'
+    | 'rejeitado'
+    | 'concluida'
+    | 'PENDENTE'
+    | 'APROVADO'
+    | 'APROVADA'
+    | 'REJEITADO'
+    | 'CONCLUIDA';
 
   /** Tipo de papel do usuário */
   type UserRole = 'user' | 'admin' | 'funcionario';
@@ -70,6 +80,19 @@ declare global {
     username: string;
     conteudo: string;
     user: User;
+  };
+
+  /** Tipo de reivindicação */
+  type Claim = {
+    id: string;
+    objeto_id: string;
+    descricao: string;
+    evidencias: string[];
+    data_registro: string;
+    status: ClaimStatus;
+    user_id: string;
+    tutor_id: string;
+    objeto?: Objeto;
   };
 }
 

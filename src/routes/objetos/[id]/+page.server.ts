@@ -1,4 +1,6 @@
-import { deleteComentario, deleteObjeto, finishObjeto, getComentariosByObjetoId, getObjetoById, postClaim, postComentario } from '$lib/api';
+import { finalizeClaim, getMyClaims, postClaim } from '$lib/api/claims';
+import { deleteComentario, getComentariosByObjetoId, postComentario } from '$lib/api/comentarios';
+import { deleteObjeto, finishObjeto, getObjetoById } from '$lib/api/objetos';
 import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
 import { redirect, type Actions } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -16,14 +18,23 @@ const fetchComentarios = async (id: string) => {
   return comentarios;
 };
 
-export const load: PageServerLoad = ({ params, url }) => {
+/** Busca reivindicações do usuário logado */
+const fetchMyClaims = async (token: string) => {
+  const claims = await getMyClaims({ page: 1, size: 100, token });
+  return claims;
+};
+
+export const load: PageServerLoad = async ({ params, url, locals: { safeGetSession } }) => {
+  const { session } = await safeGetSession();
+
   return {
     form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
     commentError: url.searchParams.get('comment_error') || null,
     finishError: url.searchParams.get('finish_error') || null,
     streamed: {
       objeto: fetchObjeto(params.id),
-      comentarios: fetchComentarios(params.id)
+      comentarios: fetchComentarios(params.id),
+      myClaims: session ? fetchMyClaims(session.access_token) : Promise.resolve({ items: [], total: 0 })
     }
   };
 };
@@ -53,7 +64,7 @@ export const actions: Actions = {
   finishObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
-      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
     }
 
     const formData = await request.formData();
@@ -71,13 +82,7 @@ export const actions: Actions = {
       );
     }
 
-    const result = await finishObjeto(
-      {
-        id: params.id as string,
-        motivo_finalizacao: validation.data.motivo_finalizacao
-      },
-      session.session.access_token
-    );
+    const result = await finishObjeto(params.id as string, validation.data.motivo_finalizacao, session.session.access_token);
 
     if (!result) {
       throw redirect(
@@ -93,7 +98,7 @@ export const actions: Actions = {
   claimObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
-      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
     }
 
     const formData = await request.formData();
@@ -136,7 +141,7 @@ export const actions: Actions = {
   deleteObjeto: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
-      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
     }
 
     const success = await deleteObjeto({ id: params.id as string }, session.session.access_token);
@@ -152,7 +157,7 @@ export const actions: Actions = {
   createComentario: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
-      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
     }
 
     const formData = await request.formData();
@@ -194,7 +199,7 @@ export const actions: Actions = {
   deleteComentario: async ({ request, params, locals: { safeGetSession } }) => {
     const session = await safeGetSession();
     if (!session.session) {
-      throw redirect(303, '/login?redirect=/objetos/' + params.id);
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
     }
 
     const formData = await request.formData();
@@ -211,5 +216,32 @@ export const actions: Actions = {
     }
 
     throw redirect(303, `/objetos/${params.id}`);
+  },
+
+  /** Finaliza reivindicação a partir da tela do objeto */
+  finalizeClaimFromObject: async ({ request, params, locals: { safeGetSession } }) => {
+    console.log('pingou');
+    const session = await safeGetSession();
+    if (!session.session) {
+      throw redirect(303, '/auth?redirect=/objetos/' + params.id);
+    }
+
+    const formData = await request.formData();
+    const claimId = formData.get('claimId') as string;
+
+    if (!claimId) {
+      throw redirect(303, `/objetos/${params.id}?error=${encodeURIComponent('ID da reivindicação não encontrado.')}`);
+    }
+
+    const success = await finalizeClaim(claimId, session.session.access_token);
+
+    if (!success) {
+      throw redirect(
+        303,
+        `/objetos/${params.id}?error=${encodeURIComponent('Erro ao finalizar reivindicação. Verifique se está aprovada.')}`
+      );
+    }
+
+    throw redirect(303, `/objetos/${params.id}?message=Reivindicação finalizada com sucesso!`);
   }
 };

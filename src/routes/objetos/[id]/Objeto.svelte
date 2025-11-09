@@ -37,13 +37,14 @@
     />
 
     <!-- Tutor/dono do objeto (clicável para ver perfil) -->
-    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:" icon={AtSign}>
+    <Row key="{objeto.tipo === 'achado' ? 'Coletado por' : 'Dono'}:">
       {#if onOpenProfile}
         <button
           type="button"
-          class="group flex w-full items-center gap-2 rounded-md p-1 text-left transition-colors hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]"
+          class="group m-0 flex w-full items-center gap-2 rounded-md p-0 text-left transition-colors hover:bg-[rgba(0,0,0,0.05)] dark:hover:bg-[rgba(255,255,255,0.05)]"
           onclick={() => onOpenProfile(objeto.user)}
         >
+          <AtSign class="h-4 w-4" />
           {objeto.user.username}
           <span class="truncate text-blue-800 group-hover:underline dark:text-blue-200">[contato]</span>
         </button>
