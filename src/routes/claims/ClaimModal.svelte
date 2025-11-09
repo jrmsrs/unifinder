@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import { Badge, Button, Heading, Modal } from 'flowbite-svelte';
-  import { Check, X } from 'lucide-svelte';
+  import { Check, CheckCircle2, X } from 'lucide-svelte';
   import { formatDate, getStatusBadgeColor, getStatusText, type Claim } from './types';
 
   let {
@@ -107,6 +107,25 @@
           <Button type="submit" color="primary" class="font-semibold shadow-sm">
             <Check class="mr-2 h-4 w-4" />
             Aprovar
+          </Button>
+        </form>
+      </div>
+    {/if}
+
+    <!-- Ação de finalizar (apenas para usuário que abriu a reivindicação e claims aprovadas) -->
+    {#if !isClaimForApproval && (claim.status === 'aprovada' || claim.status === 'APROVADA')}
+      <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+        <form
+          method="POST"
+          action="?/finalizeClaim"
+          use:enhance={() => {
+            onClose();
+          }}
+        >
+          <input type="hidden" name="claimId" value={claim.id} />
+          <Button type="submit" color="green" class="font-semibold shadow-sm">
+            <CheckCircle2 class="mr-2 h-4 w-4" />
+            Finalizar
           </Button>
         </form>
       </div>

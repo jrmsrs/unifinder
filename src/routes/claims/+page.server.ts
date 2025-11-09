@@ -1,4 +1,4 @@
-import { approveClaim, getMyClaims, getObjetosByIds, getPendingClaims, rejectClaim } from '$lib/api';
+import { approveClaim, finalizeClaim, getMyClaims, getObjetosByIds, getPendingClaims, rejectClaim } from '$lib/api';
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -85,6 +85,29 @@ export const actions: Actions = {
 
     if (!success) {
       return { success: false, error: 'Erro ao rejeitar reivindicação' };
+    }
+
+    throw redirect(303, url.pathname + url.search);
+  },
+
+  /** Finaliza reivindicação (usuário que abriu a reivindicação) */
+  finalizeClaim: async ({ request, locals: { safeGetSession }, url }) => {
+    const { session } = await safeGetSession();
+    if (!session) {
+      throw redirect(303, '/auth');
+    }
+
+    const formData = await request.formData();
+    const claimId = formData.get('claimId') as string;
+
+    if (!claimId) {
+      return { success: false, error: 'ID da reivindicação não fornecido' };
+    }
+
+    const success = await finalizeClaim(claimId, session.access_token);
+
+    if (!success) {
+      return { success: false, error: 'Erro ao finalizar reivindicação' };
     }
 
     throw redirect(303, url.pathname + url.search);
