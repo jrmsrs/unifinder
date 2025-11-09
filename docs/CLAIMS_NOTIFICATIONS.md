@@ -17,7 +17,7 @@ src/routes/objetos/
     └── +page.svelte           # Página de detalhes com botão de claim
 
 src/lib/api/
-├── api.ts                     # Funções de API para claims (postClaim, approveClaim, rejectClaim)
+├── claims.ts                  # Funções de API para claims (postClaim, approveClaim, rejectClaim)
 └── notifications.ts           # Funções de API para notificações
 
 src/lib/stores/

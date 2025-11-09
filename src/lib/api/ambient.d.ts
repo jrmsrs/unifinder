@@ -1,0 +1,3 @@
+type PathById = {
+  id: string;
+};
