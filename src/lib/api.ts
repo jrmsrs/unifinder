@@ -450,9 +450,16 @@ export const finalizeClaim = async (claimId: string, token: string): Promise<boo
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
-    return response.ok;
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error finalizing claim:', response.status, response.statusText, errorText);
+      return false;
+    }
+    
+    return true;
   } catch (error) {
-    console.error('API error:', error);
+    console.error('API error finalizing claim:', error);
     return false;
   }
 };

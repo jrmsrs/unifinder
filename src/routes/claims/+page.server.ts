@@ -101,15 +101,25 @@ export const actions: Actions = {
     const claimId = formData.get('claimId') as string;
 
     if (!claimId) {
-      return { success: false, error: 'ID da reivindicação não fornecido' };
+      return { error: 'ID da reivindicação não fornecido' };
     }
 
-    const success = await finalizeClaim(claimId, session.access_token);
+    try {
+      const success = await finalizeClaim(claimId, session.access_token);
 
-    if (!success) {
-      return { success: false, error: 'Erro ao finalizar reivindicação' };
+      if (!success) {
+        return { error: 'Erro ao finalizar reivindicação. Verifique se a reivindicação está aprovada.' };
+      }
+
+      // Redireciona para recarregar os dados e mostrar o novo status CONCLUIDA
+      throw redirect(303, url.pathname + url.search);
+    } catch (error) {
+      // Se já for um redirect, deixa passar
+      if (error && typeof error === 'object' && 'status' in error && error.status === 303) {
+        throw error;
+      }
+      console.error('Error finalizing claim:', error);
+      return { error: 'Erro inesperado ao finalizar reivindicação' };
     }
-
-    throw redirect(303, url.pathname + url.search);
   }
 };
