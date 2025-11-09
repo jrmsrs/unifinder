@@ -18,6 +18,8 @@
     onClose: () => void;
   } = $props();
 
+  let actionSubmiting = $state(false);
+
   /** Navega para a página do objeto associado à reivindicação */
   const navigateToObjeto = () => {
     if (claim?.objeto?.id) {
@@ -87,11 +89,16 @@
           method="POST"
           action="?/rejectClaim"
           use:enhance={() => {
-            onClose();
+            actionSubmiting = true;
+            return async ({ update }) => {
+              await update();
+              actionSubmiting = false;
+              onClose();
+            };
           }}
         >
           <input type="hidden" name="claimId" value={claim.id} />
-          <Button type="submit" color="light" class="border border-gray-300 dark:border-gray-600">
+          <Button type="submit" color="light" disabled={actionSubmiting}>
             <X class="mr-2 h-4 w-4" />
             Rejeitar
           </Button>
@@ -100,11 +107,16 @@
           method="POST"
           action="?/approveClaim"
           use:enhance={() => {
-            onClose();
+            actionSubmiting = true;
+            return async ({ update }) => {
+              await update();
+              actionSubmiting = false;
+              onClose();
+            };
           }}
         >
           <input type="hidden" name="claimId" value={claim.id} />
-          <Button type="submit" color="primary" class="font-semibold shadow-sm">
+          <Button type="submit" color="primary" disabled={actionSubmiting}>
             <Check class="mr-2 h-4 w-4" />
             Aprovar
           </Button>
@@ -118,10 +130,17 @@
         <form
           method="POST"
           action="?/finalizeClaim"
-          use:enhance
+          use:enhance={() => {
+            actionSubmiting = true;
+            return async ({ update }) => {
+              await update();
+              actionSubmiting = false;
+              onClose();
+            };
+          }}
         >
           <input type="hidden" name="claimId" value={claim.id} />
-          <Button type="submit" color="green" class="font-semibold shadow-sm">
+          <Button type="submit" color="green" disabled={actionSubmiting}>
             <CheckCircle2 class="mr-2 h-4 w-4" />
             Finalizar
           </Button>
