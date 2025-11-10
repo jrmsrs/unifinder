@@ -72,24 +72,3 @@
     <Alert color="red" dismissable>Erro: {error.message}</Alert>
   {/await}
 </div>
-
-<DevInfo
-  content={`\
-# debug
-  - signed_up=${Boolean(data.user)}
-# todo (tela inicial):
-  - (x) layout objetos
-  - (x) layout barra pesquisa filtrada
-  - (x) layout modal pesquisa filtrada
-  - (x) mocks modal pesquisa filtrada
-  - (x) layout cards objetos em acompanhamento
-  - (x) layout cards ultimos achados/perdidos
-  - (x) mocks cards
-  - (x) integração
-# todo (autenticação):
-  - (x) login padrão
-  - (x) sign up padrão
-  - (x) recuperação de senha padrão
-  - (x) usuario tem username (etapa adicional)
-  - (x) integração`}
-/>

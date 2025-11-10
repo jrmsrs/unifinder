@@ -111,11 +111,3 @@
 
 <!-- Modal de criação de objeto -->
 <ObjetoModalNew bind:new={newObjeto} form={data.form} query={data.query} error={data.error} />
-
-<DevInfo
-  content={`\
-# debug
-  - signed_up=${Boolean(data.user)}
-# todo (tela objetos)
-  - (x) layout objetos`}
-/>

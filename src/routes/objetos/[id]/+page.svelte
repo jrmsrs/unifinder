@@ -175,31 +175,3 @@
 {#if selectedUser}
   <Profile user={selectedUser} bind:open={showProfile} onclose={closeProfile} />
 {/if}
-
-{#await data.streamed.objeto then objeto}
-  <DevInfo
-    content={`\
-# debug
-  - signed_up=${Boolean(data.user)}
-  - objeto=${JSON.stringify(objeto, null, 2)}
-# todo (tela objeto)
-  - (-) layout objeto
-    - (x) exibir informações do objeto
-      - (x) mock objeto
-    - (x) exibir ações
-      - (x) botões de ações do responsável
-      - (x) botões de ações do usuário
-      - (x) modal finalizar
-      - (x) modal editar
-    - (x) exibir comentários
-      - (x) ações do dono
-      - (x) mock comentários
-  - (-) integração
-    - (x) get objeto
-    - (x) get comentarios
-    - (x) autorização nivel dono do objeto
-    - (x) autorização nivel dono do comentário
-    - ( ) put de objeto
-    - (x) delete de comentário`}
-  />
-{/await}
