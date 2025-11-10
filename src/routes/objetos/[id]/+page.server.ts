@@ -51,10 +51,7 @@ const claimSchema = z.object({
 
 /** Schema de validação para finalização de objeto */
 const finishSchema = z.object({
-  motivo_finalizacao: z
-    .string()
-    .min(10, 'O motivo deve ter pelo menos 10 caracteres.')
-    .max(500, 'O motivo deve ter no máximo 500 caracteres.')
+  motivo_finalizacao: z.string().min(1, 'O motivo deve ter pelo menos 1 caractere.').max(500, 'O motivo deve ter no máximo 500 caracteres.')
 });
 
 export const actions: Actions = {
