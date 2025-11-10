@@ -15,6 +15,10 @@ type JSONPostObjetoReq = {
   image_url?: string | null;
 };
 
+type JSONPutObjetoReq = Partial<JSONPostObjetoReq> & {
+  status?: ObjetoStatus;
+};
+
 type JSONGetObjetosReq = {
   search?: string;
   tipo?: ObjetoTipo;
@@ -35,6 +39,16 @@ type JSONGetObjetosRes = {
 };
 
 export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promise<Objeto | null> => {
+  console.log('Posting objeto with data:', {
+    nome: data.titulo,
+    descricao: data.descricao,
+    local_ocorrencia: data.localidade,
+    local_armazenamento: data.local_encaminhado,
+    local_especifico: data.local_especifico,
+    tipo: data.tipo.toUpperCase(),
+    categoria: data.categoria,
+    url_imagem: data.image_url ?? undefined
+  });
   const userId = JSON.parse(atob(token.split('.')[1])).sub;
   try {
     const response = await fetch(`${baseUsersApiURL}/${userId}/objetos`, {
@@ -44,6 +58,8 @@ export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promis
         nome: data.titulo,
         descricao: data.descricao,
         local_ocorrencia: data.localidade,
+        local_armazenamento: data.local_encaminhado,
+        local_especifico: data.local_especifico,
         tipo: data.tipo.toUpperCase(),
         categoria: data.categoria,
         url_imagem: data.image_url ?? undefined
@@ -141,16 +157,20 @@ export const getObjetosLatest = async (user?: { id: string; email: string }) => 
   }
 };
 
-export const putObjeto = async (path: PathById, data: Partial<JSONPostObjetoReq>, token: string): Promise<Objeto | null> => {
+export const putObjeto = async (id: string, data: JSONPutObjetoReq, token: string): Promise<Objeto | null> => {
   try {
-    const response = await fetch(`${baseObjetosApiURL}/${path.id}`, {
+    const response = await fetch(`${baseObjetosApiURL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         nome: data.titulo,
         descricao: data.descricao,
         local_ocorrencia: data.localidade,
+        local_armazenamento: data.local_encaminhado,
+        local_especifico: data.local_especifico,
         tipo: data.tipo?.toUpperCase(),
+        categoria: data.categoria,
+        status: data.status,
         url_imagem: data.image_url ?? undefined
       })
     }).then((res) => res.json());
