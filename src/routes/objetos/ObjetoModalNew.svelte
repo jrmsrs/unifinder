@@ -25,10 +25,7 @@
   ];
   let objetoLocalidade: ObjetoLocalidade | '' = $state(form?.localidade ?? '');
   let objetoLocalEspecifico: string = $state(form?.local_especifico ?? '');
-  let objetoLocalEncaminhado: string = $state(
-    form?.local_encaminhado && form?.local_encaminhado !== '' ? form?.local_encaminhado : 'em mãos'
-  );
-  let objetoLocalEncaminhadoAdd: string = $state(form?.local_encaminhado_add ?? '');
+  let objetoLocalEncaminhado: string = $state(form?.local_encaminhado ?? '');
 
   /** Lista de categorias disponíveis */
   const listaCategorias: Array<{ value: ObjetoCategoria; name: string }> = [
@@ -222,46 +219,17 @@
       </Label>
     </div>
 
-    <!-- Local de encaminhamento (apenas para achados) -->
+    <!-- Local armazenado do objeto achado -->
     {#if objetoTipo === 'achado'}
       <div>
         <Label>
-          Local para o qual o objeto foi encaminhado (se aplicável)
-          <Select
-            placeholder={objetoLocalidade !== '' && objetoLocalidade !== 'intercampi' && objetoLocalidade !== 'outro'
-              ? `Locais em ${dictLocalidades[objetoLocalidade]}`
-              : 'Selecione um local'}
-            name="local_encaminhado"
-            bind:value={objetoLocalEncaminhado}
-          >
-            <option value="em mãos"> Objeto em mãos </option>
-            <option value="wip-blabla">
-              Guarita do {objetoLocalidade !== '' && objetoLocalidade !== 'intercampi' && objetoLocalidade !== 'outro'
-                ? dictLocalidades[objetoLocalidade]
-                : 'Campus'}
-            </option>
-            <option value="outro"> Outro local - especificar </option>
-          </Select>
+          Especifique o local armazenado (ex. "Guarita do CCH", "Secretaria da Biblioteca", etc.)
+          <Input bind:value={objetoLocalEncaminhado} placeholder="Padrão: Objeto em mãos" name="local_encaminhado" />
         </Label>
       </div>
       <Helper>
-        É altamente recomendado que você encaminhe o objeto encontrado a algum dos locais listados abaixo,
-        <span class="font-extrabold"> onde deve haver responsáveis para gerir a entrega do objeto ao dono, </span>
-        e então preenchê-lo. É possível marcar como "Objeto em mãos" e modificar mais tarde quando realizar o encaminhamento.
-      </Helper>
-    {/if}
-
-    <!-- Especificar outro local (se selecionado) -->
-    {#if objetoTipo === 'achado' && objetoLocalEncaminhado === 'outro'}
-      <div>
-        <Label>
-          Especifique o outro local <span class="text-red-400">*</span>
-          <Input bind:value={objetoLocalEncaminhadoAdd} placeholder="Digite um local ainda não listado" name="local_encaminhado_add" />
-        </Label>
-      </div>
-      <Helper>
-        <span class="font-extrabold">ATENÇÃO:</span> Certifique-se de que o local especificado realmente não está listado (você selecionou a
-        Área correta?) e é seguro e apropriado para armazenar o objeto até que o dono possa recuperá-lo.
+        <span class="font-extrabold">Importante:</span> Certifique-se de que o local especificado é seguro e apropriado para armazenar o objeto
+        até que o dono possa recuperá-lo.
       </Helper>
     {/if}
 

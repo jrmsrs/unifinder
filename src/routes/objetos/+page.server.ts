@@ -67,33 +67,20 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 };
 
 /** Esquema de validação para criação de objeto */
-const objetoSchema = z
-  .object({
-    tipo: z.enum(['achado', 'perdido'], { error: 'Selecione um tipo' }),
-    titulo: z.string().trim().min(1, 'O título é obrigatório'),
-    descricao: z.string().trim().min(1, 'A descrição é obrigatória'),
-    localidade: z.string({ error: 'Selecione uma localidade' }).min(1),
-    local_especifico: z.string().optional(),
-    local_encaminhado: z.string().optional(),
-    local_encaminhado_add: z.string().optional(),
-    categoria: z.string({ error: 'Selecione uma categoria' }).min(1),
-    imagem_arquivo: z
-      .instanceof(File)
-      .refine((file) => file.size < 15 * 1024 * 1024, 'A imagem deve ter no máximo 15MB.')
-      .optional(),
-    image_url: z.string().optional()
-  })
-  .superRefine((data, ctx) => {
-    // Validação condicional: objetos achados devem ter local de encaminhamento
-    if (data.tipo === 'achado') {
-      if (!data.local_encaminhado || data.local_encaminhado === '') {
-        ctx.addIssue({ code: 'custom', path: ['local_encaminhado'], message: 'Informe para onde o objeto foi encaminhado.' });
-      }
-      if (data.local_encaminhado === 'outro' && (!data.local_encaminhado_add || data.local_encaminhado_add.trim() === '')) {
-        ctx.addIssue({ code: 'custom', path: ['local_encaminhado_add'], message: 'Especifique o outro local.' });
-      }
-    }
-  });
+const objetoSchema = z.object({
+  tipo: z.enum(['achado', 'perdido'], { error: 'Selecione um tipo' }),
+  titulo: z.string().trim().min(1, 'O título é obrigatório'),
+  descricao: z.string().trim().min(1, 'A descrição é obrigatória'),
+  localidade: z.string({ error: 'Selecione uma localidade' }).min(1),
+  local_especifico: z.string().optional(),
+  local_encaminhado: z.string().optional(),
+  categoria: z.string({ error: 'Selecione uma categoria' }).min(1),
+  imagem_arquivo: z
+    .instanceof(File)
+    .refine((file) => file.size < 15 * 1024 * 1024, 'A imagem deve ter no máximo 15MB.')
+    .optional(),
+  image_url: z.string().optional()
+});
 
 export const actions: Actions = {
   /** Cria novo objeto */
@@ -148,14 +135,6 @@ export const actions: Actions = {
       }
     }
 
-    // Define local de armazenamento (apenas para objetos achados)
-    const localArmazenamento =
-      otherData.tipo === 'achado'
-        ? otherData.local_encaminhado === 'outro'
-          ? otherData.local_encaminhado_add
-          : otherData.local_encaminhado
-        : null;
-
     // Cria objeto via API
     const createdObjeto = await postObjeto(
       {
@@ -164,7 +143,7 @@ export const actions: Actions = {
         descricao: otherData.descricao,
         localidade: otherData.localidade as ObjetoLocalidade,
         local_especifico: otherData.local_especifico as string,
-        local_encaminhado: localArmazenamento,
+        local_encaminhado: otherData.tipo === 'achado' ? otherData.local_encaminhado : null,
         categoria: otherData.categoria as ObjetoCategoria,
         image_url: imageUrl ?? otherData.image_url
       },
