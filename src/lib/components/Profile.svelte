@@ -117,7 +117,7 @@
   };
 </script>
 
-<Modal bind:open onclose={closeModal} size="md" class="w-full">
+<Modal bind:open onclose={closeModal} size="md" class="w-11/12 shadow-2xl shadow-black backdrop:bg-transparent backdrop:backdrop-blur-sm">
   {#snippet header()}
     <!-- Avatar e informações do usuário -->
     <div class="flex items-center space-x-3">

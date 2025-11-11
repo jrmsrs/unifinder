@@ -105,9 +105,9 @@
           <span class="md:hidden">Notificações</span>
         </NavItem>
         <NavItem href="/private" icon={UserSolid}>
-          <span class="md:hidden lg:flex">Perfil </span>
+          <span class="md:hidden lg:flex">Perfil</span>
         </NavItem>
-        <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red>
+        <NavItem href="/auth/logout" icon={ArrowLeftToBracketOutline} red class="me-1">
           <span class="md:hidden lg:flex">Logout</span>
         </NavItem>
       {/if}

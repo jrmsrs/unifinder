@@ -32,7 +32,7 @@
 </script>
 
 {#if claim}
-  <Modal bind:open>
+  <Modal class="w-11/12 shadow-2xl shadow-black backdrop:bg-transparent backdrop:backdrop-blur-sm" bind:open>
     {#snippet header()}
       <Heading tag="h5" class="text-center">Detalhes da Reivindicação</Heading>
     {/snippet}

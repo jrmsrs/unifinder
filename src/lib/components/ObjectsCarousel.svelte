@@ -7,6 +7,7 @@
   import Skeleton from './Skeleton.svelte';
 
   let { objects, tutela, id }: { objects: Objeto[] | null; tutela?: boolean; id: string } = $props();
+  let numCards = $derived(objects ? objects.length : 0);
 </script>
 
 <div class="relative w-full">
@@ -14,9 +15,10 @@
   <div
     {id}
     class="
-      no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth
-      px-4
-      lg:justify-center lg:px-0
+      no-scrollbar flex gap-4 overflow-x-auto! scroll-smooth px-4
+      {numCards <= 1 ? 'sm:justify-center sm:px-0' : ''}
+      {numCards <= 2 ? 'lg:justify-center lg:px-0' : ''}
+      {numCards <= 4 ? '2xl:justify-center 2xl:px-0' : ''}
       [&>*]:min-h-64 [&>*]:max-w-64 [&>*]:min-w-64
     "
   >
