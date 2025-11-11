@@ -161,7 +161,7 @@ export const putObjeto = async (id: string, data: JSONPutObjetoReq, token: strin
         tipo: data.tipo?.toUpperCase(),
         categoria: data.categoria,
         status: data.status,
-        url_imagem: data.image_url ?? undefined
+        url_imagem: data.image_url
       })
     }).then((res) => res.json());
     return response;

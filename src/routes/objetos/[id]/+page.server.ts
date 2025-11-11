@@ -1,8 +1,9 @@
 import { finalizeClaim, getMyClaims, postClaim } from '$lib/api/claims';
 import { deleteComentario, getComentariosByObjetoId, postComentario } from '$lib/api/comentarios';
-import { deleteObjeto, finishObjeto, getObjetoById } from '$lib/api/objetos';
+import { deleteObjeto, finishObjeto, getObjetoById, putObjeto } from '$lib/api/objetos';
 import { stringFromBase64URL, stringToBase64URL } from '@supabase/ssr';
-import { redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect, error as svelteError, type Actions } from '@sveltejs/kit';
+import sharp from 'sharp';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 
@@ -54,8 +55,114 @@ const finishSchema = z.object({
   motivo_finalizacao: z.string().min(1, 'O motivo deve ter pelo menos 1 caractere.').max(500, 'O motivo deve ter no máximo 500 caracteres.')
 });
 
+// Schema de validação para a edição
+const editSchema = z.object({
+  id: z.string().uuid('ID inválido'),
+  titulo: z.string().trim().min(1, 'O título é obrigatório'),
+  descricao: z.string().trim().min(1, 'A descrição é obrigatória'),
+  localidade: z.enum(['biblio', 'ccetibio', 'cch', 'ccjp', 'cla', 'ib', 'intercampi', 'ru', 'outro']),
+  local_especifico: z.string().optional(),
+  local_encaminhado: z.string().optional(),
+  categoria: z.enum(['academico', 'carteira', 'chaveiro', 'documento', 'eletronico', 'mochila', 'utensilio', 'vestuario', 'outro']),
+  tipo: z.enum(['achado', 'perdido']),
+  image_url: z.string().url().optional().nullable(),
+  imagem_arquivo: z.instanceof(File).optional()
+});
+
 export const actions: Actions = {
-  updateObjeto: async () => {},
+  updateObjeto: async ({ request, locals }) => {
+    const { session, supabase } = locals;
+
+    if (!session) {
+      throw svelteError(401, 'Usuário não autenticado.');
+    }
+
+    const formData = await request.formData();
+    const data = Object.fromEntries(formData);
+
+    // Trata os dados do formulário
+    const imageFile = data.imagem_arquivo instanceof File ? data.imagem_arquivo : undefined;
+    let imageUrl: string | undefined | null = data.image_url as string | undefined;
+    if (imageUrl === 'undefined' || imageUrl === '') imageUrl = null;
+    if (imageUrl?.startsWith('blob:') && !(imageFile && imageFile.size > 0)) imageUrl = undefined;
+
+    const validated = editSchema.safeParse({
+      ...data,
+      image_url: imageUrl,
+      imagem_arquivo: imageFile && imageFile.size > 0 ? imageFile : undefined,
+      local_especifico: data.local_especifico || undefined,
+      local_encaminhado: data.local_encaminhado || undefined
+    });
+
+    // Retorna erros de validação
+    if (!validated.success) {
+      console.error('Erro de validação:', validated.error);
+      return fail(400, { ...data, error: Object.values(z.flattenError(validated.error).fieldErrors).flat().join('; ') });
+    }
+
+    const { id, ...otherData } = validated.data;
+    let finalImageUrl: string | null | undefined = otherData.image_url;
+
+    // Lógica de Upload de Imagem
+    if (imageFile && imageFile.size > 0) {
+      try {
+        const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+        const processedImageBuffer = await sharp(imageBuffer).resize(800).jpeg({ quality: 70 }).toBuffer();
+
+        const fileName = `${crypto.randomUUID()}.jpg`;
+        const filePath = `${session.user.id}/${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage.from('objetos').upload(filePath, processedImageBuffer, {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl }
+        } = supabase.storage.from('objetos').getPublicUrl(uploadData.path);
+        finalImageUrl = publicUrl;
+      } catch (error: any) {
+        console.error('Erro ao processar/enviar a imagem:', error);
+        return fail(500, {
+          ...data,
+          error: 'Não foi possível processar a imagem. Erro: ' + error.message
+        });
+      }
+    } else if (otherData.image_url === null && !imageFile) {
+      console.log('hm');
+      finalImageUrl = null;
+    } else if (!otherData.image_url && !imageFile) {
+      console.log('ehm');
+      finalImageUrl = null;
+    }
+
+    // Chama a API para atualizar o objeto
+    const apiResult = await putObjeto(
+      id,
+      {
+        titulo: otherData.titulo,
+        descricao: otherData.descricao,
+        localidade: otherData.localidade,
+        local_especifico: otherData.local_especifico || undefined,
+        local_encaminhado: otherData.local_encaminhado || undefined,
+        categoria: otherData.categoria,
+        tipo: otherData.tipo,
+        image_url: finalImageUrl // AGORA DEVE SER `null`
+      },
+      session.access_token
+    );
+
+    if (!apiResult) {
+      return fail(500, {
+        ...data,
+        error: 'Erro na API ao atualizar o objeto. Por favor, tente novamente.'
+      });
+    }
+
+    throw redirect(303, `/objetos/${id}`);
+  },
 
   /** Finaliza objeto (tutor encerra o ciclo do objeto) */
   finishObjeto: async ({ request, params, locals: { safeGetSession } }) => {
