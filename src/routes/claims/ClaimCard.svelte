@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import { Badge, Card } from 'flowbite-svelte';
-  import { Clock } from 'lucide-svelte';
+  import { Clock, Paperclip } from 'lucide-svelte';
   import { formatDate, getStatusBadgeColor, getStatusText, type Claim } from './types';
 
   let {
@@ -78,9 +78,19 @@
         </Badge>
       </div>
 
-      <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
-        <Clock class="h-3 w-3" />
-        {formatDate(claim.data_registro)}
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500">
+          <Clock class="h-3 w-3" />
+          {formatDate(claim.data_registro)}
+        </div>
+
+        {#if claim.evidencias && claim.evidencias.length > 0}
+          <div class="flex items-center gap-1 text-xs font-medium text-primary-600 dark:text-primary-400">
+            <Paperclip class="h-3 w-3" />
+            {claim.evidencias.length}
+            {claim.evidencias.length > 1 ? 'anexos' : 'anexo'}
+          </div>
+        {/if}
       </div>
     </div>
   </div>

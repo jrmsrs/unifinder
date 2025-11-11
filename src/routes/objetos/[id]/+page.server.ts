@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { safeGetSessi
 
 /** Schema de validação para reivindicação */
 const claimSchema = z.object({
-  descricao: z.string(),
+  descricao: z.string().min(1, 'A descrição é obrigatória'),
   evidencias: z
     .array(z.instanceof(File))
     .max(5, 'Você pode enviar no máximo 5 arquivos como evidência.')
@@ -199,7 +199,7 @@ export const actions: Actions = {
   },
 
   /** Cria reivindicação de objeto */
-  claimObjeto: async ({ request, params, locals: { safeGetSession } }) => {
+  claimObjeto: async ({ request, params, locals: { safeGetSession, supabase } }) => {
     const session = await safeGetSession();
     if (!session.session) {
       throw redirect(303, '/auth?redirect=/objetos/' + params.id);
@@ -208,7 +208,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const formPayload = {
       descricao: formData.get('descricao'),
-      evidencias: Array.from(formData.getAll('evidencias')).filter((item) => item instanceof File)
+      evidencias: Array.from(formData.getAll('evidencias')).filter((item) => item instanceof File && item.size > 0)
     };
 
     const validation = claimSchema.safeParse(formPayload);
@@ -216,17 +216,48 @@ export const actions: Actions = {
     if (!validation.success) {
       console.error('Erro de validação:', validation.error);
       const { evidencias, ...rest } = formPayload;
-      throw redirect(
-        303,
-        `/objetos/${params.id}?error=${encodeURIComponent(validation.error.message)}&form=${stringToBase64URL(JSON.stringify(rest))}`
-      );
+      const error = Object.values(z.flattenError(validation.error).fieldErrors).flat().join('; ');
+      throw redirect(303, `/objetos/${params.id}?error=${encodeURIComponent(error)}&form=${stringToBase64URL(JSON.stringify(rest))}`);
+    }
+
+    const { descricao, evidencias } = validation.data;
+    const evidenceUrls: string[] = [];
+
+    if (evidencias && evidencias.length > 0) {
+      for (const file of evidencias) {
+        try {
+          const imageBuffer = Buffer.from(await file.arrayBuffer());
+          const processedImageBuffer = await sharp(imageBuffer).resize(800).jpeg({ quality: 70 }).toBuffer();
+
+          const fileName = `${crypto.randomUUID()}.jpg`;
+          const filePath = `${session.session.user.id}/claims/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('objetos')
+            .upload(filePath, processedImageBuffer, { contentType: 'image/jpeg' });
+
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = supabase.storage.from('objetos').getPublicUrl(filePath);
+          evidenceUrls.push(urlData.publicUrl);
+        } catch (error: any) {
+          console.error('Erro ao processar/enviar evidência:', error);
+          const { evidencias, ...rest } = formPayload;
+          throw redirect(
+            303,
+            `/objetos/${params.id}?error=${encodeURIComponent(
+              'Não foi possível processar uma das imagens. Erro: ' + error.message
+            )}&form=${stringToBase64URL(JSON.stringify(rest))}`
+          );
+        }
+      }
     }
 
     const result = await postClaim(
       {
         objeto_id: params.id as string,
-        descricao: validation.data.descricao,
-        evidencias: ['upload-nao-implementado']
+        descricao: descricao,
+        evidencias: evidenceUrls
       },
       session.session.access_token
     );
@@ -239,6 +270,8 @@ export const actions: Actions = {
         )}`
       );
     }
+
+    throw redirect(303, `/objetos/${params.id}?message=Reivindicação enviada com sucesso!`);
   },
 
   /** Exclui objeto (apenas tutor) */
