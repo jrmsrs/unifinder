@@ -65,6 +65,7 @@ declare global {
     descricao: string;
     local_ocorrencia: ObjetoLocalidade;
     local_armazenamento?: string;
+    local_especifico?: string;
     tipo: ObjetoTipo;
     categoria: ObjetoCategoria;
     status: ObjetoStatus;

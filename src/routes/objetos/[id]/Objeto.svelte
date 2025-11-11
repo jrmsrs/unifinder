@@ -4,7 +4,7 @@
   import Row from '$lib/components/routes/ObjetoTableRow.svelte';
   import { dictCategorias, dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Badge, Heading, P } from 'flowbite-svelte';
-  import { AlertTriangle, AtSign, Calendar, CheckCircle, FileText, Hourglass, Info, MapPin, Play } from 'lucide-svelte';
+  import { AlertTriangle, ArrowRight, AtSign, Calendar, CheckCircle, FileText, Hourglass, Info, MapPin, Play } from 'lucide-svelte';
 
   let { objeto, onOpenProfile }: { objeto: Objeto; onOpenProfile?: (user: User) => void } = $props();
 </script>
@@ -54,11 +54,18 @@
     </Row>
 
     <!-- Localidade onde foi encontrado/perdido -->
-    <Row key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:" value={dictLocalidades[objeto.local_ocorrencia]} icon={MapPin} />
-
+    <Row
+      key="{objeto.tipo === 'achado' ? 'Encontrado' : 'Perdido'} em:"
+      value={`${dictLocalidades[objeto.local_ocorrencia]}, "${objeto.local_especifico}"`}
+      icon={MapPin}
+    />
     <!-- Local de armazenamento (apenas para achados) -->
-    {#if objeto.tipo === 'achado'}
-      <Row key="Encaminhado:" value={objeto.local_armazenamento ?? 'Em mãos'} icon={MapPin} />
+    {#if objeto.tipo.toLowerCase() === 'achado'}
+      <Row
+        key="Encaminhado:"
+        value={objeto.local_armazenamento === 'Em mãos' ? 'Objeto em mãos. Entre em contato' : objeto.local_armazenamento}
+        icon={ArrowRight}
+      />
     {/if}
 
     <!-- Status do objeto -->

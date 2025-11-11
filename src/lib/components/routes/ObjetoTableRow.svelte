@@ -2,8 +2,8 @@
   let { key, value = '', icon, children }: { key: string; value?: string; icon?: any; children?: any } = $props();
 </script>
 
-<tr>
-  <td class="font-semibold">{key}</td>
+<tr class="align-middle">
+  <td class="text-xs font-semibold">{key}</td>
   <td class="flex items-center gap-2">
     {#if icon}
       {@const IconComponent = icon}

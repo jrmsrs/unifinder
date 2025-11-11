@@ -48,7 +48,7 @@ export const postObjeto = async (data: JSONPostObjetoReq, token: string): Promis
         nome: data.titulo,
         descricao: data.descricao,
         local_ocorrencia: data.localidade,
-        local_armazenamento: (data.local_encaminhado ?? data.tipo.toLocaleLowerCase() === 'achado') ? 'Em mãos' : undefined,
+        local_armazenamento: data.tipo.toLowerCase() === 'achado' ? (data.local_encaminhado ? data.local_encaminhado : 'Em mãos') : null,
         local_especifico: data.local_especifico,
         tipo: data.tipo.toUpperCase(),
         categoria: data.categoria,

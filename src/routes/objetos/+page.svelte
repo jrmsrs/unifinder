@@ -1,13 +1,11 @@
 <script lang="ts">
-  import ObjetoModalNew from './ObjetoModalNew.svelte';
-
-  import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ImageLoader from '$lib/components/ImageLoader.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import { dictLocalidades } from '$lib/utils/dicionaries.js';
   import { Alert, Badge, Button, Card, Heading, Hr, P } from 'flowbite-svelte';
   import { AtSign, MapPin } from 'lucide-svelte';
+  import ObjetoModalNew from './ObjetoModalNew.svelte';
 
   let { data } = $props();
   let newObjeto = $state(data.newObjeto);
@@ -59,8 +57,8 @@
                   <MapPin class="mb-1 inline-block h-4 w-4" />
                   {dictLocalidades[obj.local_ocorrencia]}
                 </P>
-                <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
-                  {#if obj.local_armazenamento}Encaminhado{/if}
+                <P class="text-end text-xs! text-yellow-500 dark:text-yellow-400">
+                  {#if obj.local_armazenamento && obj.local_armazenamento !== 'Em mãos'}Encaminhado{/if}
                 </P>
                 <P class="col-span-2">
                   <AtSign class="mb-1 inline-block h-4 w-4" />

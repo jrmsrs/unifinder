@@ -51,8 +51,8 @@
                   <MapPin class="mb-1 inline-block h-4 w-4" />
                   {dictLocalidades[obj.local_ocorrencia]}
                 </P>
-                <P class="text-end text-xs! text-gray-500 dark:text-gray-400">
-                  {#if obj.local_armazenamento}Encaminhado{/if}
+                <P class="text-end text-xs! text-yellow-500 dark:text-yellow-400">
+                  {#if obj.local_armazenamento && obj.local_armazenamento !== 'Em mãos'}Encaminhado{/if}
                 </P>
                 <P class="col-span-2">
                   <AtSign class="mb-1 inline-block h-4 w-4" />
