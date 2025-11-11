@@ -73,6 +73,7 @@ export const getMyClaims = async (params?: { page?: number; size?: number; token
 };
 
 export const approveClaim = async (claimId: string, token: string, motivo: string): Promise<boolean> => {
+  console.log('PUT claim', claimId, { motivo });
   try {
     const response = await fetch(`${baseURL}/${claimId}/aprovar`, {
       method: 'PUT',

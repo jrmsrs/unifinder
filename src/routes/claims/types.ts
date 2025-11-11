@@ -1,4 +1,14 @@
-export type ClaimStatus = 'pendente' | 'aprovado' | 'aprovada' | 'rejeitado' | 'concluida' | 'PENDENTE' | 'APROVADO' | 'APROVADA' | 'REJEITADO' | 'CONCLUIDA';
+export type ClaimStatus =
+  | 'pendente'
+  | 'aprovado'
+  | 'aprovada'
+  | 'rejeitado'
+  | 'concluida'
+  | 'PENDENTE'
+  | 'APROVADO'
+  | 'APROVADA'
+  | 'REJEITADO'
+  | 'CONCLUIDA';
 
 export type Claim = {
   id: string;
@@ -14,7 +24,7 @@ export type Claim = {
 
 /** Formata a data para exibição */
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+  const date = new Date(dateString + 'Z');
   return date.toLocaleDateString('pt-BR', {
     year: 'numeric',
     month: 'long',

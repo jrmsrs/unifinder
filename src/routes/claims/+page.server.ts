@@ -53,12 +53,13 @@ export const actions: Actions = {
 
     const formData = await request.formData();
     const claimId = formData.get('claimId') as string;
+    const motivo = formData.get('motivo') as string;
 
     if (!claimId) {
       return { success: false, error: 'ID da reivindicação não fornecido' };
     }
 
-    const success = await approveClaim(claimId, session.access_token);
+    const success = await approveClaim(claimId, session.access_token, motivo);
 
     if (!success) {
       return { success: false, error: 'Erro ao aprovar reivindicação' };
@@ -76,12 +77,13 @@ export const actions: Actions = {
 
     const formData = await request.formData();
     const claimId = formData.get('claimId') as string;
+    const motivo = formData.get('motivo') as string;
 
     if (!claimId) {
       return { success: false, error: 'ID da reivindicação não fornecido' };
     }
 
-    const success = await rejectClaim(claimId, session.access_token);
+    const success = await rejectClaim(claimId, session.access_token, motivo);
 
     if (!success) {
       return { success: false, error: 'Erro ao rejeitar reivindicação' };

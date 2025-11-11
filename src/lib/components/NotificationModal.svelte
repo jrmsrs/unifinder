@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { getNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '$lib/api/notifications';
   import { notificationActions, notifications, unreadCount } from '$lib/stores/notifications';
   import { Badge, Button, Modal } from 'flowbite-svelte';
@@ -62,7 +63,7 @@
 
   /** Formata timestamp para exibição relativa */
   const formatTimestamp = (timestamp: string): string => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp + 'Z');
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
@@ -78,6 +79,15 @@
     } else {
       return date.toLocaleDateString('pt-BR');
     }
+  };
+
+  /** Manipula o clique na notificação. Navega para a página de claims */
+  const handleNotificationClick = async (notificationId: string, delivered: boolean) => {
+    if (!delivered) {
+      await markAsRead(notificationId);
+    }
+    open = false;
+    await goto('/claims/');
   };
 
   // Carrega notificações ao abrir modal
@@ -104,7 +114,7 @@
         {#if $unreadCount > 0}
           <Button color="green" size="xs" onclick={markAllAsRead} class="flex items-center gap-1">
             <Check class="h-3 w-3" />
-            <span class="hidden sm:inline">Marcar todas</span>
+            Marcar todas
           </Button>
         {/if}
       </div>
@@ -158,10 +168,17 @@
         <!-- Lista de notificações -->
         <div class="space-y-3">
           {#each sortedNotifications as notification (notification.id)}
-            <div
-              class="rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 {notification.delivered
-                ? 'opacity-75'
-                : ''}"
+            <a
+              href="/claims/"
+              onclick={(e) => {
+                e.preventDefault();
+                handleNotificationClick(notification.id, notification.delivered);
+              }}
+              class="
+                mb-2 block cursor-pointer rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-600
+                transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
+                {notification.delivered ? 'opacity-75' : ''}
+              "
             >
               <div class="flex items-start gap-3">
                 <!-- Ícone da notificação -->
@@ -173,9 +190,9 @@
                 <div class="min-w-0 flex-1">
                   <div class="flex items-start justify-between gap-2">
                     <div class="flex-1">
-                      <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span class="mb-2 block text-sm text-gray-600 dark:text-gray-400">
                         {notification.message}
-                      </p>
+                      </span>
                       <p class="text-xs text-gray-500 dark:text-gray-500">
                         {formatTimestamp(notification.created_at)}
                       </p>
@@ -191,7 +208,7 @@
                         {#if !notification.delivered}
                           <Button size="xs" color="green" onclick={() => markAsRead(notification.id)} class="flex items-center gap-1">
                             <Check class="h-3 w-3" />
-                            <span class="hidden sm:inline">Lida</span>
+                            Lida
                           </Button>
                         {/if}
                       </div>
@@ -199,7 +216,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </a>
           {/each}
         </div>
       {/if}
