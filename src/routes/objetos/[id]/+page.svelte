@@ -176,14 +176,13 @@
 </ModalContainer>
 
 <!-- Modais -->
-<ObjetoClaimNew bind:objetoClaim error={null} />
-<ObjetoModalFinish bind:objetoFinish error={finishError} />
-
 {#await data.streamed.objeto then objeto}
   {#if objeto}
+    <ObjetoClaimNew bind:objetoClaim error={null} {objeto} />
     <ObjetoModalEdit bind:edit={objetoEdit} {objeto} {form} error={editError} />
   {/if}
 {/await}
+<ObjetoModalFinish bind:objetoFinish error={finishError} />
 
 {#if selectedUser}
   <Profile user={selectedUser} bind:open={showProfile} onclose={closeProfile} />

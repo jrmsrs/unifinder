@@ -5,10 +5,13 @@
   import { FileUp, X } from 'lucide-svelte';
   import { scale } from 'svelte/transition';
 
-  let { objetoClaim = $bindable(), error } = $props();
+  let { objetoClaim = $bindable(), error, objeto }: { objetoClaim: boolean; error: string | null; objeto?: Objeto } = $props();
   let claimDescricao: string = $state('');
   let claimAttachFiles: FileList | null = $state(null);
   let claimSubmiting = $state(false);
+
+  // Verifica se o objeto é do tipo 'Perdido'
+  let isObjetoPerdido = $derived(objeto?.tipo?.toLowerCase() === 'perdido');
 
   /** Valida arquivos selecionados (máximo 5 arquivos, 5MB cada) */
   const handleFileSelect = (e: Event) => {
@@ -85,11 +88,17 @@
     <!-- Campo de descrição da reivindicação -->
     <div class="mb-4">
       <Label>
-        Por que você acredita que o objeto é seu? <span class="text-red-400">*</span>
+        {#if isObjetoPerdido}
+          Por que acredita que encontrou esse objeto? <span class="text-red-400">*</span>
+        {:else}
+          Por que você acredita que o objeto é seu? <span class="text-red-400">*</span>
+        {/if}
         <Textarea
           bind:value={claimDescricao}
           name="descricao"
-          placeholder={'"Tem meu nome na capa", "É parecido com o que eu perdi", "Tenho fotos dele", "Me chama no privado (21) 99999-9999", etc.'}
+          placeholder={isObjetoPerdido 
+            ? '"Encontrei na biblioteca", "Estava na sala 101", "Alguém me mostrou", "Me chama no privado (21) 99999-9999", etc.'
+            : '"Tem meu nome na capa", "É parecido com o que eu perdi", "Tenho fotos dele", "Me chama no privado (21) 99999-9999", etc.'}
           class="mt-1 w-full dark:border-gray-600! dark:bg-gray-700!"
           rows={4}
         />
