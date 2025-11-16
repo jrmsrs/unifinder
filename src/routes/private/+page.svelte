@@ -202,7 +202,7 @@
         </div>
 
         <div class="flex justify-end border-t pt-6">
-          <Button type="submit" color="blue" disabled={isSubmitting} class="flex items-center space-x-2">
+          <Button type="submit" color="primary" disabled={isSubmitting} class="flex items-center space-x-2">
             {#if isSubmitting}
               <Spinner class="h-4 w-4" />
             {:else}
