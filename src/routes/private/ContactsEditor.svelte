@@ -183,7 +183,7 @@
               </span>
             </div>
             <div class="flex flex-shrink-0 gap-1">
-              <Button color="blue" size="xs" onclick={() => startEdit(contact.id)} aria-label="Editar">
+              <Button color="yellow" size="xs" onclick={() => startEdit(contact.id)} aria-label="Editar">
                 <Edit3 class="h-3 w-3" />
               </Button>
               <Button color="red" size="xs" onclick={() => removeContact(contact.id)} aria-label="Remover">
