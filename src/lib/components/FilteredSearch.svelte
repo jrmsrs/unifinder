@@ -5,7 +5,7 @@
   import { CloseOutline, FilterOutline, SearchOutline } from 'flowbite-svelte-icons';
   import { scale } from 'svelte/transition';
 
-  let { query = undefined } = $props();
+  let { query = undefined, user_id = '' } = $props();
 
   // Mapeia dicionários para opções de seleção
   let locations: { value: ObjetoLocalidade; name: string }[] = Object.entries(dictLocalidades).map(([value, name]) => ({
@@ -224,13 +224,15 @@
       </div>
 
       <!-- Toggle para filtrar objetos em acompanhamento -->
-      <div class="flex items-center justify-between">
-        <Label for="tutela">
-          Apenas objetos acompanhados
-          <Helper>Objetos/anúncios registrados por você ou sob sua responsabilidade</Helper>
-        </Label>
-        <Toggle id="tutela" color="primary" class="px-1" bind:checked={tutela} />
-      </div>
+      {#if user_id}
+        <div class="flex items-center justify-between">
+          <Label for="tutela">
+            Apenas objetos acompanhados
+            <Helper>Objetos/anúncios registrados por você ou sob sua responsabilidade</Helper>
+          </Label>
+          <Toggle id="tutela" color="primary" class="px-1" bind:checked={tutela} />
+        </div>
+      {/if}
     </div>
 
     {#snippet footer()}

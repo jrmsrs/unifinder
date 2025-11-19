@@ -39,7 +39,7 @@ const fetchFilteredObjetos = async (query?: query) => {
 };
 
 /** Constrói query de objetos a partir dos parâmetros da URL */
-const buildObjetoQuery = (url: URL, email?: string): query => {
+const buildObjetoQuery = (url: URL, id?: string): query => {
   const tipoUnf = url.searchParams.getAll('tipo').length > 0 ? url.searchParams.getAll('tipo') : undefined;
   const localidadeUnf = url.searchParams.getAll('localidade').length > 0 ? url.searchParams.getAll('localidade') : undefined;
   const categoriaUnf = url.searchParams.getAll('categoria').length > 0 ? url.searchParams.getAll('categoria') : undefined;
@@ -49,12 +49,12 @@ const buildObjetoQuery = (url: URL, email?: string): query => {
     localidade: localidadeUnf?.every((e): e is ObjetoLocalidade => allLocals.includes(e as ObjetoLocalidade)) ? localidadeUnf : undefined,
     categoria: categoriaUnf?.every((e): e is ObjetoCategoria => allCategorias.includes(e as ObjetoCategoria)) ? categoriaUnf : undefined,
     inativo: url.searchParams.get('inativo') === 'true' ? true : undefined,
-    usuario: url.searchParams.get('tutela') ? email : undefined
+    usuario: url.searchParams.get('tutela') ? id : undefined
   };
 };
 
 export const load: PageServerLoad = async ({ url, locals }) => {
-  const objetoQuery = buildObjetoQuery(url, locals.user?.email);
+  const objetoQuery = buildObjetoQuery(url, locals.user?.id);
   return {
     newObjeto: url.searchParams.get('new') === 'true',
     error: url.searchParams.get('error') || null,

@@ -21,7 +21,7 @@
         Lista de Objetos
         {data.query?.tipo && data.query?.tipo?.length === 1 ? (data.query?.tipo?.[0] === 'achado' ? 'Achados' : 'Perdidos') : undefined}
       </Heading>
-      <FilteredSearch query={data.query}></FilteredSearch>
+      <FilteredSearch query={data.query} user_id={data.user?.id}></FilteredSearch>
     </div>
 
     {#await data.streamed.objetos}
