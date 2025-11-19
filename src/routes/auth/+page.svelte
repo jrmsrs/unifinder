@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import { A, Alert, Button, Heading, Hr, Input, Label, P } from 'flowbite-svelte';
   import { GoogleSolid } from 'flowbite-svelte-icons';
   import { AtSign } from 'lucide-svelte';
@@ -22,7 +21,7 @@
 
 <div
   class="
-    flex h-[calc(100vh-11em)] w-full flex-col content-center justify-center
+    flex min-h-[calc(100vh-11em)] w-full flex-col content-center justify-center py-10
     [&>*]:mx-auto [&>*]:flex [&>*]:max-w-sm [&>*]:min-w-full [&>*]:flex-col [&>*]:gap-4
     [&>*]:min-[420px]:min-w-[380px]
   "
@@ -92,7 +91,7 @@
 
     <!-- Cadastro (signup) -->
   {:else if data.tab === 'signup'}
-    <Heading tag="h3" class="mb-6 text-center">Cadastrar</Heading>
+    <Heading tag="h3" class="mb-6 text-center">Cadastro</Heading>
 
     <!-- Cadastro via Google OAuth -->
     <form method="POST" action="?/gauth">
@@ -186,7 +185,7 @@
 
     <!-- Login -->
   {:else}
-    <Heading tag="h3" class="mb-6 text-center">Realizar login</Heading>
+    <Heading tag="h3" class="mb-6 text-center">Login</Heading>
 
     <!-- Login via Google OAuth -->
     <form method="POST" action="?/gauth">
@@ -240,17 +239,3 @@
     </div>
   {/if}
 </div>
-
-<DevInfo
-  content={`\
-# debug
-  - signed_up=${Boolean(data.user)}
-  - auth_tab=${data.tab}
-# todo (tela autenticação)
-  - (x) layout autenticação
-  - (x) separar login e sign up em abas
-  - (x) campos de perfil em signup
-  - (x) validação de formulário
-  - (x) integração com autenticador
-  - (-) integração com backend`}
-/>

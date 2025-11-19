@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import FilteredSearch from '$lib/components/FilteredSearch.svelte';
   import ObjectsCarousel from '$lib/components/ObjectsCarousel.svelte';
-  import DevInfo from '$lib/components/dev/DevInfo.svelte';
   import { Alert, Button, Heading, Hr, P } from 'flowbite-svelte';
   import { onMount } from 'svelte';
 
