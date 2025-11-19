@@ -113,7 +113,7 @@
         search,
         tipo: tipoSelected,
         localidade,
-        categorias: categoriaSelected,
+        categoria: categoriaSelected,
         inativo,
         tutela
       });
