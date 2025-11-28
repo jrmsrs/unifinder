@@ -3,20 +3,20 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import Profile from '$lib/components/Profile.svelte';
-  import Skeleton from '$lib/components/Skeleton.svelte';
   import CosmeticObjetosBg from '$lib/components/routes/ObjetoCosmeticBg.svelte';
   import ModalContainer from '$lib/components/routes/ObjetoModalContainer.svelte';
   import { Button, Heading } from 'flowbite-svelte';
-  import { CheckOutline, EditSolid, FilePenSolid } from 'flowbite-svelte-icons';
+  import { CheckOutline, EditSolid, FilePenSolid, ShareNodesSolid } from 'flowbite-svelte-icons';
   import { ArrowLeft, CheckCircle2 } from 'lucide-svelte';
   import ObjetoClaimNew from '../ObjetoModalClaim.svelte';
   import ObjetoModalFinish from '../ObjetoModalFinish.svelte';
-  import Objeto from './Objeto.svelte';
+  import ObjetoComponent from './Objeto.svelte';
   import ObjetoComentarios from './ObjetoComentarios.svelte';
   import ObjetoModalEdit from './ObjetoModalEdit.svelte';
 
   let ref = page.url.searchParams.get('ref') || '/objetos';
-  let { data, form }: { data: any; form: { error?: string } | null } = $props();
+  let { data, form } = $props();
+  const objeto = data.objeto;
 
   // Estado dos modais
   let objetoClaim = $state(false);
@@ -72,17 +72,11 @@
       <ArrowLeft class="drop-shadow-xs drop-shadow-gray-900" />
     </button>
 
-    {#await data.streamed.objeto}
-      <Skeleton card={64} paragraphSize={2} />
-    {:then objeto}
-      {#if objeto === null}
-        <p class="text-red-500">Objeto não encontrado.</p>
-      {:else}
-        <Objeto {objeto} {onOpenProfile} />
-      {/if}
-    {:catch error}
-      <p class="text-red-500">Erro ao carregar o objeto: {error.message}</p>
-    {/await}
+    {#if objeto === null}
+      <p class="text-red-500">Objeto não encontrado.</p>
+    {:else}
+      <ObjetoComponent {objeto} {onOpenProfile} />
+    {/if}
   </div>
 
   <!-- Coluna lateral: ações e comentários -->
@@ -91,10 +85,10 @@
     <div id="acoes">
       <Heading tag="h3" class="text-xl font-bold">Ações</Heading>
       <div class="my-1 grid grid-cols-5 gap-1 [&>form>button]:w-full!">
-        {#await Promise.all([data.streamed.objeto, data.streamed.myClaims])}
+        {#await data.streamed.myClaims}
           <div class="col-span-3 h-9 animate-pulse rounded-sm bg-gray-300"></div>
           <div class="col-span-2 h-9 animate-pulse rounded-sm bg-gray-300"></div>
-        {:then [objeto, myClaims]}
+        {:then myClaims}
           {@const approvedClaim = myClaims?.items?.find(
             (claim: Claim) => claim.objeto_id === objeto?.id && (claim.status === 'aprovada' || claim.status === 'APROVADA')
           )}
@@ -167,6 +161,29 @@
             </Button>
           {/if}
         {/await}
+        <Button
+          target="_blank"
+          href={'https://jrmsrs.github.io/share?text=' +
+            encodeURIComponent(
+              objeto?.user_id === data.user?.id
+                ? objeto?.status.toLowerCase() === 'perdido'
+                  ? `Perdi um pertence na UNIRIO. Alguém pode me ajudar a encontrá-lo?\n\n`
+                  : `Me ajude a encontrar o dono deste objeto que encontrei na UNIRIO:\n\n`
+                : objeto?.status.toLowerCase() === 'perdido'
+                  ? `Confira esse objeto que alguém está procurando na UNIRIO:\n\n`
+                  : `Confira esse objeto que foi encontrado na UNIRIO:\n\n`
+            ) +
+            '&url=' +
+            encodeURIComponent(`${page.url.origin}/objetos/${objeto?.id}`) +
+            '&autoclose=true'}
+          class="col-span-5 flex justify-between"
+          color="primary"
+          outline
+        >
+          <ShareNodesSolid class="h-5 w-5 shrink-0" />
+          Compartilhar
+          <div class="h-5 w-5"></div>
+        </Button>
       </div>
     </div>
 
@@ -176,12 +193,10 @@
 </ModalContainer>
 
 <!-- Modais -->
-{#await data.streamed.objeto then objeto}
-  {#if objeto}
-    <ObjetoClaimNew bind:objetoClaim error={null} {objeto} />
-    <ObjetoModalEdit bind:edit={objetoEdit} {objeto} {form} error={editError} />
-  {/if}
-{/await}
+{#if objeto}
+  <ObjetoClaimNew bind:objetoClaim error={null} {objeto} />
+  <ObjetoModalEdit bind:edit={objetoEdit} {objeto} {form} error={editError} />
+{/if}
 <ObjetoModalFinish bind:objetoFinish error={finishError} />
 
 {#if selectedUser}

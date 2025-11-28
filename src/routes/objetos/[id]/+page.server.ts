@@ -27,16 +27,23 @@ const fetchMyClaims = async (token: string) => {
 
 export const load: PageServerLoad = async ({ params, url, locals: { safeGetSession } }) => {
   const { session } = await safeGetSession();
-
+  const objeto = await fetchObjeto(params.id);
   return {
     form: url.searchParams.get('form') ? JSON.parse(stringFromBase64URL(url.searchParams.get('form')!)) : null,
     commentError: url.searchParams.get('comment_error') || null,
     finishError: url.searchParams.get('finish_error') || null,
+    objeto: objeto,
     streamed: {
-      objeto: fetchObjeto(params.id),
       comentarios: fetchComentarios(params.id),
       myClaims: session ? fetchMyClaims(session.access_token) : Promise.resolve({ items: [], total: 0 })
-    }
+    },
+    // Metadados para SEO
+    title: 'UniFinder: ' + (objeto ? objeto.nome : 'Objeto não encontrado'),
+    description: objeto ? `Objeto ${objeto.tipo} na UNIRIO: ${objeto.descricao}` : 'Objeto não encontrado na plataforma UniFinder.',
+    imageURL:
+      objeto && objeto.url_imagem
+        ? objeto.url_imagem
+        : 'https://gist.github.com/user-attachments/assets/24310ae2-3466-4791-afff-1636a218b7eb'
   };
 };
 

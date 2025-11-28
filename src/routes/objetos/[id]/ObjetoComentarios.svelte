@@ -5,8 +5,12 @@
   import { A, Alert, Button, Heading, P } from 'flowbite-svelte';
   import { TrashBinSolid } from 'flowbite-svelte-icons';
 
-  type Streamed = { comentarios: Promise<{ comentarios: Comentario[] }>; objeto: Promise<Objeto | null> };
-  let { data }: { data: { user: { id: string } | null; form?: string; commentError: string | null; streamed: Streamed } } = $props();
+  type Streamed = { comentarios: Promise<{ comentarios: Comentario[] }> };
+  let {
+    data
+  }: {
+    data: { user: { id: string } | null; form?: string; commentError: string | null; streamed: Streamed; objeto: Objeto | null };
+  } = $props();
   let comentario = $state(data.form ?? '');
   let comentarioSubmiting = $state(false);
   let comentarioRemoving = $state(false);
@@ -104,7 +108,7 @@
                   {String(comentario.user.username).charAt(0).toUpperCase()}
                 </div>
                 <div class="flex flex-col leading-tight">
-                  {#await data.streamed.objeto then objeto}
+                  {#await data.objeto then objeto}
                     <span
                       class="font-semibold {comentario.user.role.toLowerCase() === 'funcionario' ? 'text-blue-600 dark:text-blue-400' : ''}"
                     >
@@ -128,7 +132,7 @@
               </button>
 
               <!-- Botão de excluir (apenas autor ou tutor do objeto) -->
-              {#await data.streamed.objeto then objeto}
+              {#await data.objeto then objeto}
                 {#if data.user?.id === comentario.user_id || data.user?.id === objeto?.user_id}
                   <form
                     method="post"
